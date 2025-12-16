@@ -778,6 +778,7 @@
 
             fileInput.addEventListener('change', (e) => {
                 handleBatchAudioUpload(e.target.files);
+                e.target.value = ""; // ✅ Reset du file input pour permettre la ré-upload du même fichier
             });
         }
 
@@ -847,8 +848,8 @@
                         bar.classList.replace('bg-fuchsia-500', 'bg-red-500');
                     }, 
                     () => {
-                        // 4. Succès : Récupérer URL et créer Document
-                        window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        // 4. Succès : Récupérer URL et créer Document (VERSION OPTIMISTE)
+                        window.getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
                             const newTrackId = (Date.now() + Math.random().toString(36).substr(2, 9));
                             const newTrack = {
                                 id: newTrackId,
@@ -859,8 +860,14 @@
                                 youtube: ""
                             };
 
-                            // Ecriture Firestore
-                            window.setDoc(PUBLIC_DOC('audio', newTrackId), newTrack).then(() => {
+                            // ✅ UI instantanée (optimiste) - On ajoute tout de suite à la liste locale
+                            AUDIO_LIBRARY.push(newTrack);
+                            renderAdminAudioList();
+                            renderAudioList(document.getElementById('audio-search').value);
+
+                            try {
+                                await window.setDoc(PUBLIC_DOC('audio', newTrackId), newTrack);
+                                
                                 statusIcon.innerHTML = '<i class="fas fa-check-circle text-green-400"></i>';
                                 bar.classList.replace('bg-fuchsia-500', 'bg-green-500');
                                 
@@ -870,10 +877,15 @@
                                     setTimeout(() => progressItem.remove(), 500);
                                 }, 3000);
 
-                            }).catch(err => {
+                            } catch (err) {
                                 console.error("Firestore Error", err);
                                 statusIcon.innerHTML = '<i class="fas fa-database text-red-500"></i>';
-                            });
+
+                                // ❌ Rollback UI si Firestore refuse : on retire l'élément
+                                AUDIO_LIBRARY = AUDIO_LIBRARY.filter(t => t.id !== newTrackId);
+                                renderAdminAudioList();
+                                renderAudioList(document.getElementById('audio-search').value);
+                            }
                         });
                     }
                 );
@@ -936,22 +948,8 @@
                 if(targetInputIdForStorage) {
                     document.getElementById(targetInputIdForStorage).value = url;
                     closeModal('storage-modal');
-                    
-                    // Si c'est un MP3, on peut le prévisualiser
-                    if (fullPath.match(/\.(mp3|wav|m4a|aac)$/i)) {
-                        let preview = document.getElementById('admin-preview-audio');
-                        if (!preview) {
-                            preview = document.createElement('audio');
-                            preview.id = 'admin-preview-audio';
-                            preview.controls = true;
-                            preview.style.width = '100%';
-                            document.getElementById('storage-file-list').prepend(preview);
-                        }
-                        preview.src = url;
-                        preview.play();
-                    } else {
-                        showToast("Fichier sélectionné");
-                    }
+                    // Suppression de la preview ici car la modale est fermée
+                    showToast("Fichier sélectionné");
                 }
             }).catch(e => showErrorToast("Erreur URL"));
         };
