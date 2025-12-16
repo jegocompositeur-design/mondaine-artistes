@@ -44,6 +44,7 @@
         .sidebar-collapsed { width: 5rem !important; }
         .sidebar-collapsed .nav-text, .sidebar-collapsed .logo-text { display: none !important; }
         
+        /* PLANNING CELLS */
         .planning-cell { transition: all 0.2s; border-color: rgba(255,255,255,0.05); }
         .planning-cell.interactive:hover { filter: brightness(1.3); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
@@ -51,8 +52,8 @@
         .artist-pill:hover { transform: scale(1.05); }
         .artist-pill.selected { box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.05); z-index: 10; border: 1px solid rgba(255,255,255,0.8); }
 
-        .month-char { -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3); color: transparent; line-height: 0.85; transition: color 0.3s; }
-        .month-sidebar:hover .month-char { color: rgba(255,255,255,0.1); }
+        /* MODIF: Lettres du mois bien visibles */
+        .month-char { color: #ffffff; line-height: 0.85; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .month-sidebar { background: linear-gradient(180deg, #d946ef 0%, #7e22ce 100%); box-shadow: 5px 0 30px rgba(0,0,0,0.6); }
 
         /* ADMIN & FORMS */
@@ -112,24 +113,18 @@
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =================================================================
-        // CONFIGURATION FIREBASE (HYBRIDE PROD/CANVAS)
+        // CONFIGURATION FIREBASE
         // =================================================================
-        
         let firebaseConfig;
         let appId = 'mondaine-prod';
 
-        // 1. Priorité à la config fournie par l'environnement (Canvas) pour la prévisualisation
         if (typeof __firebase_config !== 'undefined' && __firebase_config) {
             try {
                 firebaseConfig = JSON.parse(__firebase_config);
                 appId = typeof __app_id !== 'undefined' ? __app_id : 'mondaine-preview';
-                console.log("Using Canvas Firebase Config");
-            } catch (e) {
-                console.warn("Invalid Canvas Config", e);
-            }
+            } catch (e) { console.warn("Invalid Canvas Config", e); }
         } 
         
-        // 2. Sinon, utilisation de la config Production (Netlify/Localhost)
         if (!firebaseConfig) {
             firebaseConfig = {
                 apiKey: "AIzaSyCTiIaFghO0asxaxp_jtfkUGZj3sSC9ipM",
@@ -139,54 +134,27 @@
                 messagingSenderId: "490049497488",
                 appId: "1:490049497488:web:80f210d3e70689bbdbeb15"
             };
-            console.log("Using Production Firebase Config");
         }
 
-        // =================================================================
-
-        // Initialisation sécurisée
         let app, auth, db;
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            console.log("Firebase initialized successfully");
-        } catch (e) {
-            console.error("Erreur Init Firebase:", e);
-        }
+        } catch (e) { console.error("Erreur Init Firebase:", e); }
 
-        // Export Global pour le script principal
-        window.db = db;
-        window.auth = auth;
-        window.appId = appId;
-        window.collection = collection;
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.deleteDoc = deleteDoc;
-        window.onSnapshot = onSnapshot;
+        window.db = db; window.auth = auth; window.appId = appId;
+        window.collection = collection; window.doc = doc; window.setDoc = setDoc; window.deleteDoc = deleteDoc; window.onSnapshot = onSnapshot;
 
-        // Connexion
         const initAuth = async () => {
             if (!auth) return;
             try {
-                // Si on est dans l'environnement Canvas avec un token spécial
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                     await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    // Sinon, auth anonyme standard
-                    await signInAnonymously(auth);
-                }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
             } catch (error) {
                 console.error("Erreur Auth:", error);
-                // En cas d'erreur critique (ex: auth anonyme pas activée sur le projet Prod),
-                // on bascule en mode local pour ne pas bloquer l'app.
                 setTimeout(() => {
-                    if (typeof window.switchToLocalMode === 'function') {
-                        window.switchToLocalMode();
-                        if (typeof showErrorToast === 'function') {
-                             showErrorToast("Auth échouée: Mode Local");
-                        }
-                    }
+                    if (typeof window.switchToLocalMode === 'function') window.switchToLocalMode();
                 }, 1000);
             }
         };
@@ -195,9 +163,7 @@
 
         if (auth) {
             onAuthStateChanged(auth, (user) => {
-                if (user && typeof window.initRealtimeData === 'function') {
-                    window.initRealtimeData();
-                }
+                if (user && typeof window.initRealtimeData === 'function') window.initRealtimeData();
             });
         } else {
             setTimeout(() => {
@@ -212,10 +178,8 @@
             <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
                 <i class="fas fa-microphone-alt text-xl md:text-2xl text-fuchsia-500"></i>
             </div>
-            <h2 class="hidden md:block logo-text text-[10px] tracking-[0.2em] uppercase text-purple-300 font-bold">Espace Privé</h2>
-            <div id="connection-status" class="mt-3 hidden md:block">
-                <span class="status-badge status-online">Connecté</span>
-            </div>
+            <!-- MODIF: Texte "ON AIR" -->
+            <h2 class="hidden md:block logo-text text-[10px] tracking-[0.2em] uppercase text-purple-300 font-bold animate-pulse">ON AIR</h2>
         </div>
         
         <nav class="flex-1 mt-6 relative z-50">
@@ -258,9 +222,7 @@
                 <div class="border border-white/10 p-8 md:p-16 backdrop-blur-md bg-black/60 fade-in shadow-2xl rounded-sm">
                     <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter mb-2 drop-shadow-2xl">MONDAINE</h1>
                     <h2 class="text-2xl md:text-3xl text-fuchsia-500 tracking-[0.6em] font-light font-sans drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">ARTISTES</h2>
-                    <p id="home-status-msg" class="mt-6 text-fuchsia-200 text-[10px] font-bold uppercase tracking-widest bg-black/80 px-4 py-2 rounded-full border border-fuchsia-500/20 inline-block">
-                        <i class="fas fa-wifi mr-2 animate-pulse"></i> Initialisation Système...
-                    </p>
+                    <!-- MODIF: Suppression du message d'initialisation -->
                 </div>
             </div>
         </section>
@@ -635,20 +597,18 @@
 
         // --- FONCTIONS SYSTÈME (ADAPTÉES POUR NETLIFY) ---
         // On vérifie directement l'existence des objets globaux
-    const PUBLIC_DATA = (col) => {
-    if (window.collection && window.db && !useLocalStorage) {
-        return window.collection(window.db, 'mondaine', 'public', col);
-    }
-    return null;
-};
-
-const PUBLIC_DOC = (col, id) => {
-    if (window.doc && window.db && !useLocalStorage) {
-        return window.doc(window.db, 'mondaine', 'public', col, id);
-    }
-    return null;
-};
-
+        const PUBLIC_DATA = (col) => {
+            if(window.collection && window.db && window.appId && !useLocalStorage) {
+                return window.collection(window.db, 'artifacts', window.appId, 'public', 'data', col);
+            }
+            return null;
+        };
+        const PUBLIC_DOC = (col, id) => {
+            if(window.doc && window.db && window.appId && !useLocalStorage) {
+                return window.doc(window.db, 'artifacts', window.appId, 'public', 'data', col, id);
+            }
+            return null;
+        };
 
         function showToast(msg) {
             const t = document.getElementById('toast-notification');
@@ -820,14 +780,23 @@ const PUBLIC_DOC = (col, id) => {
                             const artistId = assignments[assignKey];
                             const artist = ARTISTS.find(a => a.id === artistId);
                             const interactClass = isAdminMode ? 'interactive cursor-pointer' : 'cursor-default';
-                            let cellClass = `relative h-16 border border-white/5 bg-black/30 flex items-center justify-center planning-cell rounded-md ${interactClass} `;
+                            
+                            // MODIF: On retire bg-black/30 de la base ici pour éviter le conflit
+                            let cellClass = `relative h-16 border border-white/5 flex items-center justify-center planning-cell rounded-md ${interactClass} `;
                             let cellContent = '';
+                            
                             if(artist) {
+                                // Si artiste présent : on applique SA couleur
                                 cellClass += `${artist.color} shadow-lg `;
                                 cellContent = `<span class="font-bold text-xs truncate px-2 py-1 select-none">${artist.name}</span>`;
                                 if(selectedArtistId && artist.id === selectedArtistId) cellClass += `cell-highlight `;
                                 else if (selectedArtistId && artist.id !== selectedArtistId) cellClass += `cell-dimmed `;
-                            } else if (isAdminMode) cellContent = `<i class="fas fa-plus text-white/20 text-xs hover:text-white/80 transition-colors"></i>`;
+                            } else {
+                                // Si vide : on applique le fond sombre par défaut (bg-black/30) ici
+                                cellClass += `bg-black/30 `;
+                                if (isAdminMode) cellContent = `<i class="fas fa-plus text-white/20 text-xs hover:text-white/80 transition-colors"></i>`;
+                            }
+
                             const clickAction = isAdminMode ? `onclick="handleCellClick('${dateStr}', '${slot}')"` : '';
                             gridHTML += `<div class="${cellClass}" ${clickAction}>${cellContent}</div>`;
                         }
@@ -953,12 +922,10 @@ const PUBLIC_DOC = (col, id) => {
             if(useLocalStorage) return; 
             console.warn("Passage en Mode Local");
             useLocalStorage = true;
-            const statusEl = document.getElementById('connection-status');
-            if(statusEl) statusEl.innerHTML = '<span class="status-badge status-offline">Mode Local</span>';
+            // Removed connection-status update here
             
-            const homeMsg = document.getElementById('home-status-msg');
-            if(homeMsg) homeMsg.innerHTML = '<i class="fas fa-save mr-2"></i> Sauvegarde Locale (Navigateur)';
-            
+            // Removed homeMsg update here
+
             showErrorToast("Mode Local Activé");
             loadLocalData();
             document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
