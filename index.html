@@ -87,6 +87,11 @@
         /* Progress Bar for Upload */
         .progress-bar-container { width: 100%; background-color: rgba(255,255,255,0.1); border-radius: 4px; height: 4px; overflow: hidden; margin-top: 5px; display: none; }
         .progress-bar-fill { height: 100%; background-color: #d946ef; width: 0%; transition: width 0.3s ease; }
+
+        /* DROPZONE */
+        .dropzone { border: 2px dashed rgba(255,255,255,0.2); border-radius: 0.75rem; transition: all 0.2s; background: rgba(255,255,255,0.02); }
+        .dropzone.dragover { border-color: #d946ef; background: rgba(217, 70, 239, 0.1); transform: scale(1.01); }
+        .queue-item { animation: fadeIn 0.3s ease-in; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
@@ -366,20 +371,27 @@
                             <input type="text" id="audio-title-input" placeholder="EX: I WILL SURVIVE" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white text-sm font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
                         </div>
                         
-                        <!-- AUDIO MP3 UPLOAD -->
+                        <!-- AUDIO MP3 UPLOAD & DROPZONE -->
                         <div class="mb-4">
                             <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Fichier Audio (MP3)</label>
+                            
+                            <!-- DROPZONE -->
+                            <div id="audio-dropzone" class="dropzone p-4 text-center cursor-pointer mb-2 group hover:border-fuchsia-500 hover:bg-fuchsia-900/10">
+                                <div class="pointer-events-none">
+                                    <i class="fas fa-cloud-upload-alt text-2xl text-fuchsia-500 mb-2 group-hover:scale-110 transition-transform"></i>
+                                    <p class="text-[10px] font-bold text-fuchsia-200 uppercase tracking-wide">Glisser fichiers audio ici<br><span class="text-[9px] opacity-70 normal-case font-normal">(ou cliquer pour sélectionner)</span></p>
+                                </div>
+                                <input type="file" id="batch-audio-input" multiple accept="audio/*" class="hidden">
+                            </div>
+
+                            <!-- INPUT MANUEL URL (Fallback) -->
                             <div class="flex gap-2 mb-1">
                                 <input type="text" id="audio-src-input" placeholder="URL Storage ou lien..." class="flex-1 bg-white/5 border border-white/10 rounded p-2 text-fuchsia-300 text-xs font-mono focus:border-fuchsia-500 outline-none">
                                 <button onclick="openStoragePicker('mp3', 'audio-src-input')" class="bg-gray-700 hover:bg-gray-600 px-2 rounded text-xs text-white" title="Choisir depuis Storage"><i class="fas fa-folder-open"></i></button>
                             </div>
-                            <div class="flex gap-2 items-center">
-                                <label class="cursor-pointer bg-fuchsia-900/40 hover:bg-fuchsia-800/60 px-3 py-2 rounded text-xs font-bold flex items-center transition-colors border border-fuchsia-500/30 text-fuchsia-300 flex-1 justify-center">
-                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Uploader MP3
-                                    <input type="file" onchange="uploadFileToStorage(this, 'mp3', 'audio-src-input')" accept="audio/*" class="hidden">
-                                </label>
-                            </div>
-                            <div id="progress-mp3" class="progress-bar-container"><div class="progress-bar-fill"></div></div>
+                            
+                            <!-- QUEUE DE PROGRESSION -->
+                            <div id="upload-queue" class="space-y-1 mt-2"></div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -421,7 +433,7 @@
                              <button onclick="clearAudioForm()" class="px-5 bg-gray-800 hover:bg-gray-700 rounded text-white text-xs font-bold uppercase transition-colors border border-white/10">Annuler</button>
                         </div>
                         <div class="mt-3 p-2 bg-green-900/20 border border-green-500/20 rounded text-center">
-                            <p class="text-[9px] text-green-300 italic"><i class="fas fa-cloud mr-1"></i> Firebase Storage activé : Fichiers lourds autorisés.</p>
+                            <p class="text-[9px] text-green-300 italic"><i class="fas fa-cloud mr-1"></i> Firebase Storage activé : Upload auto via Dropzone.</p>
                         </div>
                     </div>
 
@@ -669,7 +681,7 @@
 
         // --- GESTION STORAGE FIREBASE ---
 
-        // Fonction pour uploader un fichier vers Storage
+        // Fonction pour uploader un fichier vers Storage (VERSION SINGULIÈRE - Lyrics/Sheets)
         window.uploadFileToStorage = function(input, type, targetInputId) {
             const file = input.files[0];
             if (!file) return;
@@ -680,49 +692,192 @@
                 return;
             }
 
+            const currentAppId = window.appId || 'default-app';
             const trackTitle = document.getElementById('audio-title-input').value.trim().toUpperCase() || 'UNTITLED';
             const slugTitle = trackTitle.replace(/[^A-Z0-9]/g, '-');
             const timestamp = Date.now();
             const ext = file.name.split('.').pop();
             
-            // Dossier cible
-            let folder = 'audio/mp3';
-            if (type === 'lyrics') folder = 'audio/lyrics';
-            if (type === 'sheet') folder = 'audio/sheets';
+            // Dossier cible "SCOPÉ"
+            const basePath = `artifacts/${currentAppId}/public`;
+            let folder = `${basePath}/audio/mp3`;
+            if (type === 'lyrics') folder = `${basePath}/audio/lyrics`;
+            if (type === 'sheet') folder = `${basePath}/audio/sheets`;
 
             const filePath = `${folder}/${slugTitle}_${timestamp}.${ext}`;
             const storageRef = window.storageRef(window.storage, filePath);
             const uploadTask = window.uploadBytesResumable(storageRef, file);
 
             // UI Progress
-            let progressId = 'progress-mp3';
+            let progressId = 'progress-mp3'; // Not really used for single upload here anymore for mp3 since dropzone
             if (type === 'lyrics') progressId = 'progress-lyrics';
             if (type === 'sheet') progressId = 'progress-sheet';
             
             const progressBar = document.getElementById(progressId);
-            const fill = progressBar.querySelector('.progress-bar-fill');
-            progressBar.style.display = 'block';
+            if(progressBar) {
+                const fill = progressBar.querySelector('.progress-bar-fill');
+                progressBar.style.display = 'block';
 
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    fill.style.width = progress + '%';
-                }, 
-                (error) => {
-                    console.error("Upload Error:", error);
-                    showErrorToast("Erreur Upload");
-                    progressBar.style.display = 'none';
-                }, 
-                () => {
-                    // Upload success
-                    window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        document.getElementById(targetInputId).value = downloadURL;
-                        showToast("Upload Terminé !");
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        fill.style.width = progress + '%';
+                    }, 
+                    (error) => {
+                        console.error("Upload Error:", error);
+                        showErrorToast("Erreur Upload (Auth/Perms)");
                         progressBar.style.display = 'none';
-                        input.value = ""; // Reset input
-                    });
+                    }, 
+                    () => {
+                        // Upload success
+                        window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            document.getElementById(targetInputId).value = downloadURL;
+                            showToast("Upload Terminé !");
+                            progressBar.style.display = 'none';
+                            input.value = ""; // Reset input
+                        });
+                    }
+                );
+            }
+        };
+
+        // --- LOGIQUE DROPZONE & UPLOAD MULTIPLE ---
+
+        function setupDropzone() {
+            const dropzone = document.getElementById('audio-dropzone');
+            const fileInput = document.getElementById('batch-audio-input');
+
+            if (!dropzone || !fileInput) return;
+
+            // Click trigger
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            // Drag Events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+            });
+
+            // Handle Files
+            dropzone.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                handleBatchAudioUpload(files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleBatchAudioUpload(e.target.files);
+            });
+        }
+
+        window.handleBatchAudioUpload = async function(files) {
+            if (useLocalStorage) {
+                return showErrorToast("Storage indisponible en Local");
+            }
+            if (!files || files.length === 0) return;
+
+            const queueContainer = document.getElementById('upload-queue');
+            const currentAppId = window.appId || 'default-app';
+            const basePath = `artifacts/${currentAppId}/public`;
+            const folder = `${basePath}/audio/mp3`;
+
+            // Convertir FileList en Array pour itérer
+            Array.from(files).forEach(file => {
+                // Filtre simple audio
+                if (!file.type.startsWith('audio/')) {
+                    showErrorToast("Fichier ignoré : Non Audio");
+                    return;
                 }
-            );
+
+                // 1. Préparer les données
+                const rawName = file.name.substring(0, file.name.lastIndexOf('.'));
+                const ext = file.name.split('.').pop();
+                let baseTitle = rawName.toUpperCase().replace(/_/g, ' ').trim();
+                
+                // Gestion Doublons Titre
+                let finalTitle = baseTitle;
+                let counter = 2;
+                while (AUDIO_LIBRARY.some(t => t.title === finalTitle)) {
+                    finalTitle = `${baseTitle} (${counter++})`;
+                }
+
+                const slugTitle = finalTitle.replace(/[^A-Z0-9]/g, '-');
+                const timestamp = Date.now();
+                const filePath = `${folder}/${slugTitle}_${timestamp}.${ext}`;
+                
+                // 2. Créer l'élément UI de progression
+                const progressItem = document.createElement('div');
+                progressItem.className = "bg-white/5 p-2 rounded border border-white/5 queue-item flex items-center justify-between";
+                progressItem.innerHTML = `
+                    <div class="flex-1 mr-3 overflow-hidden">
+                        <div class="text-[10px] text-fuchsia-200 font-bold truncate">${finalTitle}</div>
+                        <div class="w-full bg-gray-700 rounded-full h-1 mt-1">
+                            <div class="bg-fuchsia-500 h-1 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="status-icon text-xs text-gray-400"><i class="fas fa-spinner fa-spin"></i></div>
+                `;
+                queueContainer.appendChild(progressItem);
+                
+                // 3. Lancer l'upload
+                const storageRef = window.storageRef(window.storage, filePath);
+                const uploadTask = window.uploadBytesResumable(storageRef, file);
+                const bar = progressItem.querySelector('.bg-fuchsia-500');
+                const statusIcon = progressItem.querySelector('.status-icon');
+
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        bar.style.width = progress + '%';
+                    }, 
+                    (error) => {
+                        console.error("Upload Error", error);
+                        statusIcon.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i>';
+                        bar.classList.replace('bg-fuchsia-500', 'bg-red-500');
+                    }, 
+                    () => {
+                        // 4. Succès : Récupérer URL et créer Document
+                        window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            const newTrackId = (Date.now() + Math.random().toString(36).substr(2, 9));
+                            const newTrack = {
+                                id: newTrackId,
+                                title: finalTitle,
+                                src: downloadURL,
+                                lyrics: "",
+                                sheet: "",
+                                youtube: ""
+                            };
+
+                            // Ecriture Firestore
+                            window.setDoc(PUBLIC_DOC('audio', newTrackId), newTrack).then(() => {
+                                statusIcon.innerHTML = '<i class="fas fa-check-circle text-green-400"></i>';
+                                bar.classList.replace('bg-fuchsia-500', 'bg-green-500');
+                                
+                                // Clean up UI après délai
+                                setTimeout(() => {
+                                    progressItem.classList.add('opacity-0', 'transition-opacity');
+                                    setTimeout(() => progressItem.remove(), 500);
+                                }, 3000);
+
+                            }).catch(err => {
+                                console.error("Firestore Error", err);
+                                statusIcon.innerHTML = '<i class="fas fa-database text-red-500"></i>';
+                            });
+                        });
+                    }
+                );
+            });
         };
 
         // Ouvrir la modale de sélection
@@ -744,9 +899,12 @@
             const listContainer = document.getElementById('storage-file-list');
             listContainer.innerHTML = '<div class="text-center text-gray-500 text-xs animate-pulse">Chargement...</div>';
 
-            let folderPath = 'audio/mp3';
-            if(folderKey === 'lyrics') folderPath = 'audio/lyrics';
-            if(folderKey === 'sheet') folderPath = 'audio/sheets';
+            const currentAppId = window.appId || 'default-app';
+            const basePath = `artifacts/${currentAppId}/public`;
+            
+            let folderPath = `${basePath}/audio/mp3`;
+            if(folderKey === 'lyrics') folderPath = `${basePath}/audio/lyrics`;
+            if(folderKey === 'sheet') folderPath = `${basePath}/audio/sheets`;
 
             const listRef = window.storageRef(window.storage, folderPath);
 
@@ -758,8 +916,6 @@
                 
                 let html = '';
                 // Pour chaque fichier, on a besoin de l'URL pour le select
-                // Note: Faire un getDownloadURL pour TOUS les fichiers peut être lourd.
-                // On va afficher les noms, et charger l'URL au clic.
                 res.items.forEach((itemRef) => {
                     html += `
                     <div class="flex justify-between items-center bg-white/5 p-2 rounded hover:bg-white/10 cursor-pointer border border-white/5" onclick="selectStorageFile('${itemRef.fullPath}')">
@@ -770,7 +926,7 @@
                 listContainer.innerHTML = html;
             }).catch((error) => {
                 console.error(error);
-                listContainer.innerHTML = '<div class="text-center text-red-500 text-xs">Erreur listing.</div>';
+                listContainer.innerHTML = '<div class="text-center text-red-500 text-xs">Erreur accès/listing.</div>';
             });
         };
 
@@ -782,11 +938,17 @@
                     closeModal('storage-modal');
                     
                     // Si c'est un MP3, on peut le prévisualiser
-                    if(fullPath.includes('.mp3')) {
-                        const audio = new Audio(url);
-                        audio.play(); // Juste pour confirmer c'est le bon son
-                        setTimeout(() => audio.pause(), 3000); // Stop après 3s
-                        showToast("Fichier sélectionné (Aperçu 3s)");
+                    if (fullPath.match(/\.(mp3|wav|m4a|aac)$/i)) {
+                        let preview = document.getElementById('admin-preview-audio');
+                        if (!preview) {
+                            preview = document.createElement('audio');
+                            preview.id = 'admin-preview-audio';
+                            preview.controls = true;
+                            preview.style.width = '100%';
+                            document.getElementById('storage-file-list').prepend(preview);
+                        }
+                        preview.src = url;
+                        preview.play();
                     } else {
                         showToast("Fichier sélectionné");
                     }
@@ -797,6 +959,8 @@
         function setupEventListeners() {
             document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
             document.getElementById('admin-pass-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAdminPassword(); });
+            // Init Dropzone
+            setupDropzone();
         }
 
         // --- UI & LOGIQUE ---
@@ -1010,50 +1174,67 @@
         }
         
         function updateBtn(id, link) {
-            const btn = document.getElementById(id); btn.onclick=null;
-            if(link) { 
-                btn.classList.replace('opacity-50', 'opacity-100'); 
-                btn.classList.replace('cursor-not-allowed', 'cursor-pointer'); 
-                
-                if(link.startsWith('data:')) {
-                    btn.onclick = (e) => { e.preventDefault(); openPdfViewer(link); };
-                } else {
-                    btn.href = link; 
-                    btn.onclick = null; 
-                    btn.target = "_blank";
-                }
-            } else { 
-                btn.classList.replace('opacity-100', 'opacity-50'); 
-                btn.classList.replace('cursor-pointer', 'cursor-not-allowed'); 
-                btn.href='#'; 
-                btn.onclick = (e) => e.preventDefault(); 
+            const btn = document.getElementById(id);
+            btn.onclick = null;
+
+            if (!link) {
+                btn.classList.replace('opacity-100', 'opacity-50');
+                btn.classList.replace('cursor-pointer', 'cursor-not-allowed');
+                btn.href = '#';
+                btn.onclick = (e) => e.preventDefault();
+                return;
             }
-        }
-        
-        function dataURItoBlob(dataURI) {
-            try {
-                const byteString = atob(dataURI.split(',')[1]);
-                const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-                return new Blob([ab], {type: mimeString});
-            } catch (e) { console.error("Blob error", e); return null; }
+
+            btn.classList.replace('opacity-50', 'opacity-100');
+            btn.classList.replace('cursor-not-allowed', 'cursor-pointer');
+
+            // ✅ CAS YOUTUBE : lien normal en nouvel onglet
+            if (id === 'btn-youtube') {
+                btn.href = link;
+                btn.target = "_blank";
+                btn.rel = "noopener noreferrer";
+                btn.onclick = null;
+                return;
+            }
+
+            // ✅ CAS PDF (URL ou data: PDF) : ouverture intégrée
+            // On vérifie le type de fichier ou le protocole data
+            const isPdf = link.startsWith('data:application/pdf') || link.toLowerCase().includes('.pdf') || (id !== 'btn-youtube' && !link.includes('youtube'));
+
+            if (isPdf) {
+                btn.href = "#";
+                btn.removeAttribute("target");
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    openPdfViewer(link);
+                };
+                return;
+            }
+
+            // ✅ CAS AUTRES LIENS (fallback)
+            btn.href = link;
+            btn.target = "_blank";
+            btn.rel = "noopener noreferrer";
         }
 
-        function openPdfViewer(content) {
-            if (!content) return;
-            if (content.startsWith('http')) { window.open(content, '_blank'); return; }
-            if (content.startsWith('data:application/pdf')) {
-                const blob = dataURItoBlob(content);
-                if (blob) {
-                    const blobUrl = URL.createObjectURL(blob);
-                    window.open(blobUrl, '_blank');
-                } else {
-                    const win = window.open();
-                    win.document.write('<iframe src="' + content + '" style="border:0; width:100%; height:100%;"></iframe>');
-                }
-            } else { window.open(content, '_blank'); }
+        function openPdfViewer(url) {
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.inset = '0';
+            modal.style.background = 'rgba(0,0,0,0.9)';
+            modal.style.zIndex = '9999';
+
+            modal.innerHTML = `
+                <div style="position:absolute;top:20px;right:20px">
+                    <button onclick="this.closest('div').parentNode.remove()"
+                        style="background:#d946ef;color:white;border:none;padding:10px 14px;border-radius:50%">
+                        ✕
+                    </button>
+                </div>
+                <iframe src="${url}" style="width:100%;height:100%;border:0"></iframe>
+            `;
+
+            document.body.appendChild(modal);
         }
         
         window.switchToLocalMode = function() {
