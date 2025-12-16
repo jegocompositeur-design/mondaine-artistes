@@ -83,6 +83,10 @@
         
         .toast-visible { animation: slideUpFade 3s ease-in-out forwards; }
         @keyframes slideUpFade { 0% { transform: translate(-50%, 100%); opacity: 0; } 10% { transform: translate(-50%, -20%); opacity: 1; } 90% { transform: translate(-50%, -20%); opacity: 1; } 100% { transform: translate(-50%, 100%); opacity: 0; } }
+
+        /* Progress Bar for Upload */
+        .progress-bar-container { width: 100%; background-color: rgba(255,255,255,0.1); border-radius: 4px; height: 4px; overflow: hidden; margin-top: 5px; display: none; }
+        .progress-bar-fill { height: 100%; background-color: #d946ef; width: 0%; transition: width 0.3s ease; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
@@ -111,6 +115,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // IMPORT STORAGE
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // =================================================================
         // CONFIGURATION FIREBASE
@@ -136,15 +142,18 @@
             };
         }
 
-        let app, auth, db;
+        let app, auth, db, storage;
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            storage = getStorage(app); // Init Storage
         } catch (e) { console.error("Erreur Init Firebase:", e); }
 
-        window.db = db; window.auth = auth; window.appId = appId;
+        window.db = db; window.auth = auth; window.appId = appId; window.storage = storage;
         window.collection = collection; window.doc = doc; window.setDoc = setDoc; window.deleteDoc = deleteDoc; window.onSnapshot = onSnapshot;
+        // Expose Storage functions
+        window.storageRef = ref; window.uploadBytesResumable = uploadBytesResumable; window.getDownloadURL = getDownloadURL; window.listAll = listAll;
 
         const initAuth = async () => {
             if (!auth) return;
@@ -222,7 +231,6 @@
                 <div class="border border-white/10 p-8 md:p-16 backdrop-blur-md bg-black/60 fade-in shadow-2xl rounded-sm">
                     <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter mb-2 drop-shadow-2xl">MONDAINE</h1>
                     <h2 class="text-2xl md:text-3xl text-fuchsia-500 tracking-[0.6em] font-light font-sans drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">ARTISTES</h2>
-                    <!-- MODIF: Suppression du message d'initialisation -->
                 </div>
             </div>
         </section>
@@ -345,7 +353,7 @@
                 </div>
             </div>
 
-            <!-- GESTION BIBLIOTHÈQUE AUDIO -->
+            <!-- GESTION BIBLIOTHÈQUE AUDIO (MODIFIÉE POUR STORAGE) -->
             <div class="bg-white/5 p-6 rounded-2xl border border-white/5 w-full">
                 <h3 class="text-lg font-bold text-fuchsia-400 uppercase mb-6 flex items-center gap-2 tracking-wide">
                     <i class="fas fa-headphones"></i> Bibliothèque Audio & Partitions
@@ -357,38 +365,53 @@
                             <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Titre du Morceau</label>
                             <input type="text" id="audio-title-input" placeholder="EX: I WILL SURVIVE" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white text-sm font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
                         </div>
+                        
+                        <!-- AUDIO MP3 UPLOAD -->
                         <div class="mb-4">
                             <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Fichier Audio (MP3)</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="audio-src-input" placeholder="Lien Dropbox/Drive..." class="flex-1 bg-white/5 border border-white/10 rounded p-2 text-fuchsia-300 text-xs font-mono focus:border-fuchsia-500 outline-none">
-                                <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-xs font-bold flex items-center transition-colors border border-white/10">
-                                    <i class="fas fa-folder-open text-fuchsia-500"></i>
-                                    <input type="file" id="input-audio-file" accept="audio/*" class="hidden">
+                            <div class="flex gap-2 mb-1">
+                                <input type="text" id="audio-src-input" placeholder="URL Storage ou lien..." class="flex-1 bg-white/5 border border-white/10 rounded p-2 text-fuchsia-300 text-xs font-mono focus:border-fuchsia-500 outline-none">
+                                <button onclick="openStoragePicker('mp3', 'audio-src-input')" class="bg-gray-700 hover:bg-gray-600 px-2 rounded text-xs text-white" title="Choisir depuis Storage"><i class="fas fa-folder-open"></i></button>
+                            </div>
+                            <div class="flex gap-2 items-center">
+                                <label class="cursor-pointer bg-fuchsia-900/40 hover:bg-fuchsia-800/60 px-3 py-2 rounded text-xs font-bold flex items-center transition-colors border border-fuchsia-500/30 text-fuchsia-300 flex-1 justify-center">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Uploader MP3
+                                    <input type="file" onchange="uploadFileToStorage(this, 'mp3', 'audio-src-input')" accept="audio/*" class="hidden">
                                 </label>
                             </div>
+                            <div id="progress-mp3" class="progress-bar-container"><div class="progress-bar-fill"></div></div>
                         </div>
+
                         <div class="grid grid-cols-2 gap-4 mb-4">
+                            <!-- LYRICS PDF UPLOAD -->
                             <div>
                                 <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Paroles (PDF)</label>
-                                <div class="flex gap-1">
-                                    <input type="text" id="audio-lyrics-input" placeholder="Lien..." class="w-full bg-white/5 border border-white/10 rounded p-2 text-blue-300 text-xs font-mono focus:border-blue-500 outline-none">
-                                    <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-xs font-bold flex items-center transition-colors border border-white/10">
-                                        <i class="fas fa-file-upload text-blue-400"></i>
-                                        <input type="file" id="input-lyrics-file" accept="application/pdf" class="hidden">
-                                    </label>
+                                <div class="flex gap-1 mb-1">
+                                    <input type="text" id="audio-lyrics-input" placeholder="URL..." class="w-full bg-white/5 border border-white/10 rounded p-2 text-blue-300 text-xs font-mono focus:border-blue-500 outline-none">
+                                    <button onclick="openStoragePicker('pdf', 'audio-lyrics-input')" class="bg-gray-700 hover:bg-gray-600 px-2 rounded text-xs text-white"><i class="fas fa-folder-open"></i></button>
                                 </div>
+                                <label class="cursor-pointer bg-blue-900/40 hover:bg-blue-800/60 px-2 py-2 rounded text-[10px] font-bold flex items-center justify-center transition-colors border border-blue-500/30 text-blue-300">
+                                    <i class="fas fa-upload mr-1"></i> Upload PDF
+                                    <input type="file" onchange="uploadFileToStorage(this, 'lyrics', 'audio-lyrics-input')" accept="application/pdf" class="hidden">
+                                </label>
+                                <div id="progress-lyrics" class="progress-bar-container"><div class="progress-bar-fill"></div></div>
                             </div>
+                            
+                            <!-- SHEET PDF UPLOAD -->
                             <div>
                                 <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Partition (PDF)</label>
-                                <div class="flex gap-1">
-                                    <input type="text" id="audio-sheet-input" placeholder="Lien..." class="w-full bg-white/5 border border-white/10 rounded p-2 text-orange-300 text-xs font-mono focus:border-orange-500 outline-none">
-                                    <label class="cursor-pointer bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-xs font-bold flex items-center transition-colors border border-white/10">
-                                        <i class="fas fa-file-upload text-orange-400"></i>
-                                        <input type="file" id="input-sheet-file" accept="application/pdf" class="hidden">
-                                    </label>
+                                <div class="flex gap-1 mb-1">
+                                    <input type="text" id="audio-sheet-input" placeholder="URL..." class="w-full bg-white/5 border border-white/10 rounded p-2 text-orange-300 text-xs font-mono focus:border-orange-500 outline-none">
+                                    <button onclick="openStoragePicker('pdf', 'audio-sheet-input')" class="bg-gray-700 hover:bg-gray-600 px-2 rounded text-xs text-white"><i class="fas fa-folder-open"></i></button>
                                 </div>
+                                <label class="cursor-pointer bg-orange-900/40 hover:bg-orange-800/60 px-2 py-2 rounded text-[10px] font-bold flex items-center justify-center transition-colors border border-orange-500/30 text-orange-300">
+                                    <i class="fas fa-upload mr-1"></i> Upload PDF
+                                    <input type="file" onchange="uploadFileToStorage(this, 'sheet', 'audio-sheet-input')" accept="application/pdf" class="hidden">
+                                </label>
+                                <div id="progress-sheet" class="progress-bar-container"><div class="progress-bar-fill"></div></div>
                             </div>
                         </div>
+
                         <div class="mb-6">
                             <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Lien YouTube (Choré)</label>
                             <input type="text" id="audio-youtube-input" placeholder="https://youtube.com/..." class="w-full bg-white/5 border border-white/10 rounded p-2 text-red-300 text-xs font-mono focus:border-red-500 outline-none">
@@ -397,8 +420,8 @@
                              <button onclick="saveAudioTrack()" class="flex-1 bg-gradient-to-r from-fuchsia-700 to-purple-700 hover:from-fuchsia-600 hover:to-purple-600 py-3 rounded text-white text-xs font-bold uppercase transition-all shadow-lg"><i class="fas fa-save mr-1"></i> Sauvegarder</button>
                              <button onclick="clearAudioForm()" class="px-5 bg-gray-800 hover:bg-gray-700 rounded text-white text-xs font-bold uppercase transition-colors border border-white/10">Annuler</button>
                         </div>
-                        <div class="mt-3 p-2 bg-red-900/20 border border-red-500/20 rounded text-center">
-                            <p class="text-[9px] text-red-300 italic"><i class="fas fa-exclamation-triangle mr-1"></i> Base de données limitée (1Mo/fichier). Privilégiez les liens Google Drive / Dropbox pour les fichiers lourds.</p>
+                        <div class="mt-3 p-2 bg-green-900/20 border border-green-500/20 rounded text-center">
+                            <p class="text-[9px] text-green-300 italic"><i class="fas fa-cloud mr-1"></i> Firebase Storage activé : Fichiers lourds autorisés.</p>
                         </div>
                     </div>
 
@@ -504,6 +527,24 @@
         </div>
     </div>
 
+    <!-- STORAGE LIBRARY MODAL -->
+    <div id="storage-modal" class="fixed inset-0 bg-black/90 z-[110] hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(168,85,247,0.3)] flex flex-col h-[500px]">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/40 rounded-t-2xl">
+                <h3 class="text-white font-bold tracking-wide text-sm uppercase"><i class="fas fa-cloud mr-2"></i>Bibliothèque Storage</h3>
+                <button onclick="closeModal('storage-modal')" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 bg-fuchsia-900/10 text-[10px] text-fuchsia-300 border-b border-white/5 flex gap-2">
+                 <button onclick="listStorageFiles('mp3')" class="px-3 py-1 bg-black/40 hover:bg-black/60 rounded border border-white/10">Audio (MP3)</button>
+                 <button onclick="listStorageFiles('lyrics')" class="px-3 py-1 bg-black/40 hover:bg-black/60 rounded border border-white/10">Paroles (PDF)</button>
+                 <button onclick="listStorageFiles('sheet')" class="px-3 py-1 bg-black/40 hover:bg-black/60 rounded border border-white/10">Partitions (PDF)</button>
+            </div>
+            <div id="storage-file-list" class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-2">
+                <div class="text-center text-gray-500 text-xs py-10">Sélectionnez une catégorie ci-dessus.</div>
+            </div>
+        </div>
+    </div>
+
     <div id="delete-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center backdrop-blur-md p-4">
         <div class="bg-[#150a1f] border border-red-500/30 rounded-2xl p-8 w-full max-w-xs shadow-[0_0_40px_rgba(220,38,38,0.2)] text-center">
             <div class="mb-4 w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto border border-red-500/20"><i class="fas fa-trash-alt text-2xl text-red-500"></i></div>
@@ -562,6 +603,7 @@
         let audioToDeleteId = null;
         let artistToDeleteId = null;
         let currentTrack = null; 
+        let targetInputIdForStorage = null; // Pour savoir quel input remplir après sélection
 
         // --- CONSTANTES ---
         const DEFAULT_ARTISTS = [
@@ -625,36 +667,134 @@
             setTimeout(() => t.classList.add('opacity-0'), 5000);
         }
 
-        // --- GESTION FICHIERS ---
-        function handleFileUpload(input, targetId) {
-            const file = input.files[0]; 
+        // --- GESTION STORAGE FIREBASE ---
+
+        // Fonction pour uploader un fichier vers Storage
+        window.uploadFileToStorage = function(input, type, targetInputId) {
+            const file = input.files[0];
             if (!file) return;
             
-            // Check size (1MB pour Firestore)
-            if (file.size > 1000000) {
-                alert("FICHIER TROP LOURD (Max 1Mo pour Firestore)\n\nUtilisez un lien URL (Dropbox, Drive) pour les fichiers volumineux.");
-                input.value = ""; 
+            if (useLocalStorage) {
+                alert("L'upload Storage nécessite d'être connecté au serveur. Mode Local actif.");
+                input.value = "";
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = (e) => { 
-                document.getElementById(targetId).value = e.target.result; 
-                input.parentElement.classList.replace('bg-gray-800', 'bg-green-700');
-                input.parentElement.classList.add('border-green-500');
-            };
-            reader.readAsDataURL(file);
-        }
+            const trackTitle = document.getElementById('audio-title-input').value.trim().toUpperCase() || 'UNTITLED';
+            const slugTitle = trackTitle.replace(/[^A-Z0-9]/g, '-');
+            const timestamp = Date.now();
+            const ext = file.name.split('.').pop();
+            
+            // Dossier cible
+            let folder = 'audio/mp3';
+            if (type === 'lyrics') folder = 'audio/lyrics';
+            if (type === 'sheet') folder = 'audio/sheets';
+
+            const filePath = `${folder}/${slugTitle}_${timestamp}.${ext}`;
+            const storageRef = window.storageRef(window.storage, filePath);
+            const uploadTask = window.uploadBytesResumable(storageRef, file);
+
+            // UI Progress
+            let progressId = 'progress-mp3';
+            if (type === 'lyrics') progressId = 'progress-lyrics';
+            if (type === 'sheet') progressId = 'progress-sheet';
+            
+            const progressBar = document.getElementById(progressId);
+            const fill = progressBar.querySelector('.progress-bar-fill');
+            progressBar.style.display = 'block';
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    fill.style.width = progress + '%';
+                }, 
+                (error) => {
+                    console.error("Upload Error:", error);
+                    showErrorToast("Erreur Upload");
+                    progressBar.style.display = 'none';
+                }, 
+                () => {
+                    // Upload success
+                    window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        document.getElementById(targetInputId).value = downloadURL;
+                        showToast("Upload Terminé !");
+                        progressBar.style.display = 'none';
+                        input.value = ""; // Reset input
+                    });
+                }
+            );
+        };
+
+        // Ouvrir la modale de sélection
+        window.openStoragePicker = function(type, targetId) {
+            if(useLocalStorage) return alert("Storage indisponible en local.");
+            targetInputIdForStorage = targetId;
+            document.getElementById('storage-modal').classList.remove('hidden');
+            
+            // Par défaut lister le type demandé
+            let folderKey = 'mp3'; // default
+            if(type === 'pdf' && targetId.includes('lyrics')) folderKey = 'lyrics';
+            if(type === 'pdf' && targetId.includes('sheet')) folderKey = 'sheet';
+            
+            listStorageFiles(folderKey);
+        };
+
+        // Lister les fichiers d'un dossier Storage
+        window.listStorageFiles = function(folderKey) {
+            const listContainer = document.getElementById('storage-file-list');
+            listContainer.innerHTML = '<div class="text-center text-gray-500 text-xs animate-pulse">Chargement...</div>';
+
+            let folderPath = 'audio/mp3';
+            if(folderKey === 'lyrics') folderPath = 'audio/lyrics';
+            if(folderKey === 'sheet') folderPath = 'audio/sheets';
+
+            const listRef = window.storageRef(window.storage, folderPath);
+
+            window.listAll(listRef).then((res) => {
+                if (res.items.length === 0) {
+                    listContainer.innerHTML = '<div class="text-center text-gray-500 text-xs">Aucun fichier trouvé.</div>';
+                    return;
+                }
+                
+                let html = '';
+                // Pour chaque fichier, on a besoin de l'URL pour le select
+                // Note: Faire un getDownloadURL pour TOUS les fichiers peut être lourd.
+                // On va afficher les noms, et charger l'URL au clic.
+                res.items.forEach((itemRef) => {
+                    html += `
+                    <div class="flex justify-between items-center bg-white/5 p-2 rounded hover:bg-white/10 cursor-pointer border border-white/5" onclick="selectStorageFile('${itemRef.fullPath}')">
+                        <span class="text-xs text-gray-300 truncate"><i class="fas fa-file mr-2 text-fuchsia-500"></i>${itemRef.name}</span>
+                        <i class="fas fa-plus-circle text-gray-500"></i>
+                    </div>`;
+                });
+                listContainer.innerHTML = html;
+            }).catch((error) => {
+                console.error(error);
+                listContainer.innerHTML = '<div class="text-center text-red-500 text-xs">Erreur listing.</div>';
+            });
+        };
+
+        window.selectStorageFile = function(fullPath) {
+            const fileRef = window.storageRef(window.storage, fullPath);
+            window.getDownloadURL(fileRef).then((url) => {
+                if(targetInputIdForStorage) {
+                    document.getElementById(targetInputIdForStorage).value = url;
+                    closeModal('storage-modal');
+                    
+                    // Si c'est un MP3, on peut le prévisualiser
+                    if(fullPath.includes('.mp3')) {
+                        const audio = new Audio(url);
+                        audio.play(); // Juste pour confirmer c'est le bon son
+                        setTimeout(() => audio.pause(), 3000); // Stop après 3s
+                        showToast("Fichier sélectionné (Aperçu 3s)");
+                    } else {
+                        showToast("Fichier sélectionné");
+                    }
+                }
+            }).catch(e => showErrorToast("Erreur URL"));
+        };
 
         function setupEventListeners() {
-            const audioInput = document.getElementById('input-audio-file');
-            const lyricsInput = document.getElementById('input-lyrics-file');
-            const sheetInput = document.getElementById('input-sheet-file');
-
-            if(audioInput) audioInput.addEventListener('change', (e) => handleFileUpload(e.target, 'audio-src-input'));
-            if(lyricsInput) lyricsInput.addEventListener('change', (e) => handleFileUpload(e.target, 'audio-lyrics-input'));
-            if(sheetInput) sheetInput.addEventListener('change', (e) => handleFileUpload(e.target, 'audio-sheet-input'));
-            
             document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
             document.getElementById('admin-pass-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAdminPassword(); });
         }
@@ -864,11 +1004,9 @@
 
         function clearAudioForm() {
              document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type !== 'hidden') i.value = ''; });
-             document.querySelectorAll('input[type="file"]').forEach(i => {
-                 i.value = '';
-                 i.parentElement.classList.replace('bg-green-700', 'bg-gray-800');
-                 i.parentElement.classList.remove('border-green-500');
-             });
+             document.querySelectorAll('input[type="file"]').forEach(i => { i.value = ''; }); // Reset file inputs
+             // Hide progress bars
+             document.querySelectorAll('.progress-bar-container').forEach(el => el.style.display = 'none');
         }
         
         function updateBtn(id, link) {
@@ -922,10 +1060,6 @@
             if(useLocalStorage) return; 
             console.warn("Passage en Mode Local");
             useLocalStorage = true;
-            // Removed connection-status update here
-            
-            // Removed homeMsg update here
-
             showErrorToast("Mode Local Activé");
             loadLocalData();
             document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
@@ -1119,9 +1253,8 @@
                 youtube: document.getElementById('audio-youtube-input').value.trim()
             };
 
-            const size = newTrack.src.length + newTrack.lyrics.length + newTrack.sheet.length;
-            if(!useLocalStorage && size > 1000000) return alert("ERREUR: Fichiers trop lourds (Max 1Mo).\n\nLa base de données Firebase gratuite ne supporte pas les gros fichiers encodés directement dans le texte.\n\nSOLUTION: Hébergez le MP3 sur Dropbox/Drive et collez le lien.");
-
+            // MODIF: Suppression de la limite de taille pour Firestore, car on stocke maintenant des URL
+            
             if(useLocalStorage) {
                 const idx = AUDIO_LIBRARY.findIndex(t => t.id === id);
                 if(idx !== -1) AUDIO_LIBRARY[idx] = newTrack; else AUDIO_LIBRARY.push(newTrack);
