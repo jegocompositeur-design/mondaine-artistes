@@ -66,6 +66,14 @@
             transform: scale(0.95);
             pointer-events: none; /* Désactive les clics sur les autres */
         }
+        
+        /* AJOUT : Style pour la ligne active (date sélectionnée) */
+        .row-active {
+            background: rgba(217, 70, 239, 0.15) !important; /* Teinte fuchsia légère */
+            border-color: rgba(217, 70, 239, 0.4) !important;
+            z-index: 40;
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.1);
+        }
 
         /* MODIF: Lettres du mois bien visibles */
         .month-char { color: #ffffff; line-height: 0.85; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
@@ -653,6 +661,7 @@
         let currentTrack = null; 
         let targetInputIdForStorage = null; // Pour savoir quel input remplir après sélection
         let lastPlayStart = 0; // Mémorise le dernier point de départ de lecture
+        let highlightedRow = null; // Mémorise la date dont la ligne est surlignée
 
         // --- CONSTANTES ---
         const DEFAULT_ARTISTS = [
@@ -922,6 +931,12 @@
         }
         
         function toggleArtistFilter(id) { selectedArtistId = (selectedArtistId === id) ? null : id; renderPlanning(); }
+        // AJOUT : Fonction pour surligner une ligne entière
+        window.toggleRowHighlight = function(dateStr) {
+            if (highlightedRow === dateStr) highlightedRow = null;
+            else highlightedRow = dateStr;
+            renderPlanning();
+        };
 
         function renderArtistList(group, specificRole = null) {
             return ARTISTS.filter(a => {
@@ -981,7 +996,13 @@
                     const isSat = d.getDay() === 6;
                     const isToday = new Date().toDateString() === d.toDateString();
                     const rowColor = isSat ? 'bg-fuchsia-900/40' : 'bg-fuchsia-900/20';
-                    gridHTML += `<div class="flex flex-col justify-center items-center h-16 border border-white/5 rounded-lg ${rowColor} ${isToday ? 'ring-2 ring-fuchsia-400' : ''}"><span class="text-[9px] uppercase text-fuchsia-200 tracking-wider mb-0.5">${dayName}</span><span class="text-xl font-black text-white leading-none">${dayNum}</span></div>`;
+                    
+                    // Gestion de la classe active pour la ligne
+                    const isRowActive = highlightedRow === dateStr;
+                    const activeClass = isRowActive ? 'row-active ring-1 ring-fuchsia-500/50' : '';
+
+                    // Ajout du onclick sur la date pour surligner la ligne
+                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="flex flex-col justify-center items-center h-16 border border-white/5 rounded-lg ${rowColor} ${isToday ? 'ring-2 ring-fuchsia-400' : ''} ${activeClass} cursor-pointer hover:bg-white/10 transition-colors group relative"><span class="text-[9px] uppercase text-fuchsia-200 tracking-wider mb-0.5 group-hover:text-white transition-colors">${dayName}</span><span class="text-xl font-black text-white leading-none group-hover:scale-110 transition-transform">${dayNum}</span></div>`;
 
                     ['chant1', 'chant2', 'chant3', 'sep', 'piano', 'basse', 'drum'].forEach(slot => {
                         if(slot === 'sep') gridHTML += `<div class="flex justify-center h-full"><div class="w-[1px] h-full bg-white/10"></div></div>`;
@@ -992,7 +1013,7 @@
                             const interactClass = isAdminMode ? 'interactive cursor-pointer' : 'cursor-default';
                             
                             // MODIF: On retire bg-black/30 de la base ici pour éviter le conflit
-                            let cellClass = `relative h-16 border border-white/5 flex items-center justify-center planning-cell rounded-md ${interactClass} `;
+                            let cellClass = `relative h-16 border border-white/5 flex items-center justify-center planning-cell rounded-md ${interactClass} ${activeClass} `;
                             let cellContent = '';
                             
                             if(artist) {
@@ -1015,6 +1036,11 @@
                             gridHTML += `<div class="${cellClass}" ${clickAction}>${cellContent}</div>`;
                         }
                     });
+                    
+                    // AJOUT : Séparateur de semaine après chaque Samedi
+                    if (isSat) {
+                        gridHTML += `<div class="col-span-8 h-6 flex items-center justify-center mb-2 mt-2 opacity-50"><div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div></div>`;
+                    }
                 }
                 d.setDate(d.getDate() + 1);
             }
