@@ -707,11 +707,14 @@
             const file = input.files[0];
             if (!file) return;
             
+            // MODIFICATION : On commente ce bloc pour autoriser l'upload sur Netlify même si le mode local est détecté
+            /*
             if (useLocalStorage) {
                 alert("L'upload Storage nécessite d'être connecté au serveur. Mode Local actif.");
                 input.value = "";
                 return;
             }
+            */
 
             // UI UPDATES: Loading State
             const btn = document.getElementById(btnId);
