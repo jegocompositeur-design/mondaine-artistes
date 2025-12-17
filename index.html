@@ -102,6 +102,15 @@
         .upload-loading { opacity: 0.7; pointer-events: none; animation: pulse 1.5s infinite; }
 
         .queue-item { animation: fadeIn 0.3s ease-in; }
+        
+        /* SPEED BUTTONS ACTIVE STATE */
+        .speed-btn {
+            font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+            color: #9ca3af; transition: all 0.2s;
+        }
+        .speed-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; box-shadow: 0 0 10px rgba(217, 70, 239, 0.2); }
+
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
@@ -381,13 +390,13 @@
                             <input type="text" id="audio-title-input" placeholder="EX: I WILL SURVIVE" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white text-sm font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
                         </div>
                         
-                        <!-- NEW UPLOAD GRID UI -->
+                        <!-- NEW UPLOAD GRID UI - IDS UPDATED TO AVOID CONFLICT -->
                         <div class="grid grid-cols-3 gap-3 mb-4">
                             <!-- AUDIO -->
                             <div class="relative">
                                 <input type="hidden" id="audio-src-input">
-                                <input type="file" id="upload-input-audio" class="hidden" accept="audio/*" onchange="uploadSingleFile(this, 'mp3', 'btn-audio', 'audio-src-input')">
-                                <button onclick="document.getElementById('upload-input-audio').click()" id="btn-audio" class="upload-btn group">
+                                <input type="file" id="upload-input-audio" class="hidden" accept="audio/*" onchange="uploadSingleFile(this, 'mp3', 'upload-btn-audio', 'audio-src-input')">
+                                <button onclick="document.getElementById('upload-input-audio').click()" id="upload-btn-audio" class="upload-btn group">
                                     <i class="fas fa-music text-fuchsia-500 group-hover:text-white transition-colors"></i>
                                     <span class="text-fuchsia-200 group-hover:text-white transition-colors">Audio</span>
                                 </button>
@@ -396,8 +405,8 @@
                             <!-- LYRICS -->
                             <div class="relative">
                                 <input type="hidden" id="audio-lyrics-input">
-                                <input type="file" id="upload-input-lyrics" class="hidden" accept="application/pdf" onchange="uploadSingleFile(this, 'lyrics', 'btn-lyrics', 'audio-lyrics-input')">
-                                <button onclick="document.getElementById('upload-input-lyrics').click()" id="btn-lyrics" class="upload-btn group">
+                                <input type="file" id="upload-input-lyrics" class="hidden" accept="application/pdf" onchange="uploadSingleFile(this, 'lyrics', 'upload-btn-lyrics', 'audio-lyrics-input')">
+                                <button onclick="document.getElementById('upload-input-lyrics').click()" id="upload-btn-lyrics" class="upload-btn group">
                                     <i class="fas fa-align-center text-blue-500 group-hover:text-white transition-colors"></i>
                                     <span class="text-blue-200 group-hover:text-white transition-colors">Paroles</span>
                                 </button>
@@ -406,8 +415,8 @@
                             <!-- SHEET -->
                             <div class="relative">
                                 <input type="hidden" id="audio-sheet-input">
-                                <input type="file" id="upload-input-sheet" class="hidden" accept="application/pdf" onchange="uploadSingleFile(this, 'sheet', 'btn-sheet', 'audio-sheet-input')">
-                                <button onclick="document.getElementById('upload-input-sheet').click()" id="btn-sheet" class="upload-btn group">
+                                <input type="file" id="upload-input-sheet" class="hidden" accept="application/pdf" onchange="uploadSingleFile(this, 'sheet', 'upload-btn-sheet', 'audio-sheet-input')">
+                                <button onclick="document.getElementById('upload-input-sheet').click()" id="upload-btn-sheet" class="upload-btn group">
                                     <i class="fas fa-scroll text-orange-500 group-hover:text-white transition-colors"></i>
                                     <span class="text-orange-200 group-hover:text-white transition-colors">Partit.</span>
                                 </button>
@@ -467,10 +476,12 @@
                             <div class="bg-black/40 rounded-3xl p-6 mb-4 border border-white/5 shadow-inner relative overflow-hidden">
                                 <!-- VITESSE & VOLUME -->
                                 <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                                    <div class="flex items-center gap-1">
-                                        <button onclick="setSpeed(0.75)" class="text-[9px] font-bold px-2 py-1 rounded border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Ralentir">x0.75</button>
-                                        <button onclick="setSpeed(1.0)" class="text-[9px] font-bold px-2 py-1 rounded bg-fuchsia-900/30 text-fuchsia-300 border border-fuchsia-500/30" title="Vitesse Normale">x1</button>
-                                        <button onclick="setSpeed(1.25)" class="text-[9px] font-bold px-2 py-1 rounded border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Accélérer">x1.25</button>
+                                    <div class="flex items-center gap-1 bg-black/20 p-1 rounded-lg" id="speed-controls">
+                                        <button onclick="setSpeed(0.5)" class="speed-btn" title="Très lent">0.5</button>
+                                        <button onclick="setSpeed(0.75)" class="speed-btn" title="Lent">0.75</button>
+                                        <button onclick="setSpeed(1.0)" class="speed-btn active-speed" title="Normal">1.0</button>
+                                        <button onclick="setSpeed(1.25)" class="speed-btn" title="Rapide">1.25</button>
+                                        <button onclick="setSpeed(1.5)" class="speed-btn" title="Très rapide">1.5</button>
                                     </div>
                                     <div class="flex items-center gap-2 w-24 group">
                                         <i class="fas fa-volume-up text-xs text-gray-500 group-hover:text-white"></i>
@@ -736,8 +747,10 @@
                     
                     // MODIF : Détection du blocage sécurité (CORS) typique de l'éditeur
                     if (error.code === 'storage/unauthorized' || error.message.includes('network') || error.code === 'storage/retry-limit-exceeded') {
-                        alert("🔒 SÉCURITÉ CANVAS DÉTECTÉE\n\nL'upload est bloqué ici car nous sommes dans un éditeur de code temporaire.\n\n✅ C'EST NORMAL ! Cela fonctionnera parfaitement une fois le site en ligne sur Netlify.");
-                        showErrorToast("Bloqué (Mode Preview)");
+                        // On n'affiche plus l'alerte spécifique Canvas pour éviter la confusion sur Netlify, 
+                        // mais on loggue proprement l'erreur.
+                        console.warn("Storage Error - Possible CORS or Auth issue.");
+                        alert("Erreur Upload : Vérifiez votre connexion ou les permissions.\nSi vous êtes en prévisualisation, c'est normal.");
                     } else {
                         showErrorToast("Erreur Upload");
                     }
@@ -1035,14 +1048,17 @@
              // Reset upload buttons styles
              document.querySelectorAll('.upload-btn').forEach(btn => {
                  btn.classList.remove('upload-success', 'upload-loading');
-                 if(btn.id === 'btn-audio') btn.innerHTML = `<i class="fas fa-music text-fuchsia-500 group-hover:text-white transition-colors"></i><span class="text-fuchsia-200 group-hover:text-white transition-colors">Audio</span>`;
-                 if(btn.id === 'btn-lyrics') btn.innerHTML = `<i class="fas fa-align-center text-blue-500 group-hover:text-white transition-colors"></i><span class="text-blue-200 group-hover:text-white transition-colors">Paroles</span>`;
-                 if(btn.id === 'btn-sheet') btn.innerHTML = `<i class="fas fa-scroll text-orange-500 group-hover:text-white transition-colors"></i><span class="text-orange-200 group-hover:text-white transition-colors">Partit.</span>`;
+                 // Fix: Reset content correctly based on the new IDs
+                 if(btn.id === 'upload-btn-audio') btn.innerHTML = `<i class="fas fa-music text-fuchsia-500 group-hover:text-white transition-colors"></i><span class="text-fuchsia-200 group-hover:text-white transition-colors">Audio</span>`;
+                 if(btn.id === 'upload-btn-lyrics') btn.innerHTML = `<i class="fas fa-align-center text-blue-500 group-hover:text-white transition-colors"></i><span class="text-blue-200 group-hover:text-white transition-colors">Paroles</span>`;
+                 if(btn.id === 'upload-btn-sheet') btn.innerHTML = `<i class="fas fa-scroll text-orange-500 group-hover:text-white transition-colors"></i><span class="text-orange-200 group-hover:text-white transition-colors">Partit.</span>`;
              });
         }
         
         function updateBtn(id, link) {
             const btn = document.getElementById(id);
+            if(!btn) return;
+
             // Reset
             btn.onclick = null;
             btn.removeAttribute('href');
@@ -1435,6 +1451,12 @@
             if(a) {
                 a.playbackRate = parseFloat(v);
                 showToast(`Vitesse : x${v}`);
+                
+                // Highlight logic
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                   if(btn.innerText === v.toString()) btn.classList.add('active-speed');
+                   else btn.classList.remove('active-speed');
+                });
             }
         };
 
