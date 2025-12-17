@@ -1418,9 +1418,21 @@
             document.getElementById('player-empty-state').classList.add('hidden'); document.getElementById('player-content').classList.remove('hidden');
             document.getElementById('player-title').innerText = currentTrack.title;
             updateBtn('btn-lyrics', currentTrack.lyrics); updateBtn('btn-sheet', currentTrack.sheet); updateBtn('btn-youtube', currentTrack.youtube);
+            
             const audioEl = document.getElementById('audio-element');
-            if(currentTrack.src) { audioEl.src = currentTrack.src; audioEl.volume = 1; } 
-            else { audioEl.src = ""; resetPlayerUI(); }
+            
+            // Reset UI forcé au changement de titre
+            resetPlayerUI(); 
+            document.getElementById('time-current').innerText = "00:00";
+            document.getElementById('time-total').innerText = "00:00";
+
+            if(currentTrack.src) { 
+                audioEl.src = currentTrack.src; 
+                audioEl.currentTime = 0; // Remet le temps à 0
+                audioEl.volume = 1; 
+            } else { 
+                audioEl.src = ""; 
+            }
         };
 
         window.togglePlay = function() { 
