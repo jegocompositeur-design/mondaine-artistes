@@ -52,6 +52,21 @@
         .artist-pill:hover { transform: scale(1.05); }
         .artist-pill.selected { box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.05); z-index: 10; border: 1px solid rgba(255,255,255,0.8); }
 
+        /* AJOUTS POUR LA SURBRILLANCE DU PLANNING */
+        .cell-highlight { 
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important; 
+            border: 2px solid white !important; 
+            z-index: 50 !important; 
+            transform: scale(1.1) !important; /* Agrandissement plus marqué */
+            filter: brightness(1.2);
+        }
+        .cell-dimmed { 
+            opacity: 0.15 !important; 
+            filter: grayscale(100%) blur(1px) !important; /* Flou léger pour le fond */
+            transform: scale(0.95);
+            pointer-events: none; /* Désactive les clics sur les autres */
+        }
+
         /* MODIF: Lettres du mois bien visibles */
         .month-char { color: #ffffff; line-height: 0.85; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .month-sidebar { background: linear-gradient(180deg, #d946ef 0%, #7e22ce 100%); box-shadow: 5px 0 30px rgba(0,0,0,0.6); }
@@ -887,7 +902,11 @@
             for (const [key, assignedId] of Object.entries(assignments)) {
                 if (assignedId === artistId) {
                     const [dateStr, slot] = key.split('_');
-                    const date = new Date(dateStr);
+                    
+                    // MODIF : Parsing manuel pour éviter le décalage UTC
+                    const [y, m, d] = dateStr.split('-').map(Number);
+                    const date = new Date(y, m - 1, d);
+
                     if (date.getMonth() === currentDate.getMonth() && date.getFullYear() === currentDate.getFullYear()) {
                         artistAssignments.push({ date, slot });
                     }
@@ -949,7 +968,14 @@
             const d = new Date(year, month, 1);
             while(d.getMonth() === month) {
                 if([3,4,5,6].includes(d.getDay())) {
-                    const dateStr = d.toISOString().split('T')[0];
+                    
+                    // MODIF : Génération de la date force en local (YYYY-MM-DD)
+                    const dateStr = [
+                        d.getFullYear(),
+                        String(d.getMonth() + 1).padStart(2, '0'),
+                        String(d.getDate()).padStart(2, '0')
+                    ].join('-');
+
                     const dayName = d.toLocaleDateString('fr-FR', {weekday: 'long'});
                     const dayNum = d.getDate().toString().padStart(2, '0');
                     const isSat = d.getDay() === 6;
@@ -978,6 +1004,10 @@
                             } else {
                                 // Si vide : on applique le fond sombre par défaut (bg-black/30) ici
                                 cellClass += `bg-black/30 `;
+                                
+                                // MODIF : On grise aussi les cases vides si un artiste est sélectionné
+                                if(selectedArtistId) cellClass += `cell-dimmed `;
+
                                 if (isAdminMode) cellContent = `<i class="fas fa-plus text-white/20 text-xs hover:text-white/80 transition-colors"></i>`;
                             }
 
