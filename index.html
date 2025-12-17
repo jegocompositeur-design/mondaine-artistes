@@ -1002,9 +1002,37 @@
                     if(line.toUpperCase().includes('SET ') || line === line.toUpperCase()) return `<p class="text-${day.color}-400 font-bold text-xs uppercase underline mt-4 mb-2 tracking-widest">${line}</p>`;
                     return `<li class="ml-4">${line}</li>`;
                 }).join('') || '<li class="italic text-gray-500 list-none">Aucune chanson</li>';
-                return `<div class="bg-${day.color}-900/10 border border-${day.color}-500/30 p-0 rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.2)] flex flex-col h-full"><div class="header-${day.color} text-white py-4 text-center font-bold uppercase text-sm md:text-base tracking-wider shadow-lg">${day.data ? day.data.date : ""}</div><div class="p-6 text-sm text-gray-200 flex-1"><ul class="list-disc list-outside space-y-2 text-xs md:text-sm font-medium opacity-90">${listHTML}</ul></div></div>`;
+                
+                // AJOUT : Bouton Copier en bas de la carte
+                return `<div class="bg-${day.color}-900/10 border border-${day.color}-500/30 p-0 rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.2)] flex flex-col h-full">
+                    <div class="header-${day.color} text-white py-4 text-center font-bold uppercase text-sm md:text-base tracking-wider shadow-lg">${day.data ? day.data.date : ""}</div>
+                    <div class="p-6 text-sm text-gray-200 flex-1">
+                        <ul class="list-disc list-outside space-y-2 text-xs md:text-sm font-medium opacity-90">${listHTML}</ul>
+                    </div>
+                    <div class="p-3 bg-black/20 border-t border-white/5 flex justify-center">
+                        <button onclick="copySetlist('${day.id}')" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full transition-colors border border-white/5 flex items-center gap-2 group">
+                            <i class="fas fa-copy group-hover:text-${day.color}-400 transition-colors"></i> Copier
+                        </button>
+                    </div>
+                </div>`;
             }).join('');
         }
+
+        // NOUVELLE FONCTION POUR COPIER LE TEXTE
+        window.copySetlist = function(dayId) {
+            const content = SETLISTS[dayId] ? SETLISTS[dayId].content : "";
+            if(!content) return;
+            
+            // Méthode compatible (textarea invisible) pour copier
+            const el = document.createElement('textarea');
+            el.value = content;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            showToast("Setlist copiée !");
+        };
         
         function renderAdminAudioList() {
             const container = document.getElementById('admin-audio-list');
@@ -1440,15 +1468,40 @@
         window.togglePlay = function() { 
             const audioEl = document.getElementById('audio-element');
             const i = document.getElementById('play-btn').querySelector('i'); 
-            if(audioEl && audioEl.paused && audioEl.src) { 
-                lastPlayStart = audioEl.currentTime; // Sauvegarde la position avant de lancer la lecture
-                audioEl.play(); 
-                i.className='fas fa-pause text-xl ml-1'; 
-            } 
-            else if (audioEl) { audioEl.pause(); i.className='fas fa-play text-xl ml-1'; } 
+            
+            if (audioEl) {
+                // Si l'audio est en pause ou fini
+                if(audioEl.paused || audioEl.ended) { 
+                    // Si le morceau était fini, on le remet à 0 avant
+                    if(audioEl.ended) audioEl.currentTime = 0;
+                    
+                    // C'est ICI qu'on sauvegarde le point de repère (CUE)
+                    lastPlayStart = audioEl.currentTime; 
+                    
+                    audioEl.play(); 
+                    i.className='fas fa-pause text-xl ml-1'; 
+                } 
+                else { 
+                    audioEl.pause(); 
+                    i.className='fas fa-play text-xl ml-1'; 
+                }
+            }
         };
+
         window.stopAudio = function() { const a = document.getElementById('audio-element'); if(a) { a.pause(); a.currentTime=0; resetPlayerUI(); } };
-        window.resetAudio = function() { const a = document.getElementById('audio-element'); if(a) { a.currentTime = lastPlayStart; if(!a.paused) a.play(); } };
+        
+        window.resetAudio = function() { 
+            const a = document.getElementById('audio-element'); 
+            if(a) { 
+                // On revient au dernier point de repère enregistré
+                a.currentTime = lastPlayStart || 0; 
+                
+                // Et on lance la lecture directement (comme demandé "le morceau repart")
+                a.play(); 
+                document.getElementById('play-btn').querySelector('i').className='fas fa-pause text-xl ml-1';
+            } 
+        };
+        
         window.resetPlayerUI = function() { document.getElementById('play-btn').querySelector('i').className='fas fa-play text-xl ml-1'; document.getElementById('progress-bar').style.width='0%'; };
         window.updateProgress = function() { 
              const a = document.getElementById('audio-element');
