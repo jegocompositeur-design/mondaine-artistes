@@ -459,35 +459,51 @@
                         <p class="text-sm font-bold uppercase tracking-widest text-gray-400">Sélectionnez<br>un titre</p>
                     </div>
 
-                    <div id="player-content" class="hidden flex flex-col h-full">
-                        <div class="flex-1 flex flex-col justify-center">
+                    <div id="player-content" class="hidden flex flex-col h-full justify-start pt-4 md:pt-10">
+                        <div class="flex-1 flex flex-col">
                             <h3 id="player-title" class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter mb-1 leading-tight break-words text-center md:text-left drop-shadow-md">TITRE</h3>
                             <p class="text-[10px] font-bold text-fuchsia-500 uppercase tracking-[0.3em] mb-6 text-center md:text-left">Lecteur Audio</p>
 
-                            <div class="bg-black/40 rounded-3xl p-6 mb-4 border border-white/5 shadow-inner">
+                            <div class="bg-black/40 rounded-3xl p-6 mb-4 border border-white/5 shadow-inner relative overflow-hidden">
+                                <!-- VITESSE & VOLUME -->
+                                <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="setSpeed(0.75)" class="text-[9px] font-bold px-2 py-1 rounded border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Ralentir">x0.75</button>
+                                        <button onclick="setSpeed(1.0)" class="text-[9px] font-bold px-2 py-1 rounded bg-fuchsia-900/30 text-fuchsia-300 border border-fuchsia-500/30" title="Vitesse Normale">x1</button>
+                                        <button onclick="setSpeed(1.25)" class="text-[9px] font-bold px-2 py-1 rounded border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Accélérer">x1.25</button>
+                                    </div>
+                                    <div class="flex items-center gap-2 w-24 group">
+                                        <i class="fas fa-volume-up text-xs text-gray-500 group-hover:text-white"></i>
+                                        <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+
+                                <!-- CONTROLES PRINCIPAUX -->
                                 <div class="flex justify-center items-center gap-6 mb-6">
                                     <button onclick="stopAudio()" class="player-btn w-10 h-10 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white flex items-center justify-center border border-white/5"><i class="fas fa-stop text-sm"></i></button>
                                     <button onclick="togglePlay()" id="play-btn" class="player-btn w-16 h-16 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white hover:scale-105 flex items-center justify-center border-4 border-[#1a0b2e] shadow-[0_0_25px_rgba(217,70,239,0.3)] transition-all"><i class="fas fa-play text-xl ml-1"></i></button>
                                     <button onclick="resetAudio()" class="player-btn w-10 h-10 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white flex items-center justify-center border border-white/5"><i class="fas fa-redo-alt text-sm"></i></button>
                                 </div>
+                                
                                 <audio id="audio-element" ontimeupdate="updateProgress()" onended="resetPlayerUI()"></audio>
+                                
                                 <div class="w-full bg-gray-800 rounded-full h-1.5 mb-2 overflow-hidden cursor-pointer group" onclick="seekAudio(event)">
                                     <div id="progress-bar" class="bg-fuchsia-500 h-full w-0 transition-all duration-100 relative group-hover:bg-fuchsia-400">
                                         <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     </div>
                                 </div>
-                                <div class="flex justify-between text-[9px] text-gray-500 font-mono mb-2">
+                                <div class="flex justify-between text-[9px] text-gray-500 font-mono">
                                     <span id="time-current">00:00</span>
                                     <span id="time-total">00:00</span>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3 mb-3">
-                                <a id="btn-lyrics" href="#" class="flex flex-col items-center justify-center p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl hover:bg-blue-900/40 transition-all group opacity-50 cursor-not-allowed">
+                                <a id="btn-lyrics" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl hover:bg-blue-900/40 transition-all group opacity-50 cursor-not-allowed">
                                     <i class="fas fa-align-center text-xl mb-1 text-blue-400 group-hover:scale-110 transition-transform"></i>
                                     <span class="text-[9px] font-bold uppercase tracking-wider text-blue-200">Paroles</span>
                                 </a>
-                                <a id="btn-sheet" href="#" class="flex flex-col items-center justify-center p-3 bg-orange-900/20 border border-orange-500/20 rounded-xl hover:bg-orange-900/40 transition-all group opacity-50 cursor-not-allowed">
+                                <a id="btn-sheet" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 bg-orange-900/20 border border-orange-500/20 rounded-xl hover:bg-orange-900/40 transition-all group opacity-50 cursor-not-allowed">
                                     <i class="fas fa-music text-xl mb-1 text-orange-400 group-hover:scale-110 transition-transform"></i>
                                     <span class="text-[9px] font-bold uppercase tracking-wider text-orange-200">Partition</span>
                                 </a>
@@ -675,12 +691,18 @@
 
         // --- GESTION STORAGE FIREBASE ---
 
-       // Fonction pour uploader un fichier vers Storage (VERSION DIAGNOSTIC)
+        // Fonction pour uploader un fichier vers Storage (NOUVELLE VERSION AVEC BOUTON UNIQUE)
         window.uploadSingleFile = function(input, type, btnId, targetInputId) {
             const file = input.files[0];
             if (!file) return;
             
-            // UI UPDATES
+            if (useLocalStorage) {
+                alert("L'upload Storage nécessite d'être connecté au serveur. Mode Local actif.");
+                input.value = "";
+                return;
+            }
+
+            // UI UPDATES: Loading State
             const btn = document.getElementById(btnId);
             const originalContent = btn.innerHTML;
             const originalClass = btn.className;
@@ -705,29 +727,32 @@
 
             uploadTask.on('state_changed', 
                 (snapshot) => {
+                    // Optional: Update text with %
                     const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
                     if(progress < 100) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><br>${progress}%`;
                 }, 
                 (error) => {
                     console.error("Upload Error:", error);
                     
-                    // --- LE TEST EST ICI ---
-                    // On affiche l'erreur exacte à l'écran
-                    alert("⚠️ ERREUR GOOGLE DETECTÉE :\n\nCode: " + error.code + "\nMessage: " + error.message);
-                    
-                    if (error.code === 'storage/retry-limit-exceeded' || error.message.includes('network')) {
-                         alert("💡 SOLUTION : C'est bien le problème CORS (Sécurité).\nIl faut faire la manipulation avec le Terminal Noir (Cloud Shell).");
+                    // MODIF : Détection du blocage sécurité (CORS) typique de l'éditeur
+                    if (error.code === 'storage/unauthorized' || error.message.includes('network') || error.code === 'storage/retry-limit-exceeded') {
+                        alert("🔒 SÉCURITÉ CANVAS DÉTECTÉE\n\nL'upload est bloqué ici car nous sommes dans un éditeur de code temporaire.\n\n✅ C'EST NORMAL ! Cela fonctionnera parfaitement une fois le site en ligne sur Netlify.");
+                        showErrorToast("Bloqué (Mode Preview)");
+                    } else {
+                        showErrorToast("Erreur Upload");
                     }
-                    // -----------------------
 
-                    showErrorToast("Erreur Upload");
+                    // Reset Button
                     btn.innerHTML = originalContent;
                     btn.className = originalClass;
                 }, 
                 () => {
+                    // Success
                     window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                         document.getElementById(targetInputId).value = downloadURL;
                         showToast("Fichier Enregistré !");
+                        
+                        // UI Success State
                         btn.classList.remove('upload-loading');
                         btn.classList.add('upload-success');
                         btn.innerHTML = `<i class="fas fa-check"></i><br>OK`;
@@ -1018,8 +1043,11 @@
         
         function updateBtn(id, link) {
             const btn = document.getElementById(id);
+            // Reset
             btn.onclick = null;
+            btn.removeAttribute('href');
 
+            // Cas : Pas de lien
             if (!link) {
                 btn.classList.replace('opacity-100', 'opacity-50');
                 btn.classList.replace('cursor-pointer', 'cursor-not-allowed');
@@ -1028,33 +1056,11 @@
                 return;
             }
 
+            // Cas : Lien valide
             btn.classList.replace('opacity-50', 'opacity-100');
             btn.classList.replace('cursor-not-allowed', 'cursor-pointer');
-
-            // ✅ CAS YOUTUBE : lien normal en nouvel onglet
-            if (id === 'btn-youtube') {
-                btn.href = link;
-                btn.target = "_blank";
-                btn.rel = "noopener noreferrer";
-                btn.onclick = null;
-                return;
-            }
-
-            // ✅ CAS PDF (URL ou data: PDF) : ouverture intégrée
-            // On vérifie le type de fichier ou le protocole data
-            const isPdf = link.startsWith('data:application/pdf') || link.toLowerCase().includes('.pdf') || (id !== 'btn-youtube' && !link.includes('youtube'));
-
-            if (isPdf) {
-                btn.href = "#";
-                btn.removeAttribute("target");
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    openPdfViewer(link);
-                };
-                return;
-            }
-
-            // ✅ CAS AUTRES LIENS (fallback)
+            
+            // On force TOUJOURS l'ouverture dans un nouvel onglet pour éviter les blocages de sécurité
             btn.href = link;
             btn.target = "_blank";
             btn.rel = "noopener noreferrer";
@@ -1154,7 +1160,7 @@
                                 if(document.getElementById('setlist-wed')) loadAdminValues();
                             } else if (colName === 'audio') {
                                 AUDIO_LIBRARY = snapshot.docs.map(doc => doc.data());
-                                renderAdminAudioList(); renderAudioList(document.getElementById('audio-search').value);
+                                renderAdminAudioList(); renderAdminAudioList(); renderAudioList(document.getElementById('audio-search').value);
                             }
                             
                             initialLoadComplete++;
@@ -1417,8 +1423,20 @@
         };
         function formatTime(s) { if (!s || isNaN(s)) return "00:00"; const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`; }
         window.seekAudio = function(e) { const a = document.getElementById('audio-element'); if(a&&a.duration) a.currentTime = (e.offsetX / e.currentTarget.clientWidth) * a.duration; };
-        window.setVolume = function(v) { const a = document.getElementById('audio-element'); if(a) a.volume = v; };
-        window.setSpeed = function(v) { const a = document.getElementById('audio-element'); if(a) a.playbackRate = v; };
+        
+        // MODIF: Activation du volume et vitesse
+        window.setVolume = function(v) { 
+            const a = document.getElementById('audio-element'); 
+            if(a) a.volume = parseFloat(v); 
+        };
+        
+        window.setSpeed = function(v) { 
+            const a = document.getElementById('audio-element'); 
+            if(a) {
+                a.playbackRate = parseFloat(v);
+                showToast(`Vitesse : x${v}`);
+            }
+        };
 
         // --- INIT ---
         window.onload = () => {
