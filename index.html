@@ -675,18 +675,12 @@
 
         // --- GESTION STORAGE FIREBASE ---
 
-        // Fonction pour uploader un fichier vers Storage (NOUVELLE VERSION AVEC BOUTON UNIQUE)
+       // Fonction pour uploader un fichier vers Storage (VERSION DIAGNOSTIC)
         window.uploadSingleFile = function(input, type, btnId, targetInputId) {
             const file = input.files[0];
             if (!file) return;
             
-            if (useLocalStorage) {
-                alert("L'upload Storage nécessite d'être connecté au serveur. Mode Local actif.");
-                input.value = "";
-                return;
-            }
-
-            // UI UPDATES: Loading State
+            // UI UPDATES
             const btn = document.getElementById(btnId);
             const originalContent = btn.innerHTML;
             const originalClass = btn.className;
@@ -711,24 +705,29 @@
 
             uploadTask.on('state_changed', 
                 (snapshot) => {
-                    // Optional: Update text with %
                     const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
                     if(progress < 100) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><br>${progress}%`;
                 }, 
                 (error) => {
                     console.error("Upload Error:", error);
+                    
+                    // --- LE TEST EST ICI ---
+                    // On affiche l'erreur exacte à l'écran
+                    alert("⚠️ ERREUR GOOGLE DETECTÉE :\n\nCode: " + error.code + "\nMessage: " + error.message);
+                    
+                    if (error.code === 'storage/retry-limit-exceeded' || error.message.includes('network')) {
+                         alert("💡 SOLUTION : C'est bien le problème CORS (Sécurité).\nIl faut faire la manipulation avec le Terminal Noir (Cloud Shell).");
+                    }
+                    // -----------------------
+
                     showErrorToast("Erreur Upload");
-                    // Reset Button
                     btn.innerHTML = originalContent;
                     btn.className = originalClass;
                 }, 
                 () => {
-                    // Success
                     window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                         document.getElementById(targetInputId).value = downloadURL;
                         showToast("Fichier Enregistré !");
-                        
-                        // UI Success State
                         btn.classList.remove('upload-loading');
                         btn.classList.add('upload-success');
                         btn.innerHTML = `<i class="fas fa-check"></i><br>OK`;
