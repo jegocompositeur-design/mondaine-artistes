@@ -637,6 +637,7 @@
         let artistToDeleteId = null;
         let currentTrack = null; 
         let targetInputIdForStorage = null; // Pour savoir quel input remplir après sélection
+        let lastPlayStart = 0; // Mémorise le dernier point de départ de lecture
 
         // --- CONSTANTES ---
         const DEFAULT_ARTISTS = [
@@ -1423,6 +1424,7 @@
             
             // Reset UI forcé au changement de titre
             resetPlayerUI(); 
+            lastPlayStart = 0; // Reset du point de repère
             document.getElementById('time-current').innerText = "00:00";
             document.getElementById('time-total').innerText = "00:00";
 
@@ -1438,11 +1440,15 @@
         window.togglePlay = function() { 
             const audioEl = document.getElementById('audio-element');
             const i = document.getElementById('play-btn').querySelector('i'); 
-            if(audioEl && audioEl.paused && audioEl.src) { audioEl.play(); i.className='fas fa-pause text-xl ml-1'; } 
+            if(audioEl && audioEl.paused && audioEl.src) { 
+                lastPlayStart = audioEl.currentTime; // Sauvegarde la position avant de lancer la lecture
+                audioEl.play(); 
+                i.className='fas fa-pause text-xl ml-1'; 
+            } 
             else if (audioEl) { audioEl.pause(); i.className='fas fa-play text-xl ml-1'; } 
         };
         window.stopAudio = function() { const a = document.getElementById('audio-element'); if(a) { a.pause(); a.currentTime=0; resetPlayerUI(); } };
-        window.resetAudio = function() { const a = document.getElementById('audio-element'); if(a) { a.currentTime=0; if(!a.paused) a.play(); } };
+        window.resetAudio = function() { const a = document.getElementById('audio-element'); if(a) { a.currentTime = lastPlayStart; if(!a.paused) a.play(); } };
         window.resetPlayerUI = function() { document.getElementById('play-btn').querySelector('i').className='fas fa-play text-xl ml-1'; document.getElementById('progress-bar').style.width='0%'; };
         window.updateProgress = function() { 
              const a = document.getElementById('audio-element');
