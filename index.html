@@ -207,11 +207,15 @@
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                 else await signInAnonymously(auth);
+                
+                // AJOUT : On confirme que la connexion est bonne
+                console.log("Connecté à Firebase avec succès");
+                
             } catch (error) {
                 console.error("Erreur Auth:", error);
-                setTimeout(() => {
-                    if (typeof window.switchToLocalMode === 'function') window.switchToLocalMode();
-                }, 1000);
+                // MODIF : On ne passe plus en mode local automatiquement ici pour te laisser voir l'erreur
+                // setTimeout(() => { ... }, 1000); 
+                showErrorToast("Erreur Connexion Firebase");
             }
         };
 
@@ -221,11 +225,13 @@
             onAuthStateChanged(auth, (user) => {
                 if (user && typeof window.initRealtimeData === 'function') window.initRealtimeData();
             });
-        } else {
+        }
+        // MODIF : On supprime le fallback automatique ici aussi
+        /* else {
             setTimeout(() => {
                 if(typeof window.switchToLocalMode === 'function') window.switchToLocalMode();
             }, 1000);
-        }
+        } */
     </script>
 
     <!-- SIDEBAR -->
@@ -1224,7 +1230,8 @@
 
         window.initRealtimeData = function() {
             if(!window.db) {
-                window.switchToLocalMode();
+                // window.switchToLocalMode(); // MODIF : On désactive le passage forcé
+                console.error("Pas de DB détectée");
                 return;
             }
             
@@ -1234,15 +1241,12 @@
             let connectionFailed = false;
 
             const handleFirestoreError = (error, listenerName) => {
-                // Ignore permission errors initially if we are just loading
-                if (error.code === 'permission-denied' || error.message.includes('permission')) {
-                    console.warn(`Permission refusée pour ${listenerName} - Passage en local possible.`);
-                    if (!connectionFailed) {
-                        connectionFailed = true;
-                        listeners.forEach(unsub => unsub());
-                        window.switchToLocalMode();
-                    }
-                } else { console.error(`Erreur Sync ${listenerName}:`, error); }
+                console.error(`Erreur Sync ${listenerName}:`, error);
+                
+                // MODIF : On n'active le mode local QUE si c'est vraiment bloqué
+                if (error.code === 'permission-denied') {
+                     showErrorToast("Droits refusés (Vérifier Règles)");
+                }
             };
             
             try {
