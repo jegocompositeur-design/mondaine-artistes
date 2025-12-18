@@ -69,10 +69,12 @@
         
         /* AJOUT : Style pour la ligne active (date sélectionnée) */
         .row-active {
-            background: rgba(217, 70, 239, 0.15) !important; /* Teinte fuchsia légère */
-            border-color: rgba(217, 70, 239, 0.4) !important;
+            /* CORRECTION : On enlève le background qui écrasait les couleurs */
+            /* background: rgba(217, 70, 239, 0.15) !important; */
+            
+            /* NOUVEAU : Halo blanc lumineux autour, sans toucher au fond */
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.15) !important;
             z-index: 40;
-            box-shadow: 0 0 15px rgba(217, 70, 239, 0.1);
         }
 
         /* MODIF: Lettres du mois bien visibles */
@@ -1005,7 +1007,8 @@
                     
                     // Gestion de la classe active pour la ligne
                     const isRowActive = highlightedRow === dateStr;
-                    const activeClass = isRowActive ? 'row-active ring-1 ring-fuchsia-500/50' : '';
+                    // MODIF : On enlève les classes Tailwind "ring" pour laisser le CSS gérer le halo proprement
+                    const activeClass = isRowActive ? 'row-active' : '';
 
                     // Ajout du onclick sur la date pour surligner la ligne
                     gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="flex flex-col justify-center items-center h-16 border border-white/5 rounded-lg ${rowColor} ${isToday ? 'ring-2 ring-fuchsia-400' : ''} ${activeClass} cursor-pointer hover:bg-white/10 transition-colors group relative"><span class="text-[9px] uppercase text-fuchsia-200 tracking-wider mb-0.5 group-hover:text-white transition-colors">${dayName}</span><span class="text-xl font-black text-white leading-none group-hover:scale-110 transition-transform">${dayNum}</span></div>`;
