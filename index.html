@@ -280,12 +280,18 @@
     <main class="flex-1 relative overflow-hidden w-full z-0 bg-[#050505]">
         
         <!-- HOME -->
-        <section id="home" class="page-section h-full w-full absolute inset-0 z-10">
-            <div class="h-full w-full flex flex-col justify-center items-center text-center p-4" 
+        <section id="home" class="page-section h-full w-full absolute inset-0 z-10 overflow-y-auto">
+            <div class="min-h-full w-full flex flex-col justify-center items-center text-center p-4 relative" 
                  style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(5,5,5,0.95)), url('https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center;">
-                <div class="border border-white/10 p-8 md:p-16 backdrop-blur-md bg-black/60 fade-in shadow-2xl rounded-sm">
+                
+                <div class="border border-white/10 p-8 md:p-16 backdrop-blur-md bg-black/60 fade-in shadow-2xl rounded-sm mb-8">
                     <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter mb-2 drop-shadow-2xl">MONDAINE</h1>
                     <h2 class="text-2xl md:text-3xl text-fuchsia-500 tracking-[0.6em] font-light font-sans drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">ARTISTES</h2>
+                </div>
+
+                <!-- AJOUT : CONTAINER DES NOUVEAUTÉS -->
+                <div id="home-news-container" class="w-full max-w-2xl space-y-4 fade-in hidden z-20">
+                    <!-- Les cartes "Flash Info" seront injectées ici par le JS -->
                 </div>
             </div>
         </section>
@@ -459,6 +465,15 @@
                             <div class="flex items-center bg-white/5 border border-white/10 rounded p-2">
                                 <i class="fab fa-youtube text-red-500 mr-2 text-lg"></i>
                                 <input type="text" id="audio-youtube-input" placeholder="https://youtube.com/..." class="bg-transparent w-full text-white text-xs font-mono focus:outline-none placeholder-gray-600">
+                            </div>
+                        </div>
+
+                        <!-- AJOUT : CASE À COCHER NOUVEAUTÉ -->
+                        <div class="mb-6 flex items-center bg-fuchsia-900/20 border border-fuchsia-500/30 rounded p-3">
+                            <input type="checkbox" id="audio-is-new" class="w-5 h-5 accent-fuchsia-500 cursor-pointer mr-3">
+                            <div>
+                                <label for="audio-is-new" class="text-xs font-bold text-white uppercase cursor-pointer">Marquer comme Nouveauté / À Travailler</label>
+                                <p class="text-[9px] text-fuchsia-300">Affichera une alerte sur la page d'accueil.</p>
                             </div>
                         </div>
 
@@ -1102,7 +1117,7 @@
         function renderAdminAudioList() {
             const container = document.getElementById('admin-audio-list');
             const sorted = [...AUDIO_LIBRARY].sort((a, b) => a.title.localeCompare(b.title));
-            container.innerHTML = sorted.length ? sorted.map(t => `<div class="flex items-center justify-between bg-white/5 p-3 rounded mb-2 hover:bg-white/10 transition-colors"><div class="truncate flex-1 pr-4"><div class="text-xs font-bold text-white uppercase">${t.title}</div><div class="text-[9px] text-gray-500 font-mono truncate">${t.src ? 'Audio OK' : 'Pas d\'audio'}</div></div><div class="flex gap-2"><button onclick="editAudioTrack('${t.id}')" class="text-blue-400 hover:text-blue-300 p-2"><i class="fas fa-edit"></i></button><button onclick="askDeleteAudio('${t.id}')" class="text-red-400 hover:text-red-300 p-2"><i class="fas fa-trash"></i></button></div></div>`).join('') : `<p class="text-gray-500 text-center italic text-xs mt-4">Aucun titre.</p>`;
+            container.innerHTML = sorted.length ? sorted.map(t => `<div class="flex items-center justify-between bg-white/5 p-3 rounded mb-2 hover:bg-white/10 transition-colors"><div class="truncate flex-1 pr-4"><div class="text-xs font-bold text-white uppercase">${t.isNew ? '<i class="fas fa-star text-yellow-400 mr-1"></i>' : ''}${t.title}</div><div class="text-[9px] text-gray-500 font-mono truncate">${t.src ? 'Audio OK' : 'Pas d\'audio'}</div></div><div class="flex gap-2"><button onclick="editAudioTrack('${t.id}')" class="text-blue-400 hover:text-blue-300 p-2"><i class="fas fa-edit"></i></button><button onclick="askDeleteAudio('${t.id}')" class="text-red-400 hover:text-red-300 p-2"><i class="fas fa-trash"></i></button></div></div>`).join('') : `<p class="text-gray-500 text-center italic text-xs mt-4">Aucun titre.</p>`;
         }
         
         function renderAudioList(term='') {
@@ -1124,7 +1139,9 @@
                     if (tracksForLetter && tracksForLetter.length > 0) {
                         listHTML += `<div class="text-xs font-black text-fuchsia-500 pt-4 pb-1 border-b border-white/5 mb-1">${letter}</div>`;
                         tracksForLetter.forEach(t => {
-                            listHTML += `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left py-3 px-4 border-b border-white/5 text-gray-300 font-bold uppercase hover:text-white flex items-center justify-between group ${currentTrack?.id===t.id?'active':''}"><span>${t.title}</span><i class="fas fa-play text-xs opacity-0 group-hover:opacity-50 text-fuchsia-500 transition-opacity"></i></button>`;
+                            // MODIF : Ajout de l'icône sirène si c'est une nouveauté
+                            const newBadge = t.isNew ? '<span class="mr-2 text-lg animate-pulse">🚨</span>' : '';
+                            listHTML += `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left py-3 px-4 border-b border-white/5 text-gray-300 font-bold uppercase hover:text-white flex items-center justify-between group ${currentTrack?.id===t.id?'active':''}"><span>${newBadge}${t.title}</span><i class="fas fa-play text-xs opacity-0 group-hover:opacity-50 text-fuchsia-500 transition-opacity"></i></button>`;
                         });
                     }
                 });
@@ -1132,15 +1149,70 @@
             list.innerHTML = listHTML;
         }
 
+        // AJOUT : FONCTION POUR AFFICHER LES NOUVEAUTÉS SUR L'ACCUEIL
+        function renderHomeNews() {
+            const container = document.getElementById('home-news-container');
+            const newTracks = AUDIO_LIBRARY.filter(t => t.isNew);
+            
+            if (newTracks.length === 0) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="bg-red-900/80 backdrop-blur-md border border-red-500/50 rounded-xl p-1 shadow-[0_0_30px_rgba(220,38,38,0.4)] animate-pulse">
+                    <div class="bg-black/40 rounded-lg p-4">
+                        <h3 class="text-red-400 font-black uppercase tracking-[0.2em] text-xs mb-4 flex items-center justify-center gap-2">
+                            <i class="fas fa-exclamation-triangle"></i> NOUVEAUTÉ À TRAVAILLER
+                        </h3>
+                        <div class="space-y-3">
+                            ${newTracks.map(t => `
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white/5 p-3 rounded-lg border border-white/10">
+                                    <div class="text-center md:text-left">
+                                        <div class="text-white font-bold uppercase text-sm md:text-base tracking-wider">🚨 ${t.title}</div>
+                                        <div class="text-[10px] text-gray-400">Nouveau titre ajouté</div>
+                                    </div>
+                                    <button onclick="playNewsTrack('${t.id}')" class="bg-white text-red-900 hover:bg-red-100 font-bold py-2 px-6 rounded-full text-xs uppercase tracking-widest shadow-lg transform hover:scale-105 transition-all flex items-center gap-2">
+                                        <i class="fas fa-play"></i> Écouter
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // AJOUT : FONCTION POUR JOUER DEPUIS L'ACCUEIL
+        window.playNewsTrack = function(id) {
+            showPage('audio');
+            setTimeout(() => {
+                selectTrack(id);
+                // On force la lecture
+                const audioEl = document.getElementById('audio-element');
+                if (audioEl && audioEl.src) {
+                    audioEl.play().catch(e => console.log("Autoplay bloqué par le navigateur"));
+                    document.getElementById('play-btn').querySelector('i').className='fas fa-pause text-xl ml-1';
+                }
+            }, 100);
+        };
+
         function editAudioTrack(id) {
             const t = AUDIO_LIBRARY.find(tr => tr.id === id); if(!t) return;
             document.getElementById('audio-id-input').value = t.id; document.getElementById('audio-title-input').value = t.title;
             document.getElementById('audio-src-input').value = t.src||''; document.getElementById('audio-lyrics-input').value = t.lyrics||'';
             document.getElementById('audio-sheet-input').value = t.sheet||''; document.getElementById('audio-youtube-input').value = t.youtube||'';
+            // AJOUT : Charger l'état de la checkbox
+            document.getElementById('audio-is-new').checked = t.isNew || false;
         }
 
         function clearAudioForm() {
              document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type !== 'hidden') i.value = ''; });
+             // AJOUT : Reset checkbox
+             document.getElementById('audio-is-new').checked = false;
+             
              document.querySelectorAll('input[type="file"]').forEach(i => { i.value = ''; }); // Reset file inputs
              // Reset upload buttons styles
              document.querySelectorAll('.upload-btn').forEach(btn => {
@@ -1226,6 +1298,7 @@
                 renderSetlistPublic();
                 renderAdminAudioList();
                 renderAudioList();
+                renderHomeNews(); // AJOUT
                 updateColorPicker();
                 localDataLoaded = true;
             } catch(e) { console.error("Local Load Error", e); }
@@ -1272,6 +1345,7 @@
                             } else if (colName === 'audio') {
                                 AUDIO_LIBRARY = snapshot.docs.map(doc => doc.data());
                                 renderAdminAudioList(); renderAdminAudioList(); renderAudioList(document.getElementById('audio-search').value);
+                                renderHomeNews(); // AJOUT : Mise à jour de l'accueil en temps réel
                             }
                             
                             initialLoadComplete++;
@@ -1391,7 +1465,9 @@
                 src: document.getElementById('audio-src-input').value.trim(),
                 lyrics: document.getElementById('audio-lyrics-input').value.trim(),
                 sheet: document.getElementById('audio-sheet-input').value.trim(),
-                youtube: document.getElementById('audio-youtube-input').value.trim()
+                youtube: document.getElementById('audio-youtube-input').value.trim(),
+                // AJOUT : Sauvegarde de l'état "Nouveauté"
+                isNew: document.getElementById('audio-is-new').checked
             };
 
             // MODIF: Suppression de la limite de taille pour Firestore, car on stocke maintenant des URL
@@ -1399,7 +1475,7 @@
             if(useLocalStorage) {
                 const idx = AUDIO_LIBRARY.findIndex(t => t.id === id);
                 if(idx !== -1) AUDIO_LIBRARY[idx] = newTrack; else AUDIO_LIBRARY.push(newTrack);
-                try { localStorage.setItem('mondaine_audio_library', JSON.stringify(AUDIO_LIBRARY)); renderAdminAudioList(); clearAudioForm(); showToast("Sauvegardé (Local)"); } catch(e) { alert("Mémoire pleine !"); }
+                try { localStorage.setItem('mondaine_audio_library', JSON.stringify(AUDIO_LIBRARY)); renderAdminAudioList(); clearAudioForm(); showToast("Sauvegardé (Local)"); renderHomeNews(); } catch(e) { alert("Mémoire pleine !"); }
             } else {
                 try { await window.setDoc(PUBLIC_DOC('audio', id), newTrack); clearAudioForm(); showToast(); } catch(e) { showErrorToast("Erreur sauvegarde"); }
             }
