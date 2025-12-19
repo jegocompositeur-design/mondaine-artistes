@@ -1209,15 +1209,25 @@
         }
 
         function clearAudioForm() {
-             document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type !== 'hidden') i.value = ''; });
-             // AJOUT : Reset checkbox
+             // MODIF : On vide tous les champs textes visibles
+             document.querySelectorAll('#admin-panel input').forEach(i => { 
+                 if(i.type !== 'hidden' && i.type !== 'checkbox') i.value = ''; 
+             });
+             
+             // MODIF CRUCIALE : On force le vidage de l'ID caché pour éviter d'écraser un ancien titre
+             document.getElementById('audio-id-input').value = '';
+             
+             // Reset checkbox Nouveauté
              document.getElementById('audio-is-new').checked = false;
              
-             document.querySelectorAll('input[type="file"]').forEach(i => { i.value = ''; }); // Reset file inputs
-             // Reset upload buttons styles
+             // Reset file inputs (sécurité supplémentaire)
+             document.querySelectorAll('input[type="file"]').forEach(i => { i.value = ''; }); 
+             
+             // Reset du design des boutons d'upload
              document.querySelectorAll('.upload-btn').forEach(btn => {
                  btn.classList.remove('upload-success', 'upload-loading');
-                 // Fix: Reset content correctly based on the new IDs
+                 
+                 // On remet les icônes d'origine
                  if(btn.id === 'upload-btn-audio') btn.innerHTML = `<i class="fas fa-music text-fuchsia-500 group-hover:text-white transition-colors"></i><span class="text-fuchsia-200 group-hover:text-white transition-colors">Audio</span>`;
                  if(btn.id === 'upload-btn-lyrics') btn.innerHTML = `<i class="fas fa-align-center text-blue-500 group-hover:text-white transition-colors"></i><span class="text-blue-200 group-hover:text-white transition-colors">Paroles</span>`;
                  if(btn.id === 'upload-btn-sheet') btn.innerHTML = `<i class="fas fa-scroll text-orange-500 group-hover:text-white transition-colors"></i><span class="text-orange-200 group-hover:text-white transition-colors">Partit.</span>`;
