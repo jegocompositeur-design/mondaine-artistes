@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- MODIF : Ajout de viewport-fit=cover pour les écrans pleins (iPhone notch) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Intranet Artistes Mondaine - Gestion de planning et bibliothèque audio.">
     <meta name="theme-color" content="#1a0b2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -44,6 +45,22 @@
         .sidebar-collapsed { width: 5rem !important; }
         .sidebar-collapsed .nav-text, .sidebar-collapsed .logo-text { display: none !important; }
         
+        /* AJOUT : Classe pour figer la colonne date sur mobile */
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 30; /* Au-dessus du reste */
+            background-color: #0a0a0c; /* Fond opaque nécessaire pour cacher le scroll */
+            box-shadow: 4px 0 15px rgba(0,0,0,0.5); /* Ombre pour détacher la colonne */
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        /* Ajustement si la ligne est active (surbrillance) */
+        .row-active.sticky-col {
+            z-index: 45 !important;
+            /* On garde l'effet halo mais on assure l'opacité */
+            background-color: #1a0b2e !important; 
+        }
+
         /* PLANNING CELLS */
         .planning-cell { transition: all 0.2s; border-color: rgba(255,255,255,0.05); }
         .planning-cell.interactive:hover { filter: brightness(1.3); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
@@ -52,32 +69,29 @@
         .artist-pill:hover { transform: scale(1.05); }
         .artist-pill.selected { box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.05); z-index: 10; border: 1px solid rgba(255,255,255,0.8); }
 
-        /* AJOUTS POUR LA SURBRILLANCE DU PLANNING */
+        /* HIGHLIGHTS PLANNING */
         .cell-highlight { 
             box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important; 
             border: 2px solid white !important; 
             z-index: 50 !important; 
-            transform: scale(1.1) !important; /* Agrandissement plus marqué */
+            transform: scale(1.1) !important;
             filter: brightness(1.2);
         }
         .cell-dimmed { 
             opacity: 0.15 !important; 
-            filter: grayscale(100%) blur(1px) !important; /* Flou léger pour le fond */
+            filter: grayscale(100%) blur(1px) !important;
             transform: scale(0.95);
-            pointer-events: none; /* Désactive les clics sur les autres */
+            pointer-events: none;
         }
         
-        /* AJOUT : Style pour la ligne active (date sélectionnée) */
+        /* Style pour la ligne active (date sélectionnée) */
         .row-active {
-            /* CORRECTION : On enlève le background qui écrasait les couleurs */
-            /* background: rgba(217, 70, 239, 0.15) !important; */
-            
-            /* NOUVEAU : Halo blanc lumineux autour, sans toucher au fond */
+            /* Halo blanc lumineux autour, sans toucher au fond */
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.15) !important;
             z-index: 40;
         }
 
-        /* MODIF: Lettres du mois bien visibles */
+        /* Lettres du mois */
         .month-char { color: #ffffff; line-height: 0.85; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .month-sidebar { background: linear-gradient(180deg, #d946ef 0%, #7e22ce 100%); box-shadow: 5px 0 30px rgba(0,0,0,0.6); }
 
@@ -93,12 +107,27 @@
 
         /* AUDIO PLAYER */
         .track-item { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        /* MODIF : Texte plus grand et padding plus confortable sur mobile */
         .track-item:hover { background-color: rgba(255,255,255,0.05); padding-left: 1.25rem; }
         .track-item.active { background: linear-gradient(90deg, rgba(217, 70, 239, 0.15) 0%, transparent 100%); border-left: 3px solid #d946ef; padding-left: 1.25rem; color: #f0abfc; }
         
+        /* AJOUT : Meilleure zone de touche sur mobile */
+        @media (max-width: 768px) {
+            .track-item { padding-top: 1rem; padding-bottom: 1rem; font-size: 0.95rem; } /* Plus aéré */
+            .artist-pill { padding: 0.75rem 0.5rem; font-size: 0.75rem; } /* Pills plus gros */
+        }
+
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #d946ef; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px #d946ef; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; cursor: pointer; background: rgba(255,255,255,0.2); }
+
+        /* SPEED BUTTONS ACTIVE STATE */
+        .speed-btn {
+            font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+            color: #9ca3af; transition: all 0.2s;
+        }
+        .speed-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; box-shadow: 0 0 10px rgba(217, 70, 239, 0.2); }
 
         /* UTILS */
         #loading-overlay { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
@@ -127,18 +156,11 @@
         .upload-loading { opacity: 0.7; pointer-events: none; animation: pulse 1.5s infinite; }
 
         .queue-item { animation: fadeIn 0.3s ease-in; }
-        
-        /* SPEED BUTTONS ACTIVE STATE */
-        .speed-btn {
-            font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
-            color: #9ca3af; transition: all 0.2s;
-        }
-        .speed-btn:hover { background: rgba(255,255,255,0.1); color: white; }
-        .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; box-shadow: 0 0 10px rgba(217, 70, 239, 0.2); }
-
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
+    <!-- MODIF : Padding safe-area pour les téléphones récents -->
+    <div class="fixed inset-0 pointer-events-none z-[200]" style="padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);"></div>
 
     <!-- HIDDEN SAFELIST FOR TAILWIND -->
     <div class="hidden">
@@ -209,14 +231,9 @@
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                 else await signInAnonymously(auth);
-                
-                // AJOUT : On confirme que la connexion est bonne
                 console.log("Connecté à Firebase avec succès");
-                
             } catch (error) {
                 console.error("Erreur Auth:", error);
-                // MODIF : On ne passe plus en mode local automatiquement ici pour te laisser voir l'erreur
-                // setTimeout(() => { ... }, 1000); 
                 showErrorToast("Erreur Connexion Firebase");
             }
         };
@@ -228,12 +245,6 @@
                 if (user && typeof window.initRealtimeData === 'function') window.initRealtimeData();
             });
         }
-        // MODIF : On supprime le fallback automatique ici aussi
-        /* else {
-            setTimeout(() => {
-                if(typeof window.switchToLocalMode === 'function') window.switchToLocalMode();
-            }, 1000);
-        } */
     </script>
 
     <!-- SIDEBAR -->
@@ -242,7 +253,6 @@
             <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
                 <i class="fas fa-microphone-alt text-xl md:text-2xl text-fuchsia-500"></i>
             </div>
-            <!-- MODIF: Texte "ON AIR" -->
             <h2 class="hidden md:block logo-text text-[10px] tracking-[0.2em] uppercase text-purple-300 font-bold animate-pulse">ON AIR</h2>
         </div>
         
@@ -289,9 +299,9 @@
                     <h2 class="text-2xl md:text-3xl text-fuchsia-500 tracking-[0.6em] font-light font-sans drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">ARTISTES</h2>
                 </div>
 
-                <!-- AJOUT : CONTAINER DES NOUVEAUTÉS -->
+                <!-- NOUVEAUTÉS -->
                 <div id="home-news-container" class="w-full max-w-2xl space-y-4 fade-in hidden z-20">
-                    <!-- Les cartes "Flash Info" seront injectées ici par le JS -->
+                     <!-- Injecté par JS -->
                 </div>
             </div>
         </section>
@@ -427,7 +437,7 @@
                             <input type="text" id="audio-title-input" placeholder="EX: I WILL SURVIVE" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white text-sm font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
                         </div>
                         
-                        <!-- NEW UPLOAD GRID UI - IDS UPDATED TO AVOID CONFLICT -->
+                        <!-- NEW UPLOAD GRID UI - IDS UPDATED -->
                         <div class="grid grid-cols-3 gap-3 mb-4">
                             <!-- AUDIO -->
                             <div class="relative">
@@ -468,7 +478,7 @@
                             </div>
                         </div>
 
-                        <!-- AJOUT : CASE À COCHER NOUVEAUTÉ -->
+                         <!-- CASE À COCHER NOUVEAUTÉ -->
                         <div class="mb-6 flex items-center bg-fuchsia-900/20 border border-fuchsia-500/30 rounded p-3">
                             <input type="checkbox" id="audio-is-new" class="w-5 h-5 accent-fuchsia-500 cursor-pointer mr-3">
                             <div>
@@ -887,7 +897,13 @@
         function setupEventListeners() {
             document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
             document.getElementById('admin-pass-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAdminPassword(); });
-            // Dropzone deleted
+            
+            // AJOUT : Sécurité anti-fermeture accidentelle
+            // Le navigateur demandera confirmation avant de fermer l'onglet
+            window.addEventListener('beforeunload', (e) => {
+                e.preventDefault();
+                e.returnValue = ''; 
+            });
         }
 
         // --- UI & LOGIQUE ---
@@ -954,6 +970,7 @@
         }
         
         function toggleArtistFilter(id) { selectedArtistId = (selectedArtistId === id) ? null : id; renderPlanning(); }
+
         // AJOUT : Fonction pour surligner une ligne entière
         window.toggleRowHighlight = function(dateStr) {
             if (highlightedRow === dateStr) highlightedRow = null;
@@ -995,11 +1012,14 @@
             const yearStr = currentDate.getFullYear();
             document.getElementById('current-month-display').textContent = `${monthName} ${yearStr}`;
 
-            let verticalMonthHTML = `<div class="month-sidebar flex flex-col justify-center items-center w-20 md:w-28 shrink-0 mr-4 md:mr-8 rounded-r-3xl border-r border-fuchsia-400/30">`;
+            let verticalMonthHTML = `<div class="month-sidebar flex flex-col justify-center items-center w-20 md:w-28 shrink-0 mr-4 md:mr-8 rounded-r-3xl border-r border-fuchsia-400/30 hidden md:flex">`; // MODIF: Caché sur très petits écrans si besoin, ou on le garde
             for(let char of monthName) { verticalMonthHTML += `<span class="month-char block text-5xl md:text-7xl font-black mb-0 md:mb-1 text-center w-full cursor-default select-none">${char}</span>`; }
             verticalMonthHTML += `</div>`;
 
-            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-20 pr-4"><div class=""></div><div class="col-span-3 flex items-center justify-center gap-2 bg-purple-900/40 p-3 rounded-t-xl border border-purple-500/20 backdrop-blur-sm"><i class="fas fa-microphone-alt text-purple-400"></i><span class="font-bold text-purple-100 tracking-[0.2em] uppercase text-xs">Chants</span></div><div></div><div class="col-span-3 flex items-center justify-center gap-2 bg-blue-900/40 p-3 rounded-t-xl border border-blue-500/20 backdrop-blur-sm"><i class="fas fa-music text-blue-400"></i><span class="font-bold text-blue-100 tracking-[0.2em] uppercase text-xs">Musiciens</span></div><div class="bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 rounded-l-lg border border-white/5 flex items-center justify-center">DATES</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10">Chant 1</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10">Chant 2</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10 rounded-r-lg">Chant 3</div><div class="flex justify-center"><div class="w-[1px] h-full bg-white/10"></div></div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10 rounded-l-lg">Piano</div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10">Basse</div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10 rounded-r-lg">Drum</div>`;
+            // MODIF : sticky-col ajouté à la case titre "DATES"
+            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-20 pr-4"><div class=""></div><div class="col-span-3 flex items-center justify-center gap-2 bg-purple-900/40 p-3 rounded-t-xl border border-purple-500/20 backdrop-blur-sm"><i class="fas fa-microphone-alt text-purple-400"></i><span class="font-bold text-purple-100 tracking-[0.2em] uppercase text-xs">Chants</span></div><div></div><div class="col-span-3 flex items-center justify-center gap-2 bg-blue-900/40 p-3 rounded-t-xl border border-blue-500/20 backdrop-blur-sm"><i class="fas fa-music text-blue-400"></i><span class="font-bold text-blue-100 tracking-[0.2em] uppercase text-xs">Musiciens</span></div>
+            <div class="bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 rounded-l-lg border border-white/5 flex items-center justify-center sticky-col">DATES</div>
+            <div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10">Chant 1</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10">Chant 2</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10 rounded-r-lg">Chant 3</div><div class="flex justify-center"><div class="w-[1px] h-full bg-white/10"></div></div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10 rounded-l-lg">Piano</div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10">Basse</div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10 rounded-r-lg">Drum</div>`;
 
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -1018,15 +1038,18 @@
                     const dayNum = d.getDate().toString().padStart(2, '0');
                     const isSat = d.getDay() === 6;
                     const isToday = new Date().toDateString() === d.toDateString();
+                    
+                    // MODIF : Background opaque pour la colonne sticky
                     const rowColor = isSat ? 'bg-fuchsia-900/40' : 'bg-fuchsia-900/20';
+                    // La couleur de la colonne date doit être unie pour cacher ce qui passe dessous
+                    const dateCellColor = isSat ? 'bg-[#2a1b3d]' : 'bg-[#1a0b2e]'; 
                     
                     // Gestion de la classe active pour la ligne
                     const isRowActive = highlightedRow === dateStr;
-                    // MODIF : On enlève les classes Tailwind "ring" pour laisser le CSS gérer le halo proprement
                     const activeClass = isRowActive ? 'row-active' : '';
 
-                    // Ajout du onclick sur la date pour surligner la ligne
-                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="flex flex-col justify-center items-center h-16 border border-white/5 rounded-lg ${rowColor} ${isToday ? 'ring-2 ring-fuchsia-400' : ''} ${activeClass} cursor-pointer hover:bg-white/10 transition-colors group relative"><span class="text-[9px] uppercase text-fuchsia-200 tracking-wider mb-0.5 group-hover:text-white transition-colors">${dayName}</span><span class="text-xl font-black text-white leading-none group-hover:scale-110 transition-transform">${dayNum}</span></div>`;
+                    // MODIF : Ajout de la classe 'sticky-col' et ajustement du background
+                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="flex flex-col justify-center items-center h-16 border border-white/5 rounded-lg ${dateCellColor} ${isToday ? 'ring-2 ring-fuchsia-400' : ''} ${activeClass} sticky-col cursor-pointer hover:bg-white/10 transition-colors group relative"><span class="text-[9px] uppercase text-fuchsia-200 tracking-wider mb-0.5 group-hover:text-white transition-colors">${dayName}</span><span class="text-xl font-black text-white leading-none group-hover:scale-110 transition-transform">${dayNum}</span></div>`;
 
                     ['chant1', 'chant2', 'chant3', 'sep', 'piano', 'basse', 'drum'].forEach(slot => {
                         if(slot === 'sep') gridHTML += `<div class="flex justify-center h-full"><div class="w-[1px] h-full bg-white/10"></div></div>`;
@@ -1650,7 +1673,7 @@
                 document.getElementById('play-btn').querySelector('i').className='fas fa-pause text-xl ml-1';
             } 
         };
-        
+
         window.resetPlayerUI = function() { document.getElementById('play-btn').querySelector('i').className='fas fa-play text-xl ml-1'; document.getElementById('progress-bar').style.width='0%'; };
         window.updateProgress = function() { 
              const a = document.getElementById('audio-element');
