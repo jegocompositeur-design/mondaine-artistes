@@ -203,50 +203,50 @@
                     <div class="flex-1 overflow-y-auto pr-2 pb-24 md:pb-0" id="audio-track-list"></div>
                 </div>
 
-                <!-- LECTEUR (Droite Desktop / Haut Mobile) -->
-                <div class="h-auto md:h-full w-full md:w-96 glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl">
+                <!-- LECTEUR (Droite Desktop / Haut Mobile) - ÉLARGIE SUR DESKTOP -->
+                <div class="h-auto md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl transition-all duration-300">
                     <div id="player-empty-state" class="flex flex-col items-center justify-center h-32 md:h-full text-center opacity-40">
-                        <i class="fas fa-headphones text-3xl md:text-4xl text-fuchsia-500 mb-2"></i>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Sélectionnez un titre</p>
+                        <i class="fas fa-headphones text-3xl md:text-5xl text-fuchsia-500 mb-2"></i>
+                        <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Sélectionnez un titre</p>
                     </div>
                     <div id="player-content" class="hidden flex flex-col h-full">
-                        <h3 id="player-title" class="text-xl md:text-2xl font-black text-white uppercase mb-4 md:mb-6 leading-tight truncate">TITRE</h3>
-                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-5 mb-4 border border-white/5 shadow-inner">
-                            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                                <div class="flex gap-1" id="speed-controls">
-                                    <button onclick="setSpeed(0.5)" class="speed-btn">0.5</button>
-                                    <button onclick="setSpeed(1.0)" class="speed-btn active-speed">1.0</button>
-                                    <button onclick="setSpeed(1.5)" class="speed-btn">1.5</button>
+                        <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight truncate">TITRE</h3>
+                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-5 md:p-8 mb-6 border border-white/5 shadow-inner">
+                            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                                <div class="flex gap-2" id="speed-controls">
+                                    <button onclick="setSpeed(0.5)" class="speed-btn px-3 py-1.5">0.5</button>
+                                    <button onclick="setSpeed(1.0)" class="speed-btn px-3 py-1.5 active-speed">1.0</button>
+                                    <button onclick="setSpeed(1.5)" class="speed-btn px-3 py-1.5">1.5</button>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-volume-up text-[10px] text-gray-500"></i>
-                                    <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-16">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-volume-up text-xs text-gray-500"></i>
+                                    <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-24">
                                 </div>
                             </div>
-                            <div class="flex justify-center items-center gap-6 mb-6">
-                                <button onclick="stopAudio()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-stop"></i></button>
-                                <button onclick="togglePlay()" id="play-btn" class="w-14 h-14 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white flex items-center justify-center shadow-[0_0_20px_rgba(217,70,239,0.3)]"><i class="fas fa-play ml-1 text-lg"></i></button>
-                                <button onclick="resetAudio()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-redo-alt"></i></button>
+                            <div class="flex justify-center items-center gap-8 mb-8">
+                                <button onclick="stopAudio()" class="text-gray-500 hover:text-white transition-colors text-lg"><i class="fas fa-stop"></i></button>
+                                <button onclick="togglePlay()" id="play-btn" class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white flex items-center justify-center shadow-[0_0_30px_rgba(217,70,239,0.4)] hover:scale-105 transition-transform"><i class="fas fa-play ml-1 text-2xl md:text-3xl"></i></button>
+                                <button onclick="resetAudio()" class="text-gray-500 hover:text-white transition-colors text-lg"><i class="fas fa-redo-alt"></i></button>
                             </div>
                             <audio id="audio-element" ontimeupdate="updateProgress()" onended="resetPlayerUI()"></audio>
-                            <div class="w-full bg-gray-800 h-1.5 rounded-full mb-2 cursor-pointer" onclick="seekAudio(event)">
-                                <div id="progress-bar" class="bg-fuchsia-500 h-full w-0"></div>
+                            <div class="w-full bg-gray-800 h-2 rounded-full mb-3 cursor-pointer" onclick="seekAudio(event)">
+                                <div id="progress-bar" class="bg-fuchsia-500 h-full w-0 rounded-full shadow-[0_0_10px_#d946ef]"></div>
                             </div>
-                            <div class="flex justify-between text-[10px] text-gray-500 font-mono">
+                            <div class="flex justify-between text-xs text-gray-400 font-mono">
                                 <span id="time-current">00:00</span>
                                 <span id="time-total">00:00</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <a id="btn-lyrics" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
-                                <i class="fas fa-align-center mb-1 text-blue-400"></i><span>Paroles</span>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <a id="btn-lyrics" href="#" target="_blank" class="flex flex-col items-center justify-center p-4 bg-blue-900/20 border border-blue-500/20 rounded-2xl opacity-50 text-[10px] md:text-xs font-bold uppercase transition-all hover:bg-blue-900/30">
+                                <i class="fas fa-align-center mb-2 text-blue-400 text-lg"></i><span>Paroles</span>
                             </a>
-                            <a id="btn-sheet" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 bg-orange-900/20 border border-orange-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
-                                <i class="fas fa-music mb-1 text-orange-400"></i><span>Partition</span>
+                            <a id="btn-sheet" href="#" target="_blank" class="flex flex-col items-center justify-center p-4 bg-orange-900/20 border border-orange-500/20 rounded-2xl opacity-50 text-[10px] md:text-xs font-bold uppercase transition-all hover:bg-orange-900/30">
+                                <i class="fas fa-music mb-2 text-orange-400 text-lg"></i><span>Partition</span>
                             </a>
                         </div>
-                        <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 p-3 bg-red-900/20 border border-red-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
-                            <i class="fab fa-youtube text-red-500 text-lg"></i><span>Vidéo / Choré</span>
+                        <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-3 p-4 bg-red-900/20 border border-red-500/20 rounded-2xl opacity-50 text-[10px] md:text-xs font-bold uppercase transition-all hover:bg-red-900/30">
+                            <i class="fab fa-youtube text-red-500 text-2xl"></i><span>Vidéo / Choré</span>
                         </a>
                     </div>
                 </div>
@@ -402,7 +402,6 @@
         window.uploadSingleFile = function(input, type, btnId, targetId) {
             const file = input.files[0]; if (!file) return;
             const btn = document.getElementById(btnId);
-            const original = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
             btn.classList.add('opacity-50');
 
@@ -424,7 +423,6 @@
             });
         };
 
-        // RESTAURATION : Calcul de la liste des dates assignées
         function getArtistScheduleHTML(artistId) {
             const artistAssignments = [];
             for (const [key, assignedId] of Object.entries(assignments)) {
@@ -446,7 +444,6 @@
             }).join('')}</ul></div>`;
         }
 
-        // RESTAURATION : Rendu de la liste avec catégories
         function renderArtistList(roleId) {
             const artists = ARTISTS.filter(a => a.role === roleId);
             return artists.map(a => {
@@ -470,7 +467,6 @@
             const monthName = currentDate.toLocaleDateString('fr-FR', {month: 'long'}).toUpperCase();
             document.getElementById('current-month-display').textContent = `${monthName} ${currentDate.getFullYear()}`;
 
-            // RESTAURATION : Sidebar verticale du mois pour Desktop
             let verticalMonthHTML = `<div class="month-sidebar flex flex-col justify-center items-center w-20 md:w-28 shrink-0 mr-4 md:mr-8 rounded-r-3xl border-r border-fuchsia-400/30 hidden md:flex">`;
             for(let char of monthName) { verticalMonthHTML += `<span class="month-char block text-5xl md:text-7xl font-black mb-1 text-center w-full">${char}</span>`; }
             verticalMonthHTML += `</div>`;
@@ -521,7 +517,6 @@
             gridHTML += `</div></div>`;
             container.innerHTML = verticalMonthHTML + gridHTML;
 
-            // RESTAURATION : Rendu de la sidebar avec catégories
             const roles = [
                 { id: 'chant', label: 'Chants', icon: 'fa-microphone-alt', color: 'text-fuchsia-400' },
                 { id: 'piano', label: 'Piano', icon: 'fa-keyboard', color: 'text-green-400' },
@@ -563,7 +558,7 @@
             a.currentTime = 0; lastPlayStart = 0;
             updateBtn('btn-lyrics', currentTrack.lyrics);
             updateBtn('btn-sheet', currentTrack.sheet);
-            updateBtn('btn-youtube', currentTrack.youtube); // RESTAURATION
+            updateBtn('btn-youtube', currentTrack.youtube);
             renderAudioList(document.getElementById('audio-search').value);
         };
 
@@ -582,12 +577,12 @@
 
         window.togglePlay = () => {
             const a = document.getElementById('audio-element'); const i = document.getElementById('play-btn').querySelector('i');
-            if(a.paused) { a.play(); i.className = "fas fa-pause text-lg"; lastPlayStart = a.currentTime; }
-            else { a.pause(); i.className = "fas fa-play text-lg ml-1"; }
+            if(a.paused) { a.play(); i.className = "fas fa-pause text-2xl md:text-3xl"; lastPlayStart = a.currentTime; }
+            else { a.pause(); i.className = "fas fa-play text-2xl md:text-3xl ml-1"; }
         };
         window.stopAudio = () => { const a = document.getElementById('audio-element'); a.pause(); a.currentTime = 0; resetPlayerUI(); };
-        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPlayStart; a.play(); document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-lg"; };
-        window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play text-lg ml-1"; };
+        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPlayStart; a.play(); document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl"; };
+        window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play text-2xl md:text-3xl ml-1"; };
         window.updateProgress = () => {
             const a = document.getElementById('audio-element');
             if(a.duration) {
@@ -741,7 +736,13 @@
         }
         window.selectColor = (el, c) => { document.getElementById('selected-color-value').value=c; document.querySelectorAll('#new-artist-color-picker div').forEach(d=>d.style.transform=(el===d)?'scale(1.2)':'scale(1)'); };
 
-        window.onload = () => { showPage('home'); updateColorPicker(); window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); };
+        window.onload = () => { 
+            showPage('home'); 
+            updateColorPicker(); 
+            // FIX : Activation du moteur de recherche sur tous les supports
+            document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
+            window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); 
+        };
     </script>
 </body>
 </html>
