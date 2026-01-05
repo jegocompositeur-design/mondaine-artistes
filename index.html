@@ -203,14 +203,15 @@
                     <div class="flex-1 overflow-y-auto pr-2 pb-24 md:pb-0" id="audio-track-list"></div>
                 </div>
 
-                <!-- LECTEUR (Droite Desktop / Haut Mobile) - ÉLARGIE SUR DESKTOP -->
+                <!-- LECTEUR (Droite Desktop / Haut Mobile) -->
                 <div class="h-auto md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl transition-all duration-300">
                     <div id="player-empty-state" class="flex flex-col items-center justify-center h-32 md:h-full text-center opacity-40">
                         <i class="fas fa-headphones text-3xl md:text-5xl text-fuchsia-500 mb-2"></i>
                         <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Sélectionnez un titre</p>
                     </div>
                     <div id="player-content" class="hidden flex flex-col h-full">
-                        <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight truncate">TITRE</h3>
+                        <!-- TITRE ADAPTÉ : suppression de truncate, ajout de break-words -->
+                        <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight break-words">TITRE</h3>
                         <div class="bg-black/40 rounded-2xl md:rounded-3xl p-5 md:p-8 mb-6 border border-white/5 shadow-inner">
                             <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
                                 <div class="flex gap-2" id="speed-controls">
@@ -556,6 +557,11 @@
             const a = document.getElementById('audio-element');
             a.src = currentTrack.src || "";
             a.currentTime = 0; lastPlayStart = 0;
+            
+            // MODIFICATION : Lecture automatique au chargement
+            a.play().catch(e => console.log("Auto-play blocked, interaction required"));
+            document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl";
+            
             updateBtn('btn-lyrics', currentTrack.lyrics);
             updateBtn('btn-sheet', currentTrack.sheet);
             updateBtn('btn-youtube', currentTrack.youtube);
@@ -600,6 +606,7 @@
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'artists'), s => { ARTISTS = s.docs.map(d=>d.data()); renderAdminTeamList(); renderPlanning(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'planning'), s => { assignments = {}; s.forEach(d=>assignments[d.id]=d.data().artistId); renderPlanning(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'audio'), s => { AUDIO_LIBRARY = s.docs.map(d=>d.data()); renderAudioList(); renderAdminAudioList(); renderHomeNews(); });
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'audio_library'), s => {  }); // Placeholder
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'setlists'), s => { s.forEach(d=>{if(SETLISTS[d.id]) SETLISTS[d.id]=d.data();}); renderSetlistPublic(); });
             setTimeout(() => document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none'), 800);
         };
@@ -739,7 +746,6 @@
         window.onload = () => { 
             showPage('home'); 
             updateColorPicker(); 
-            // FIX : Activation du moteur de recherche sur tous les supports
             document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
             window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); 
         };
