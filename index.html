@@ -338,7 +338,7 @@
 
                         <div class="flex items-center gap-3 mb-6 bg-fuchsia-900/20 p-3 rounded-lg border border-fuchsia-500/20">
                             <input type="checkbox" id="audio-is-new" class="w-4 h-4 accent-fuchsia-500">
-                            <label for="audio-is-new" class="text-xs font-bold uppercase text-white cursor-pointer">Nouveauté / À travailler</label>
+                            <label for="audio-is-new" class="text-xs font-bold uppercase text-white cursive cursor-pointer">Nouveauté / À travailler</label>
                         </div>
 
                         <div class="flex gap-2">
@@ -361,23 +361,25 @@
 
     <!-- MODAL MOT DE PASSE ADMIN -->
     <div id="password-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center">
-            <h3 class="text-white font-black text-xl mb-6 uppercase">Admin Mondaine</h3>
-            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded p-3 text-center text-white mb-4 focus:border-fuchsia-500 outline-none" placeholder="••••">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModal('password-modal')" class="py-3 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold uppercase">Annuler</button>
-                <button onclick="checkAdminPassword()" class="py-3 bg-fuchsia-600 text-white rounded-lg text-xs font-bold uppercase">OK</button>
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center shadow-[0_0_50px_rgba(217,70,239,0.3)]">
+            <h3 class="text-white font-black text-xl mb-6 uppercase tracking-tighter">Admin Mondaine</h3>
+            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-center text-white mb-6 focus:border-fuchsia-500 outline-none text-2xl tracking-[0.5em]" placeholder="••••">
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="closeModal('password-modal')" class="py-4 border border-white/10 text-gray-400 rounded-xl text-xs font-bold uppercase hover:bg-white/5 transition-all">Annuler</button>
+                <button onclick="checkAdminPassword()" class="py-4 bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white rounded-xl text-xs font-bold uppercase shadow-lg shadow-fuchsia-500/20">OK</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL ASSIGNATION PLANNING -->
     <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm">
-            <h3 class="text-white font-bold uppercase text-xs mb-4 text-center border-b border-white/10 pb-2" id="modal-slot-info">Assigner Artiste</h3>
-            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
-            <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg text-xs font-bold uppercase">Retirer l'artiste</button>
-            <button onclick="closeModal('assign-modal')" class="w-full mt-2 py-2 text-gray-500 text-[10px] uppercase font-bold">Fermer</button>
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <h3 class="text-white font-bold uppercase text-[10px] tracking-widest mb-6 text-center border-b border-white/5 pb-4" id="modal-slot-info">Assigner Artiste</h3>
+            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1"></div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-3">
+                <button onclick="removeAssignment()" class="w-full py-4 border border-red-500/30 text-red-400 rounded-xl text-[10px] font-bold uppercase hover:bg-red-500/5 transition-all">Retirer l'artiste</button>
+                <button onclick="closeModal('assign-modal')" class="w-full py-2 text-gray-500 text-[9px] uppercase font-bold hover:text-white transition-colors">Fermer</button>
+            </div>
         </div>
     </div>
 
@@ -468,6 +470,7 @@
             const container = document.getElementById('planning-container');
             const sidebar = document.getElementById('artist-sidebar-content');
             const mobileContainer = document.getElementById('artist-mobile-content');
+            if(!container) return;
             
             const monthName = currentDate.toLocaleDateString('fr-FR', {month: 'long'}).toUpperCase();
             document.getElementById('current-month-display').textContent = `${monthName} ${currentDate.getFullYear()}`;
@@ -547,6 +550,7 @@
 
         function renderAudioList(term='') {
             const list = document.getElementById('audio-track-list');
+            if(!list) return;
             const filtered = AUDIO_LIBRARY.filter(t => t.title.toLowerCase().includes(term.toLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
             list.innerHTML = filtered.map(t => `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}">
                 <span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i>
@@ -639,7 +643,7 @@
 
         window.renderHomeNews = () => {
             const c = document.getElementById('home-news-container'); const nt = AUDIO_LIBRARY.filter(t => t.isNew);
-            if(!nt.length) { c.classList.add('hidden'); return; }
+            if(!nt.length || !c) { if(c) c.classList.add('hidden'); return; }
             c.classList.remove('hidden');
             c.innerHTML = `<div class="bg-red-900/80 p-4 rounded-xl border border-red-500/50 shadow-lg animate-pulse">
                 <h3 class="text-white font-black text-xs mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> NOUVEAUTÉ À TRAVAILLER</h3>
@@ -653,6 +657,7 @@
 
         function renderSetlistPublic() {
             const c = document.getElementById('setlist-public-container');
+            if(!c) return;
             const d = [{k:'wed',c:'blue'},{k:'thu',c:'purple'},{k:'fri',c:'pink'},{k:'sat',c:'indigo'}];
             c.innerHTML = d.map(day => `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl">
                 <div class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm">${SETLISTS[day.k].date}</div>
@@ -688,8 +693,18 @@
         }
 
         window.toggleSidebar = () => { document.getElementById('main-sidebar').classList.toggle('sidebar-collapsed'); };
-        window.toggleAdminMode = () => { if(isAdminMode) { isAdminMode=false; updateAdminUI(); } else document.getElementById('password-modal').classList.remove('hidden'); };
-        window.checkAdminPassword = () => { if(document.getElementById('admin-pass-input').value==='mondaine') { isAdminMode=true; updateAdminUI(); closeModal('password-modal'); } };
+        window.toggleAdminMode = () => { 
+            if(isAdminMode) { isAdminMode=false; updateAdminUI(); } 
+            else { document.getElementById('password-modal').classList.remove('hidden'); } 
+        };
+        window.checkAdminPassword = () => { 
+            if(document.getElementById('admin-pass-input').value==='mondaine') { 
+                isAdminMode=true; updateAdminUI(); closeModal('password-modal'); 
+                document.getElementById('admin-pass-input').value = '';
+            } else {
+                showToast("Mot de passe incorrect");
+            }
+        };
         window.updateAdminUI = () => { document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); renderPlanning(); };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
         window.handleCellClick = (d, s) => { currentEditSlot = {dateStr:d, slot:s}; renderModalArtists(); document.getElementById('assign-modal').classList.remove('hidden'); };
@@ -708,7 +723,9 @@
         
         function renderAdminAudioList() {
             const sorted = [...AUDIO_LIBRARY].sort((a,b) => a.title.localeCompare(b.title));
-            document.getElementById('admin-audio-list').innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join('');
+            const container = document.getElementById('admin-audio-list');
+            if(!container) return;
+            container.innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join('');
         }
 
         function renderAdminTeamList() {
@@ -740,7 +757,9 @@
 
         function updateColorPicker() {
             const colors = ['bg-pink-500','bg-fuchsia-500','bg-purple-500','bg-indigo-500','bg-blue-500','bg-teal-500','bg-green-500','bg-yellow-500','bg-orange-500','bg-red-500'];
-            document.getElementById('new-artist-color-picker').innerHTML = colors.map(c => `<div class="w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all ${c}" onclick="selectColor(this,'${c} text-white')"></div>`).join('');
+            const container = document.getElementById('new-artist-color-picker');
+            if(!container) return;
+            container.innerHTML = colors.map(c => `<div class="w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all ${c}" onclick="selectColor(this,'${c} text-white')"></div>`).join('');
             selectColor(null, colors[0]+' text-white');
         }
         window.selectColor = (el, c) => { document.getElementById('selected-color-value').value=c; document.querySelectorAll('#new-artist-color-picker div').forEach(d=>d.style.transform=(el===d)?'scale(1.2)':'scale(1)'); };
