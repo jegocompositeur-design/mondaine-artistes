@@ -36,7 +36,6 @@
         .sidebar-collapsed { width: 5rem !important; }
         .sidebar-collapsed .nav-text, .sidebar-collapsed .logo-text { display: none !important; }
         
-        /* STICKY COLUMN FOR MOBILE */
         @media (max-width: 1024px) {
             .sticky-col {
                 position: sticky;
@@ -80,7 +79,6 @@
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
 
-    <!-- LOADING SCREEN -->
     <div id="loading-overlay">
         <div class="flex flex-col items-center">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500 mb-4 shadow-[0_0_15px_#d946ef]"></div>
@@ -88,7 +86,6 @@
         </div>
     </div>
 
-    <!-- FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -120,7 +117,6 @@
         });
     </script>
 
-    <!-- SIDEBAR -->
     <aside id="main-sidebar" class="w-20 md:w-64 bg-black/80 backdrop-blur-xl border-r border-white/5 flex flex-col z-50 shrink-0 transition-all duration-300">
         <div class="p-4 md:p-8 text-center">
             <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30">
@@ -147,7 +143,6 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 relative overflow-hidden bg-[#050505]">
         <!-- ACCUEIL -->
         <section id="home" class="page-section h-full w-full absolute inset-0 z-10 overflow-y-auto">
@@ -193,7 +188,6 @@
         <!-- AUDIO -->
         <section id="audio" class="page-section h-full w-full absolute inset-0 hidden overflow-hidden bg-[#080510]">
             <div class="flex h-full flex-col md:flex-row">
-                <!-- LISTE (Gauche Desktop / Bas Mobile) -->
                 <div class="flex-1 flex flex-col p-4 md:p-8 overflow-hidden order-2 md:order-1">
                     <h2 class="hidden md:block text-3xl font-black text-white mb-6 uppercase tracking-tighter">AUDIO <span class="text-fuchsia-600">PLAYER</span></h2>
                     <div class="mb-4 md:mb-6 relative">
@@ -203,14 +197,12 @@
                     <div class="flex-1 overflow-y-auto pr-2 pb-24 md:pb-0" id="audio-track-list"></div>
                 </div>
 
-                <!-- LECTEUR (Droite Desktop / Haut Mobile) -->
                 <div class="h-auto md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl transition-all duration-300">
                     <div id="player-empty-state" class="flex flex-col items-center justify-center h-32 md:h-full text-center opacity-40">
                         <i class="fas fa-headphones text-3xl md:text-5xl text-fuchsia-500 mb-2"></i>
                         <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Sélectionnez un titre</p>
                     </div>
                     <div id="player-content" class="hidden flex flex-col h-full">
-                        <!-- TITRE ADAPTÉ : suppression de truncate, ajout de break-words -->
                         <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight break-words">TITRE</h3>
                         <div class="bg-black/40 rounded-2xl md:rounded-3xl p-5 md:p-8 mb-6 border border-white/5 shadow-inner">
                             <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
@@ -264,7 +256,6 @@
             </header>
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-                <!-- EQUIPE -->
                 <div class="lg:col-span-5 bg-white/5 p-6 rounded-2xl border border-white/5">
                     <h3 class="text-fuchsia-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
                         <i class="fas fa-users"></i> Gestion de l'équipe
@@ -286,7 +277,6 @@
                     <div id="admin-team-list" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
                 </div>
 
-                <!-- SETLISTS -->
                 <div class="lg:col-span-7 bg-white/5 p-6 rounded-2xl border border-white/5">
                     <h3 class="text-blue-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
                         <i class="fas fa-list-ol"></i> Édition Hebdomadaire
@@ -312,7 +302,6 @@
                 </div>
             </div>
 
-            <!-- AUDIO ADMIN -->
             <div class="bg-white/5 p-6 rounded-2xl border border-white/5">
                 <h3 class="text-fuchsia-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
                     <i class="fas fa-headphones"></i> Bibliothèque Audio & Fichiers
@@ -370,6 +359,28 @@
         <i class="fas fa-check-circle text-lg"></i> <span id="toast-msg">Enregistré</span>
     </div>
 
+    <!-- MODAL MOT DE PASSE ADMIN -->
+    <div id="password-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center">
+            <h3 class="text-white font-black text-xl mb-6 uppercase">Admin Mondaine</h3>
+            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded p-3 text-center text-white mb-4 focus:border-fuchsia-500 outline-none" placeholder="••••">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModal('password-modal')" class="py-3 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold uppercase">Annuler</button>
+                <button onclick="checkAdminPassword()" class="py-3 bg-fuchsia-600 text-white rounded-lg text-xs font-bold uppercase">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ASSIGNATION PLANNING -->
+    <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm">
+            <h3 class="text-white font-bold uppercase text-xs mb-4 text-center border-b border-white/10 pb-2" id="modal-slot-info">Assigner Artiste</h3>
+            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
+            <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg text-xs font-bold uppercase">Retirer l'artiste</button>
+            <button onclick="closeModal('assign-modal')" class="w-full mt-2 py-2 text-gray-500 text-[10px] uppercase font-bold">Fermer</button>
+        </div>
+    </div>
+
     <!-- SCRIPTS -->
     <script>
         let ARTISTS = [];
@@ -389,15 +400,8 @@
         function showToast(msg) {
             const t = document.getElementById('toast-notification');
             if(msg) document.getElementById('toast-msg').innerText = msg;
-            t.classList.add('toast-visible');
-            setTimeout(() => t.classList.remove('toast-visible'), 3000);
-        }
-        function showErrorToast(msg) {
-            const t = document.getElementById('error-toast');
-            if(!t) { alert(msg); return; }
-            document.getElementById('error-message').innerText = msg;
             t.classList.add('opacity-100');
-            setTimeout(() => t.classList.remove('opacity-100'), 5000);
+            setTimeout(() => t.classList.remove('opacity-100'), 3000);
         }
 
         window.uploadSingleFile = function(input, type, btnId, targetId) {
@@ -437,8 +441,8 @@
                 }
             }
             artistAssignments.sort((a, b) => a.date - b.date);
-            if (artistAssignments.length === 0) return '<div class="text-[9px] text-gray-500 text-center py-1 schedule-dropdown">Aucune date ce mois-ci</div>';
-            return `<div class="mt-1 bg-white/5 rounded-lg p-2 schedule-dropdown"><ul class="space-y-1">${artistAssignments.map(a => {
+            if (artistAssignments.length === 0) return '<div class="text-[9px] text-gray-500 text-center py-1">Aucune date ce mois-ci</div>';
+            return `<div class="mt-1 bg-white/5 rounded-lg p-2"><ul class="space-y-1">${artistAssignments.map(a => {
                 const dayName = a.date.toLocaleDateString('fr-FR', {weekday: 'short'});
                 const dayNum = a.date.getDate().toString().padStart(2, '0');
                 return `<li class="flex justify-between text-[10px] text-gray-300"><span class="font-bold text-fuchsia-400 capitalize">${dayName} ${dayNum}</span><span class="uppercase opacity-70 text-[9px]">${a.slot.replace(/(\d+)$/, ' $1')}</span></li>`;
@@ -558,8 +562,7 @@
             a.src = currentTrack.src || "";
             a.currentTime = 0; lastPlayStart = 0;
             
-            // MODIFICATION : Lecture automatique au chargement
-            a.play().catch(e => console.log("Auto-play blocked, interaction required"));
+            a.play().catch(e => console.log("Auto-play bloqué par le navigateur"));
             document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl";
             
             updateBtn('btn-lyrics', currentTrack.lyrics);
@@ -603,10 +606,9 @@
         window.setVolume = (v) => { document.getElementById('audio-element').volume = v; };
 
         window.initRealtimeData = () => {
-            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'artists'), s => { ARTISTS = s.docs.map(d=>d.data()); renderAdminTeamList(); renderPlanning(); });
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'artists'), s => { ARTISTS = s.docs.map(d=>d.data()); renderPlanning(); renderAdminTeamList(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'planning'), s => { assignments = {}; s.forEach(d=>assignments[d.id]=d.data().artistId); renderPlanning(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'audio'), s => { AUDIO_LIBRARY = s.docs.map(d=>d.data()); renderAudioList(); renderAdminAudioList(); renderHomeNews(); });
-            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'audio_library'), s => {  }); // Placeholder
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'setlists'), s => { s.forEach(d=>{if(SETLISTS[d.id]) SETLISTS[d.id]=d.data();}); renderSetlistPublic(); });
             setTimeout(() => document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none'), 800);
         };
