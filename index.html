@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- MODIF : Ajout de viewport-fit=cover pour les écrans pleins (iPhone notch) -->
+    <!-- Viewport optimisé pour mobile et encoches (notch) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Intranet Artistes Mondaine - Gestion de planning et bibliothèque audio.">
     <meta name="theme-color" content="#1a0b2e">
@@ -45,20 +45,20 @@
         .sidebar-collapsed { width: 5rem !important; }
         .sidebar-collapsed .nav-text, .sidebar-collapsed .logo-text { display: none !important; }
         
-        /* AJOUT : Classe pour figer la colonne date sur mobile */
+        /* MOBILE RESPONSIVE FIXES */
         .sticky-col {
             position: sticky;
             left: 0;
-            z-index: 30; /* Au-dessus du reste */
-            background-color: #0a0a0c; /* Fond opaque nécessaire pour cacher le scroll */
-            box-shadow: 4px 0 15px rgba(0,0,0,0.5); /* Ombre pour détacher la colonne */
+            z-index: 30;
+            background-color: #0a0a0c;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.5);
             border-right: 1px solid rgba(255,255,255,0.1);
         }
-        /* Ajustement si la ligne est active (surbrillance) */
-        .row-active.sticky-col {
-            z-index: 45 !important;
-            /* On garde l'effet halo mais on assure l'opacité */
-            background-color: #1a0b2e !important; 
+        .row-active.sticky-col { z-index: 45 !important; background-color: #1a0b2e !important; }
+
+        @media (max-width: 768px) {
+            .track-item { padding-top: 1rem; padding-bottom: 1rem; font-size: 0.95rem; }
+            .artist-pill { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
         }
 
         /* PLANNING CELLS */
@@ -66,32 +66,13 @@
         .planning-cell.interactive:hover { filter: brightness(1.3); border-color: rgba(255,255,255,0.3); transform: translateY(-2px); z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
         .artist-pill { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .artist-pill:hover { transform: scale(1.05); }
         .artist-pill.selected { box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: scale(1.05); z-index: 10; border: 1px solid rgba(255,255,255,0.8); }
 
-        /* HIGHLIGHTS PLANNING */
-        .cell-highlight { 
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important; 
-            border: 2px solid white !important; 
-            z-index: 50 !important; 
-            transform: scale(1.1) !important;
-            filter: brightness(1.2);
-        }
-        .cell-dimmed { 
-            opacity: 0.15 !important; 
-            filter: grayscale(100%) blur(1px) !important;
-            transform: scale(0.95);
-            pointer-events: none;
-        }
-        
-        /* Style pour la ligne active (date sélectionnée) */
-        .row-active {
-            /* Halo blanc lumineux autour, sans toucher au fond */
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.15) !important;
-            z-index: 40;
-        }
+        /* HIGHLIGHTS */
+        .cell-highlight { box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important; border: 2px solid white !important; z-index: 50 !important; transform: scale(1.1) !important; filter: brightness(1.2); }
+        .cell-dimmed { opacity: 0.15 !important; filter: grayscale(100%) blur(1px) !important; transform: scale(0.95); pointer-events: none; }
+        .row-active { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.15) !important; z-index: 40; }
 
-        /* Lettres du mois */
         .month-char { color: #ffffff; line-height: 0.85; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .month-sidebar { background: linear-gradient(180deg, #d946ef 0%, #7e22ce 100%); box-shadow: 5px 0 30px rgba(0,0,0,0.6); }
 
@@ -100,898 +81,548 @@
         .admin-textarea { background-color: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #ddd; font-family: 'Courier New', monospace; font-size: 0.85rem; transition: all 0.3s; }
         .admin-textarea:focus { outline: none; border-color: #d946ef; box-shadow: 0 0 15px rgba(217, 70, 239, 0.2); background-color: rgba(0,0,0,0.6); }
 
-        .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative; }
-        .color-swatch:hover { transform: scale(1.1); }
-        .color-swatch.active { border-color: white; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        .color-swatch.used { opacity: 0.3; transform: scale(0.8); filter: grayscale(1); }
-
         /* AUDIO PLAYER */
         .track-item { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        /* MODIF : Texte plus grand et padding plus confortable sur mobile */
-        .track-item:hover { background-color: rgba(255,255,255,0.05); padding-left: 1.25rem; }
         .track-item.active { background: linear-gradient(90deg, rgba(217, 70, 239, 0.15) 0%, transparent 100%); border-left: 3px solid #d946ef; padding-left: 1.25rem; color: #f0abfc; }
         
-        /* AJOUT : Meilleure zone de touche sur mobile */
-        @media (max-width: 768px) {
-            .track-item { padding-top: 1rem; padding-bottom: 1rem; font-size: 0.95rem; } /* Plus aéré */
-            .artist-pill { padding: 0.75rem 0.5rem; font-size: 0.75rem; } /* Pills plus gros */
-        }
-
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #d946ef; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px #d946ef; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; cursor: pointer; background: rgba(255,255,255,0.2); }
 
-        /* SPEED BUTTONS ACTIVE STATE */
-        .speed-btn {
-            font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
-            color: #9ca3af; transition: all 0.2s;
-        }
-        .speed-btn:hover { background: rgba(255,255,255,0.1); color: white; }
-        .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; box-shadow: 0 0 10px rgba(217, 70, 239, 0.2); }
+        .speed-btn { font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); color: #9ca3af; transition: all 0.2s; }
+        .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; }
 
         /* UTILS */
         #loading-overlay { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .status-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .status-online { background: rgba(22, 163, 74, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.2); }
-        .status-offline { background: rgba(234, 88, 12, 0.2); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.2); }
-        
         .toast-visible { animation: slideUpFade 3s ease-in-out forwards; }
         @keyframes slideUpFade { 0% { transform: translate(-50%, 100%); opacity: 0; } 10% { transform: translate(-50%, -20%); opacity: 1; } 90% { transform: translate(-50%, -20%); opacity: 1; } 100% { transform: translate(-50%, 100%); opacity: 0; } }
 
-        /* UPLOAD BUTTONS */
-        .upload-btn {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100px; width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 0.75rem;
-            cursor: pointer; transition: all 0.3s;
-            color: #9ca3af;
-        }
-        .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: white; transform: translateY(-2px); }
-        .upload-btn i { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        .upload-btn span { font-size: 0.65rem; font-weight: 700; uppercase; letter-spacing: 0.1em; }
-        
-        .upload-success { background: rgba(22, 163, 74, 0.8) !important; color: white !important; border-color: #4ade80 !important; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3); }
+        .upload-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; cursor: pointer; transition: all 0.3s; color: #9ca3af; }
+        .upload-success { background: rgba(22, 163, 74, 0.8) !important; color: white !important; }
         .upload-loading { opacity: 0.7; pointer-events: none; animation: pulse 1.5s infinite; }
-
-        .queue-item { animation: fadeIn 0.3s ease-in; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
-    <!-- MODIF : Padding safe-area pour les téléphones récents -->
-    <div class="fixed inset-0 pointer-events-none z-[200]" style="padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);"></div>
-
-    <!-- HIDDEN SAFELIST FOR TAILWIND -->
-    <div class="hidden">
-        <div class="bg-fuchsia-500 bg-pink-500 bg-rose-500 bg-purple-500 bg-indigo-500 bg-fuchsia-400 bg-pink-400 bg-rose-400"></div>
-        <div class="bg-pink-300 bg-fuchsia-300 bg-sky-300 bg-lime-300 bg-yellow-300 bg-orange-300 bg-teal-300 bg-cyan-300 bg-violet-300"></div>
-        <div class="bg-green-600 bg-emerald-700 bg-lime-700 bg-yellow-800 bg-amber-900 bg-stone-700 bg-green-800 bg-olive-700"></div>
-        <div class="bg-violet-600 bg-purple-800 bg-indigo-700 bg-blue-600 bg-cyan-700 bg-sky-900 bg-slate-700 bg-blue-900"></div>
-        <div class="bg-red-600 bg-orange-600 bg-amber-600 bg-yellow-500 bg-red-800 bg-yellow-800 bg-orange-800 bg-rose-700"></div>
-        <div class="text-white text-gray-800 text-black"></div>
-        <div class="text-blue-400 text-purple-400 text-pink-400 text-indigo-400 bg-blue-900/10 bg-purple-900/10 bg-pink-900/10 bg-indigo-900/10 border-blue-500/30 border-purple-500/30 border-pink-500/30 border-indigo-500/30 header-blue header-purple header-pink header-indigo"></div>
-    </div>
 
     <!-- LOADING SCREEN -->
     <div id="loading-overlay">
         <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500 mb-4 shadow-[0_0_15px_#d946ef]"></div>
-            <p class="text-white font-serif tracking-[0.3em] text-xs animate-pulse">MONDAINE ARTISTES</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500 mb-4"></div>
+            <p class="text-white font-serif tracking-[0.3em] text-xs animate-pulse uppercase">Mondaine Artistes</p>
         </div>
     </div>
 
-    <!-- FIREBASE MODULE & LOGIC -->
+    <!-- FIREBASE MODULE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // IMPORT STORAGE
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // =================================================================
-        // CONFIGURATION FIREBASE
-        // =================================================================
-        let firebaseConfig;
-        let appId = 'mondaine-prod';
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTiIaFghO0asxaxp_jtfkUGZj3sSC9ipM",
+            authDomain: "mondaine-artistes.firebaseapp.com",
+            projectId: "mondaine-artistes",
+            storageBucket: "mondaine-artistes.firebasestorage.app",
+            messagingSenderId: "490049497488",
+            appId: "1:490049497488:web:80f210d3e70689bbdbeb15"
+        };
 
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-            try {
-                firebaseConfig = JSON.parse(__firebase_config);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'mondaine-preview';
-            } catch (e) { console.warn("Invalid Canvas Config", e); }
-        } 
-        
-        if (!firebaseConfig) {
-            firebaseConfig = {
-                apiKey: "AIzaSyCTiIaFghO0asxaxp_jtfkUGZj3sSC9ipM",
-                authDomain: "mondaine-artistes.firebaseapp.com",
-                projectId: "mondaine-artistes",
-                storageBucket: "mondaine-artistes.firebasestorage.app",
-                messagingSenderId: "490049497488",
-                appId: "1:490049497488:web:80f210d3e70689bbdbeb15"
-            };
-        }
-
-        let app, auth, db, storage;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            storage = getStorage(app); // Init Storage
-        } catch (e) { console.error("Erreur Init Firebase:", e); }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const appId = 'mondaine-prod';
 
         window.db = db; window.auth = auth; window.appId = appId; window.storage = storage;
         window.collection = collection; window.doc = doc; window.setDoc = setDoc; window.deleteDoc = deleteDoc; window.onSnapshot = onSnapshot;
-        // Expose Storage functions
         window.storageRef = ref; window.uploadBytesResumable = uploadBytesResumable; window.getDownloadURL = getDownloadURL; window.listAll = listAll;
 
         const initAuth = async () => {
-            if (!auth) return;
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-                else await signInAnonymously(auth);
-                console.log("Connecté à Firebase avec succès");
-            } catch (error) {
-                console.error("Erreur Auth:", error);
-                showErrorToast("Erreur Connexion Firebase");
-            }
+            try { await signInAnonymously(auth); console.log("Connecté"); } 
+            catch (e) { console.error(e); }
         };
-
         initAuth();
 
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user && typeof window.initRealtimeData === 'function') window.initRealtimeData();
-            });
-        }
+        onAuthStateChanged(auth, (user) => { if (user) window.initRealtimeData(); });
     </script>
 
     <!-- SIDEBAR -->
     <aside id="main-sidebar" class="w-20 md:w-64 bg-black/80 backdrop-blur-xl border-r border-white/5 flex flex-col z-50 shrink-0 transition-all duration-300 relative">
         <div class="p-4 md:p-8 text-center">
-            <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+            <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30">
                 <i class="fas fa-microphone-alt text-xl md:text-2xl text-fuchsia-500"></i>
             </div>
-            <h2 class="hidden md:block logo-text text-[10px] tracking-[0.2em] uppercase text-purple-300 font-bold animate-pulse">ON AIR</h2>
+            <h2 class="hidden md:block logo-text text-[10px] tracking-[0.2em] uppercase text-purple-300 font-bold">ON AIR</h2>
         </div>
         
         <nav class="flex-1 mt-6 relative z-50">
             <ul class="space-y-2">
-                <li><a href="#" onclick="showPage('home')" id="nav-home" class="nav-item active flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white transition-all border-l-4 border-transparent"><i class="fas fa-home w-5 text-center"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs tracking-wider">ACCUEIL</span></a></li>
-                <li><a href="#" onclick="showPage('planning')" id="nav-planning" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white transition-all border-l-4 border-transparent"><i class="far fa-calendar-alt w-5 text-center"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs tracking-wider">PLANNING</span></a></li>
-                <li><a href="#" onclick="showPage('setlist')" id="nav-setlist" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white transition-all border-l-4 border-transparent"><i class="fas fa-music w-5 text-center"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs tracking-wider">SET LISTE</span></a></li>
-                <li><a href="#" onclick="showPage('audio')" id="nav-audio" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white transition-all border-l-4 border-transparent"><i class="fas fa-headphones w-5 text-center"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs tracking-wider">AUDIO</span></a></li>
-                
+                <li><a href="#" onclick="showPage('home')" id="nav-home" class="nav-item active flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white border-l-4 border-transparent"><i class="fas fa-home w-5"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs">ACCUEIL</span></a></li>
+                <li><a href="#" onclick="showPage('planning')" id="nav-planning" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white border-l-4 border-transparent"><i class="far fa-calendar-alt w-5"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs">PLANNING</span></a></li>
+                <li><a href="#" onclick="showPage('setlist')" id="nav-setlist" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white border-l-4 border-transparent"><i class="fas fa-music w-5"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs">SETLISTE</span></a></li>
+                <li><a href="#" onclick="showPage('audio')" id="nav-audio" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-gray-400 hover:text-white border-l-4 border-transparent"><i class="fas fa-headphones w-5"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs">AUDIO</span></a></li>
                 <li id="admin-nav-item" class="hidden mt-8 border-t border-white/5 pt-4">
-                    <a href="#" onclick="showPage('admin-panel')" id="nav-admin-panel" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-red-400 hover:text-red-300 hover:bg-red-900/10 transition-all border-l-4 border-transparent">
-                        <i class="fas fa-cogs w-5 text-center"></i>
-                        <span class="hidden md:inline nav-text ml-4 font-bold text-xs tracking-wider">ADMIN</span>
-                    </a>
+                    <a href="#" onclick="showPage('admin-panel')" id="nav-admin-panel" class="nav-item flex items-center justify-center md:justify-start px-2 md:px-8 py-4 text-red-400 border-l-4 border-transparent"><i class="fas fa-cogs w-5"></i><span class="hidden md:inline nav-text ml-4 font-bold text-xs">ADMIN</span></a>
                 </li>
             </ul>
         </nav>
 
-        <div class="p-4 border-t border-white/5 text-center relative z-50">
-             <button onclick="toggleSidebar()" class="mb-4 text-gray-500 hover:text-white transition-colors w-full flex items-center justify-center cursor-pointer" title="Réduire/Agrandir Menu">
-                <i id="sidebar-icon" class="fas fa-compress-alt text-lg"></i>
-                <span class="hidden md:inline nav-text ml-2 text-[10px] font-bold uppercase">Menu</span>
-             </button>
-
-             <button onclick="toggleAdminMode()" id="admin-toggle-btn" class="text-gray-500 hover:text-fuchsia-400 transition-colors w-full flex items-center justify-center py-4 cursor-pointer group relative">
-                <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-10 rounded-lg transition-opacity"></div>
-                <i class="fas fa-lock group-hover:scale-110 transition-transform text-sm"></i> 
-                <span class="hidden md:inline nav-text ml-2 text-[10px] font-bold uppercase">Admin</span>
-            </button>
+        <div class="p-4 border-t border-white/5 text-center">
+             <button onclick="toggleSidebar()" class="mb-4 text-gray-500 hover:text-white w-full flex items-center justify-center"><i id="sidebar-icon" class="fas fa-compress-alt text-lg"></i></button>
+             <button onclick="toggleAdminMode()" id="admin-toggle-btn" class="text-gray-500 hover:text-fuchsia-400 w-full flex items-center justify-center py-4"><i class="fas fa-lock"></i></button>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 relative overflow-hidden w-full z-0 bg-[#050505]">
-        
-        <!-- HOME -->
+    <!-- MAIN -->
+    <main class="flex-1 relative overflow-hidden w-full bg-[#050505]">
+        <!-- ACCUEIL -->
         <section id="home" class="page-section h-full w-full absolute inset-0 z-10 overflow-y-auto">
-            <div class="min-h-full w-full flex flex-col justify-center items-center text-center p-4 relative" 
-                 style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(5,5,5,0.95)), url('https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center;">
-                
-                <div class="border border-white/10 p-8 md:p-16 backdrop-blur-md bg-black/60 fade-in shadow-2xl rounded-sm mb-8">
-                    <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter mb-2 drop-shadow-2xl">MONDAINE</h1>
-                    <h2 class="text-2xl md:text-3xl text-fuchsia-500 tracking-[0.6em] font-light font-sans drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">ARTISTES</h2>
+            <div class="min-h-full w-full flex flex-col justify-center items-center text-center p-4 relative" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(5,5,5,0.95)), url('https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=2000&auto=format&fit=crop'); background-size: cover;">
+                <div class="border border-white/10 p-8 md:p-16 backdrop-blur-md bg-black/60 fade-in rounded-sm mb-8">
+                    <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter mb-2">MONDAINE</h1>
+                    <h2 class="text-2xl md:text-3xl text-fuchsia-500 tracking-[0.6em] font-light">ARTISTES</h2>
                 </div>
-
-                <!-- NOUVEAUTÉS -->
-                <div id="home-news-container" class="w-full max-w-2xl space-y-4 fade-in hidden z-20">
-                     <!-- Injecté par JS -->
-                </div>
+                <div id="home-news-container" class="w-full max-w-2xl space-y-4 fade-in hidden z-20"></div>
             </div>
         </section>
 
         <!-- PLANNING -->
-        <section id="planning" class="page-section h-full w-full absolute inset-0 hidden flex flex-col fade-in z-10 bg-[#0a0a0c]">
-            <header class="flex justify-between items-center p-6 md:px-8 border-b border-white/5 bg-black/40 shrink-0 backdrop-blur-sm">
-                <h2 class="text-3xl md:text-4xl text-white font-black uppercase tracking-tighter drop-shadow-lg">Planning</h2>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 bg-white/5 rounded-full px-4 py-1.5 border border-white/5 hover:border-fuchsia-500/30 transition-colors">
-                        <button onclick="changeMonth(-1)" class="p-1 hover:text-fuchsia-400 transition-colors"><i class="fas fa-chevron-left"></i></button>
-                        <span id="current-month-display" class="w-32 text-center font-bold text-xs uppercase text-white tracking-widest">CHARGEMENT</span>
-                        <button onclick="changeMonth(1)" class="p-1 hover:text-fuchsia-400 transition-colors"><i class="fas fa-chevron-right"></i></button>
-                    </div>
+        <section id="planning" class="page-section h-full w-full absolute inset-0 hidden flex flex-col fade-in bg-[#0a0a0c]">
+            <header class="flex justify-between items-center p-6 border-b border-white/5 bg-black/40 backdrop-blur-sm shrink-0">
+                <h2 class="text-3xl text-white font-black uppercase">Planning</h2>
+                <div class="flex items-center gap-2 bg-white/5 rounded-full px-4 py-1.5">
+                    <button onclick="changeMonth(-1)" class="p-1"><i class="fas fa-chevron-left"></i></button>
+                    <span id="current-month-display" class="w-32 text-center font-bold text-xs uppercase tracking-widest">MOIS</span>
+                    <button onclick="changeMonth(1)" class="p-1"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </header>
             <div class="flex flex-1 overflow-hidden">
-                <div class="flex-1 overflow-auto flex" id="planning-container"></div>
-                <aside class="w-48 md:w-60 bg-[#08080a] border-l border-white/5 p-5 overflow-y-auto hidden lg:block shadow-2xl z-20 backdrop-blur-md">
-                     <h3 class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6 text-center border-b border-white/5 pb-2">Effectifs</h3>
+                <div class="flex-1 overflow-auto" id="planning-scroll-container">
+                    <div class="flex" id="planning-container"></div>
+                    <!-- AJOUT : Liste des artistes pour mobile sous le planning -->
+                    <div id="artist-mobile-content" class="lg:hidden p-6 grid grid-cols-2 gap-2 pb-24 bg-black/40 border-t border-white/5"></div>
+                </div>
+                <aside class="w-48 md:w-60 bg-[#08080a] border-l border-white/5 p-5 overflow-y-auto hidden lg:block shadow-2xl">
+                     <h3 class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6 text-center">Effectifs</h3>
                      <div id="artist-sidebar-content"></div>
                 </aside>
             </div>
         </section>
 
-        <!-- SET LISTE (Publique) -->
-        <section id="setlist" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-4 md:p-10 fade-in z-10 bg-[#0b0b10]">
-            <div class="flex items-center mb-8 pt-2 border-b border-white/5 pb-4">
-                <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Set <span class="text-fuchsia-600 underline decoration-4 underline-offset-8">Liste</span></h2>
-            </div>
+        <!-- SETLISTE -->
+        <section id="setlist" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-4 md:p-10 bg-[#0b0b10]">
+            <h2 class="text-4xl font-black text-white mb-8">SET <span class="text-fuchsia-600">LISTE</span></h2>
             <div id="setlist-public-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
         </section>
 
-        <!-- ADMIN PANEL -->
-        <section id="admin-panel" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-6 md:p-10 fade-in z-20 bg-[#0f0a18]">
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-white/10 pb-6 gap-4">
-                <div>
-                    <h2 class="text-3xl md:text-4xl text-white font-black uppercase tracking-tighter"><i class="fas fa-cogs text-fuchsia-600 mr-3"></i>Administration</h2>
-                    <p class="text-xs text-gray-500 mt-1">Gérez votre équipe, vos dates et vos fichiers.</p>
-                </div>
-                <button onclick="saveSetlistsOnly()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-8 rounded-full uppercase text-xs tracking-wider shadow-lg transform hover:scale-105 transition-all w-full md:w-auto">
-                    <i class="fas fa-save mr-2"></i> Enregistrer Textes
-                </button>
-            </header>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-                <!-- GESTION EQUIPE -->
-                <div class="lg:col-span-5 bg-white/5 p-6 rounded-2xl border border-white/5">
-                    <h3 class="text-lg font-bold text-fuchsia-400 uppercase mb-6 flex items-center gap-2 tracking-wide">
-                        <i class="fas fa-users"></i> Gestion de l'équipe
-                    </h3>
-                    
-                    <div class="bg-black/40 p-5 rounded-xl mb-6 border border-white/5 shadow-inner">
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <div>
-                                <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Nom</label>
-                                <input type="text" id="new-artist-name" placeholder="NOM" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white text-xs font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
-                            </div>
-                            <div>
-                                <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Rôle</label>
-                                <select id="new-artist-role" onchange="updateColorPicker()" class="w-full bg-black/50 border border-white/10 rounded p-2 text-white text-xs font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
-                                    <option value="chant">CHANT</option>
-                                    <option value="piano">PIANO</option>
-                                    <option value="basse">BASSE</option>
-                                    <option value="drum">DRUM</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-2 block">Identité Visuelle</label>
-                            <div id="new-artist-color-picker" class="flex flex-wrap gap-2 p-3 bg-black/30 rounded-lg border border-white/5 min-h-[50px]"></div>
-                        </div>
-                        
-                        <input type="hidden" id="selected-color-value">
-                        <button onclick="addNewArtist()" class="w-full bg-gradient-to-r from-fuchsia-700 to-purple-700 hover:from-fuchsia-600 hover:to-purple-600 py-3 rounded text-white text-xs font-bold uppercase transition-all shadow-lg mt-2"><i class="fas fa-plus mr-1"></i> Ajouter l'artiste</button>
-                    </div>
-
-                    <div class="h-[400px] overflow-y-auto custom-scrollbar pr-2" id="admin-team-list"></div>
-                </div>
-
-                <!-- GESTION SETLISTS -->
-                <div class="lg:col-span-7 bg-white/5 p-6 rounded-2xl border border-white/5">
-                    <h3 class="text-lg font-bold text-blue-400 uppercase mb-6 flex items-center gap-2 tracking-wide">
-                        <i class="fas fa-list-ol"></i> Édition des Setlists
-                    </h3>
-                    <p class="text-[10px] text-gray-400 mb-4 bg-blue-900/20 border border-blue-500/20 p-2 rounded flex items-center"><i class="fas fa-info-circle mr-2 text-blue-400"></i> Utilisez "SET 1", "SET 2" pour créer des séparateurs visuels.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Loop for efficient coding -->
-                        <div>
-                            <div class="flex justify-between mb-1 items-end">
-                                <label class="text-[10px] font-bold text-blue-300 tracking-wider">MERCREDI</label>
-                                <input type="text" id="date-wed" class="bg-transparent border-b border-white/10 text-right text-[10px] text-gray-400 w-24 focus:border-blue-500 outline-none" placeholder="ex: 12 DEC">
-                            </div>
-                            <textarea id="setlist-wed" class="admin-textarea w-full h-56 rounded-lg p-3 resize-none shadow-inner" placeholder="Liste..."></textarea>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1 items-end">
-                                <label class="text-[10px] font-bold text-purple-300 tracking-wider">JEUDI</label>
-                                <input type="text" id="date-thu" class="bg-transparent border-b border-white/10 text-right text-[10px] text-gray-400 w-24 focus:border-purple-500 outline-none" placeholder="ex: 13 DEC">
-                            </div>
-                            <textarea id="setlist-thu" class="admin-textarea w-full h-56 rounded-lg p-3 resize-none shadow-inner" placeholder="Liste..."></textarea>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1 items-end">
-                                <label class="text-[10px] font-bold text-pink-300 tracking-wider">VENDREDI</label>
-                                <input type="text" id="date-fri" class="bg-transparent border-b border-white/10 text-right text-[10px] text-gray-400 w-24 focus:border-pink-500 outline-none" placeholder="ex: 14 DEC">
-                            </div>
-                            <textarea id="setlist-fri" class="admin-textarea w-full h-56 rounded-lg p-3 resize-none shadow-inner" placeholder="Liste..."></textarea>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1 items-end">
-                                <label class="text-[10px] font-bold text-indigo-300 tracking-wider">SAMEDI</label>
-                                <input type="text" id="date-sat" class="bg-transparent border-b border-white/10 text-right text-[10px] text-gray-400 w-24 focus:border-indigo-500 outline-none" placeholder="ex: 15 DEC">
-                            </div>
-                            <textarea id="setlist-sat" class="admin-textarea w-full h-56 rounded-lg p-3 resize-none shadow-inner" placeholder="Liste..."></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- GESTION BIBLIOTHÈQUE AUDIO (MODIFIÉE POUR STORAGE) -->
-            <div class="bg-white/5 p-6 rounded-2xl border border-white/5 w-full">
-                <h3 class="text-lg font-bold text-fuchsia-400 uppercase mb-6 flex items-center gap-2 tracking-wide">
-                    <i class="fas fa-headphones"></i> Bibliothèque Audio & Partitions
-                </h3>
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div class="lg:col-span-5 bg-black/40 p-6 rounded-xl border border-white/5 shadow-inner">
-                        <input type="hidden" id="audio-id-input">
-                        <div class="mb-4">
-                            <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Titre du Morceau</label>
-                            <input type="text" id="audio-title-input" placeholder="EX: I WILL SURVIVE" class="w-full bg-white/5 border border-white/10 rounded p-2 text-white text-sm font-bold uppercase focus:border-fuchsia-500 outline-none transition-colors">
-                        </div>
-                        
-                        <!-- NEW UPLOAD GRID UI - IDS UPDATED -->
-                        <div class="grid grid-cols-3 gap-3 mb-4">
-                            <!-- AUDIO -->
-                            <div class="relative">
-                                <input type="hidden" id="audio-src-input">
-                                <input type="file" id="upload-input-audio" class="hidden" accept="audio/*" onchange="uploadSingleFile(this, 'mp3', 'upload-btn-audio', 'audio-src-input')">
-                                <button onclick="document.getElementById('upload-input-audio').click()" id="upload-btn-audio" class="upload-btn group">
-                                    <i class="fas fa-music text-fuchsia-500 group-hover:text-white transition-colors"></i>
-                                    <span class="text-fuchsia-200 group-hover:text-white transition-colors">Audio</span>
-                                </button>
-                            </div>
-
-                            <!-- LYRICS -->
-                            <div class="relative">
-                                <input type="hidden" id="audio-lyrics-input">
-                                <input type="file" id="upload-input-lyrics" class="hidden" accept="application/pdf" onchange="uploadSingleFile(this, 'lyrics', 'upload-btn-lyrics', 'audio-lyrics-input')">
-                                <button onclick="document.getElementById('upload-input-lyrics').click()" id="upload-btn-lyrics" class="upload-btn group">
-                                    <i class="fas fa-align-center text-blue-500 group-hover:text-white transition-colors"></i>
-                                    <span class="text-blue-200 group-hover:text-white transition-colors">Paroles</span>
-                                </button>
-                            </div>
-
-                            <!-- SHEET -->
-                            <div class="relative">
-                                <input type="hidden" id="audio-sheet-input">
-                                <input type="file" id="upload-input-sheet" class="hidden" accept="application/pdf" onchange="uploadSingleFile(this, 'sheet', 'upload-btn-sheet', 'audio-sheet-input')">
-                                <button onclick="document.getElementById('upload-input-sheet').click()" id="upload-btn-sheet" class="upload-btn group">
-                                    <i class="fas fa-scroll text-orange-500 group-hover:text-white transition-colors"></i>
-                                    <span class="text-orange-200 group-hover:text-white transition-colors">Partit.</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="mb-6">
-                            <label class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-1 block">Lien YouTube (Choré)</label>
-                            <div class="flex items-center bg-white/5 border border-white/10 rounded p-2">
-                                <i class="fab fa-youtube text-red-500 mr-2 text-lg"></i>
-                                <input type="text" id="audio-youtube-input" placeholder="https://youtube.com/..." class="bg-transparent w-full text-white text-xs font-mono focus:outline-none placeholder-gray-600">
-                            </div>
-                        </div>
-
-                         <!-- CASE À COCHER NOUVEAUTÉ -->
-                        <div class="mb-6 flex items-center bg-fuchsia-900/20 border border-fuchsia-500/30 rounded p-3">
-                            <input type="checkbox" id="audio-is-new" class="w-5 h-5 accent-fuchsia-500 cursor-pointer mr-3">
-                            <div>
-                                <label for="audio-is-new" class="text-xs font-bold text-white uppercase cursor-pointer">Marquer comme Nouveauté / À Travailler</label>
-                                <p class="text-[9px] text-fuchsia-300">Affichera une alerte sur la page d'accueil.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-3">
-                             <button onclick="saveAudioTrack()" class="flex-1 bg-gradient-to-r from-fuchsia-700 to-purple-700 hover:from-fuchsia-600 hover:to-purple-600 py-3 rounded text-white text-xs font-bold uppercase transition-all shadow-lg"><i class="fas fa-save mr-1"></i> Sauvegarder</button>
-                             <button onclick="clearAudioForm()" class="px-5 bg-gray-800 hover:bg-gray-700 rounded text-white text-xs font-bold uppercase transition-colors border border-white/10">Annuler</button>
-                        </div>
-                        <div class="mt-3 text-center">
-                            <p class="text-[9px] text-gray-500 italic"><i class="fas fa-info-circle mr-1"></i> Cliquez sur les icônes pour ajouter des fichiers.</p>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-7 h-[450px] overflow-y-auto custom-scrollbar bg-black/30 rounded-xl border border-white/5">
-                        <div id="admin-audio-list" class="p-3"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- AUDIO SECTION (PUBLIC) -->
-        <section id="audio" class="page-section h-full w-full absolute inset-0 hidden overflow-hidden fade-in z-10 bg-[#080510]">
+        <!-- AUDIO -->
+        <section id="audio" class="page-section h-full w-full absolute inset-0 hidden overflow-hidden bg-[#080510]">
+            <!-- Inversion de l'ordre pour mobile : Lecteur en haut -->
             <div class="flex h-full flex-col md:flex-row">
-                <div class="flex-1 flex flex-col p-4 md:p-8 overflow-hidden">
-                    <h2 class="text-3xl md:text-4xl text-white mb-6 border-b border-gray-800 pb-4 font-black tracking-tighter">AUDIO <span class="text-fuchsia-600">PLAYER</span></h2>
-                    <div class="mb-6 relative group">
-                        <input type="text" id="audio-search" placeholder="RECHERCHER UN TITRE..." class="w-full bg-white/5 border border-white/10 rounded-full py-4 pl-14 pr-6 text-white text-sm md:text-lg font-bold tracking-wider focus:outline-none focus:border-fuchsia-500 transition-all uppercase placeholder-gray-600 group-hover:bg-white/10">
-                        <i class="fas fa-search absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg group-hover:text-fuchsia-500 transition-colors"></i>
+                <!-- LE LECTEUR (En haut sur mobile, à droite sur desktop) -->
+                <div class="h-auto md:h-full w-full md:w-96 glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl">
+                    <div id="player-empty-state" class="flex flex-col items-center justify-center h-32 md:h-full text-center opacity-40">
+                        <i class="fas fa-headphones text-3xl md:text-4xl text-fuchsia-500 mb-2 md:mb-4"></i>
+                        <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest">SÉLECTIONNEZ UN TITRE</p>
                     </div>
-                    <!-- Liste des morceaux -->
-                    <div class="flex-1 overflow-y-auto custom-scrollbar pr-2" id="audio-track-list"></div>
+                    <div id="player-content" class="hidden flex flex-col h-full">
+                        <h3 id="player-title" class="text-xl md:text-2xl font-black text-white uppercase mb-4 md:mb-6 truncate">TITRE</h3>
+                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-4 md:p-6 mb-4 border border-white/5">
+                            <div class="flex justify-between items-center mb-4 md:mb-6">
+                                <div class="flex gap-1" id="speed-controls">
+                                    <button onclick="setSpeed(0.5)" class="speed-btn">0.5</button>
+                                    <button onclick="setSpeed(1.0)" class="speed-btn active-speed">1.0</button>
+                                    <button onclick="setSpeed(1.5)" class="speed-btn">1.5</button>
+                                </div>
+                                <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-16">
+                            </div>
+                            <div class="flex justify-center items-center gap-6 mb-4 md:mb-6">
+                                <button onclick="stopAudio()" class="text-gray-500 hover:text-white"><i class="fas fa-stop"></i></button>
+                                <button onclick="togglePlay()" id="play-btn" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-fuchsia-600 text-white flex items-center justify-center shadow-lg"><i class="fas fa-play ml-1"></i></button>
+                                <button onclick="resetAudio()" class="text-gray-500 hover:text-white"><i class="fas fa-redo-alt"></i></button>
+                            </div>
+                            <audio id="audio-element" ontimeupdate="updateProgress()" onended="resetPlayerUI()"></audio>
+                            <div class="w-full bg-gray-800 h-1.5 rounded-full mb-2 cursor-pointer" onclick="seekAudio(event)">
+                                <div id="progress-bar" class="bg-fuchsia-500 h-full w-0"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-gray-500 font-mono">
+                                <span id="time-current">00:00</span>
+                                <span id="time-total">00:00</span>
+                            </div>
+                        </div>
+                        <!-- Liens compacts sur mobile -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <a id="btn-lyrics" href="#" target="_blank" class="flex items-center justify-center gap-2 p-2 bg-blue-900/20 rounded-xl opacity-50 text-[10px] font-bold uppercase"><i class="fas fa-align-center"></i><span>Paroles</span></a>
+                            <a id="btn-sheet" href="#" target="_blank" class="flex items-center justify-center gap-2 p-2 bg-orange-900/20 rounded-xl opacity-50 text-[10px] font-bold uppercase"><i class="fas fa-music"></i><span>Partit.</span></a>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="h-64 md:h-full w-full md:w-96 glass-panel flex flex-col p-4 md:p-8 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] z-20 shrink-0 border-t md:border-t-0 md:border-l border-white/10">
-                    <div id="player-empty-state" class="flex flex-col items-center justify-center h-full text-center opacity-40">
-                        <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                            <i class="fas fa-headphones text-4xl text-fuchsia-500"></i>
-                        </div>
-                        <p class="text-sm font-bold uppercase tracking-widest text-gray-400">Sélectionnez<br>un titre</p>
+                <!-- LA LISTE (En bas sur mobile, à gauche sur desktop) -->
+                <div class="flex-1 flex flex-col p-4 md:p-8 overflow-hidden order-2 md:order-1">
+                    <h2 class="hidden md:block text-3xl font-black text-white mb-6 uppercase">AUDIO <span class="text-fuchsia-600">PLAYER</span></h2>
+                    <div class="mb-4 md:mb-6 relative">
+                        <input type="text" id="audio-search" placeholder="RECHERCHER..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 md:py-4 pl-12 pr-6 text-white text-sm font-bold focus:border-fuchsia-500 outline-none uppercase">
+                        <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
                     </div>
-
-                    <div id="player-content" class="hidden flex flex-col h-full justify-start pt-4 md:pt-10">
-                        <div class="flex-1 flex flex-col">
-                            <h3 id="player-title" class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter mb-1 leading-tight break-words text-center md:text-left drop-shadow-md">TITRE</h3>
-                            <p class="text-[10px] font-bold text-fuchsia-500 uppercase tracking-[0.3em] mb-6 text-center md:text-left">Lecteur Audio</p>
-
-                            <div class="bg-black/40 rounded-3xl p-6 mb-4 border border-white/5 shadow-inner relative overflow-hidden">
-                                <!-- VITESSE & VOLUME -->
-                                <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                                    <div class="flex items-center gap-1 bg-black/20 p-1 rounded-lg" id="speed-controls">
-                                        <button onclick="setSpeed(0.5)" class="speed-btn" title="Très lent">0.5</button>
-                                        <button onclick="setSpeed(0.75)" class="speed-btn" title="Lent">0.75</button>
-                                        <button onclick="setSpeed(1.0)" class="speed-btn active-speed" title="Normal">1.0</button>
-                                        <button onclick="setSpeed(1.25)" class="speed-btn" title="Rapide">1.25</button>
-                                        <button onclick="setSpeed(1.5)" class="speed-btn" title="Très rapide">1.5</button>
-                                    </div>
-                                    <div class="flex items-center gap-2 w-24 group">
-                                        <i class="fas fa-volume-up text-xs text-gray-500 group-hover:text-white"></i>
-                                        <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                    </div>
-                                </div>
-
-                                <!-- CONTROLES PRINCIPAUX -->
-                                <div class="flex justify-center items-center gap-6 mb-6">
-                                    <button onclick="stopAudio()" class="player-btn w-10 h-10 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white flex items-center justify-center border border-white/5"><i class="fas fa-stop text-sm"></i></button>
-                                    <button onclick="togglePlay()" id="play-btn" class="player-btn w-16 h-16 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white hover:scale-105 flex items-center justify-center border-4 border-[#1a0b2e] shadow-[0_0_25px_rgba(217,70,239,0.3)] transition-all"><i class="fas fa-play text-xl ml-1"></i></button>
-                                    <button onclick="resetAudio()" class="player-btn w-10 h-10 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white flex items-center justify-center border border-white/5"><i class="fas fa-redo-alt text-sm"></i></button>
-                                </div>
-                                
-                                <audio id="audio-element" ontimeupdate="updateProgress()" onended="resetPlayerUI()"></audio>
-                                
-                                <div class="w-full bg-gray-800 rounded-full h-1.5 mb-2 overflow-hidden cursor-pointer group" onclick="seekAudio(event)">
-                                    <div id="progress-bar" class="bg-fuchsia-500 h-full w-0 transition-all duration-100 relative group-hover:bg-fuchsia-400">
-                                        <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between text-[9px] text-gray-500 font-mono">
-                                    <span id="time-current">00:00</span>
-                                    <span id="time-total">00:00</span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3 mb-3">
-                                <a id="btn-lyrics" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl hover:bg-blue-900/40 transition-all group opacity-50 cursor-not-allowed">
-                                    <i class="fas fa-align-center text-xl mb-1 text-blue-400 group-hover:scale-110 transition-transform"></i>
-                                    <span class="text-[9px] font-bold uppercase tracking-wider text-blue-200">Paroles</span>
-                                </a>
-                                <a id="btn-sheet" href="#" target="_blank" class="flex flex-col items-center justify-center p-3 bg-orange-900/20 border border-orange-500/20 rounded-xl hover:bg-orange-900/40 transition-all group opacity-50 cursor-not-allowed">
-                                    <i class="fas fa-music text-xl mb-1 text-orange-400 group-hover:scale-110 transition-transform"></i>
-                                    <span class="text-[9px] font-bold uppercase tracking-wider text-orange-200">Partition</span>
-                                </a>
-                            </div>
-                            
-                            <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 p-3 bg-red-900/20 border border-red-500/20 rounded-xl hover:bg-red-900/40 transition-all group opacity-50 cursor-not-allowed">
-                                <i class="fab fa-youtube text-xl text-red-500 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-white">Chorégraphie</span>
-                            </a>
-                        </div>
-                    </div>
+                    <div class="flex-1 overflow-y-auto pr-2 pb-24 md:pb-0" id="audio-track-list"></div>
                 </div>
             </div>
         </section>
 
+        <!-- ADMIN -->
+        <section id="admin-panel" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-6 md:p-10 bg-[#0f0a18]">
+            <h2 class="text-3xl font-black text-white mb-8 uppercase"><i class="fas fa-cogs text-fuchsia-600 mr-3"></i>Admin</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Artistes -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/5">
+                    <h3 class="text-fuchsia-400 font-bold uppercase mb-4 text-sm">Équipe</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <input type="text" id="new-artist-name" placeholder="NOM" class="bg-black/40 p-2 rounded text-white uppercase text-xs">
+                        <select id="new-artist-role" onchange="updateColorPicker()" class="bg-black/40 p-2 rounded text-white uppercase text-xs">
+                            <option value="chant">CHANT</option>
+                            <option value="piano">PIANO</option>
+                            <option value="basse">BASSE</option>
+                            <option value="drum">DRUM</option>
+                        </select>
+                    </div>
+                    <div id="new-artist-color-picker" class="flex flex-wrap gap-2 mb-4"></div>
+                    <input type="hidden" id="selected-color-value">
+                    <button onclick="addNewArtist()" class="w-full bg-fuchsia-600 py-3 rounded text-white font-bold uppercase text-xs">Ajouter</button>
+                    <div id="admin-team-list" class="mt-6 space-y-2"></div>
+                </div>
+                <!-- Audio Admin -->
+                <div class="bg-white/5 p-6 rounded-2xl border border-white/5">
+                    <h3 class="text-fuchsia-400 font-bold uppercase mb-4 text-sm">Bibliothèque Audio</h3>
+                    <input type="hidden" id="audio-id-input">
+                    <input type="text" id="audio-title-input" placeholder="TITRE" class="w-full bg-black/40 p-3 rounded mb-4 text-white uppercase text-xs">
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <button onclick="document.getElementById('upload-input-audio').click()" id="upload-btn-audio" class="upload-btn"><i class="fas fa-music mb-2"></i><span>Audio</span></button>
+                        <button onclick="document.getElementById('upload-input-lyrics').click()" id="upload-btn-lyrics" class="upload-btn"><i class="fas fa-align-center mb-2"></i><span>Paroles</span></button>
+                        <button onclick="document.getElementById('upload-input-sheet').click()" id="upload-btn-sheet" class="upload-btn"><i class="fas fa-scroll mb-2"></i><span>Partit.</span></button>
+                    </div>
+                    <input type="file" id="upload-input-audio" class="hidden" accept="audio/*" onchange="uploadSingleFile(this, 'mp3', 'upload-btn-audio', 'audio-src-input')">
+                    <input type="file" id="upload-input-lyrics" class="hidden" accept=".pdf" onchange="uploadSingleFile(this, 'lyrics', 'upload-btn-lyrics', 'audio-lyrics-input')">
+                    <input type="file" id="upload-input-sheet" class="hidden" accept=".pdf" onchange="uploadSingleFile(this, 'sheet', 'upload-btn-sheet', 'audio-sheet-input')">
+                    <input type="hidden" id="audio-src-input"><input type="hidden" id="audio-lyrics-input"><input type="hidden" id="audio-sheet-input">
+                    <input type="text" id="audio-youtube-input" placeholder="Lien YouTube" class="w-full bg-black/40 p-2 rounded mb-4 text-white text-xs">
+                    <div class="flex items-center gap-2 mb-4 bg-fuchsia-900/20 p-2 rounded">
+                        <input type="checkbox" id="audio-is-new">
+                        <label for="audio-is-new" class="text-[10px] font-bold uppercase text-white">Nouveauté à travailler</label>
+                    </div>
+                    <button onclick="saveAudioTrack()" class="w-full bg-fuchsia-600 py-3 rounded text-white font-bold uppercase text-xs mb-4">Sauvegarder Titre</button>
+                    <div id="admin-audio-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                </div>
+            </div>
+            <!-- Setlists Admin -->
+            <div class="mt-8 bg-white/5 p-6 rounded-2xl border border-white/5">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-blue-400 font-bold uppercase text-sm">Setlistes Hebdo</h3>
+                    <button onclick="saveSetlistsOnly()" class="bg-green-600 px-6 py-2 rounded-full text-white text-[10px] font-bold uppercase">Enregistrer</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div><input type="text" id="date-wed" class="w-full bg-transparent border-b border-white/10 text-xs mb-1" placeholder="MER 12"><textarea id="setlist-wed" class="admin-textarea w-full h-48 rounded p-2"></textarea></div>
+                    <div><input type="text" id="date-thu" class="w-full bg-transparent border-b border-white/10 text-xs mb-1" placeholder="JEU 13"><textarea id="setlist-thu" class="admin-textarea w-full h-48 rounded p-2"></textarea></div>
+                    <div><input type="text" id="date-fri" class="w-full bg-transparent border-b border-white/10 text-xs mb-1" placeholder="VEN 14"><textarea id="setlist-fri" class="admin-textarea w-full h-48 rounded p-2"></textarea></div>
+                    <div><input type="text" id="date-sat" class="w-full bg-transparent border-b border-white/10 text-xs mb-1" placeholder="SAM 15"><textarea id="setlist-sat" class="admin-textarea w-full h-48 rounded p-2"></textarea></div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast-notification" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-green-600/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.4)] z-[100] opacity-0 font-bold text-xs uppercase tracking-wider flex items-center gap-3 pointer-events-none border border-green-500/30">
-        <i class="fas fa-check-circle text-lg"></i>
-        <span id="toast-msg">Enregistré</span>
+    <!-- TOASTS -->
+    <div id="toast-notification" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-lg z-[100] opacity-0 font-bold text-xs uppercase transition-all pointer-events-none flex items-center gap-2">
+        <i class="fas fa-check-circle"></i> <span id="toast-msg">Enregistré</span>
     </div>
-
-    <!-- ERROR TOAST -->
-    <div id="error-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-orange-600/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.4)] z-[100] opacity-0 font-bold text-xs uppercase tracking-wider flex items-center gap-3 pointer-events-none transition-opacity duration-300 border border-orange-500/30">
-        <i class="fas fa-wifi text-lg"></i>
-        <span id="error-message">Mode Local</span>
+    <div id="error-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg z-[100] opacity-0 font-bold text-xs uppercase transition-all pointer-events-none flex items-center gap-2">
+        <i class="fas fa-exclamation-circle"></i> <span id="error-message">Erreur</span>
     </div>
 
     <!-- MODALS -->
-    <div id="password-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center backdrop-blur-md p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm shadow-[0_0_50px_rgba(168,85,247,0.2)] transform transition-all text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent"></div>
-            <div class="mb-6"><i class="fas fa-fingerprint text-5xl text-fuchsia-500 animate-pulse"></i></div>
-            <h3 class="text-white font-black text-xl mb-1 tracking-wide uppercase">Accès Réservé</h3>
-            <p class="text-gray-500 text-xs mb-6">Zone Administration Mondaine</p>
-            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-center text-white text-lg tracking-[0.5em] mb-4 focus:border-fuchsia-500 focus:outline-none placeholder-gray-700 transition-colors" placeholder="••••">
-            <p id="pass-error" class="text-red-400 text-xs mb-4 hidden bg-red-900/20 py-1 rounded border border-red-500/20"><i class="fas fa-times-circle mr-1"></i> Mot de passe incorrect</p>
+    <div id="password-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center">
+            <h3 class="text-white font-black text-xl mb-6 uppercase">Admin Mondaine</h3>
+            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded p-3 text-center text-white mb-4 focus:border-fuchsia-500 outline-none" placeholder="••••">
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModal('password-modal')" class="py-3 border border-gray-700 text-gray-400 rounded-lg hover:bg-white/5 text-xs font-bold uppercase transition-colors">Annuler</button>
-                <button onclick="checkAdminPassword()" class="py-3 bg-fuchsia-600 text-white rounded-lg hover:bg-fuchsia-500 text-xs font-bold uppercase shadow-lg transition-all hover:scale-105">Déverrouiller</button>
+                <button onclick="closeModal('password-modal')" class="py-3 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold uppercase">Annuler</button>
+                <button onclick="checkAdminPassword()" class="py-3 bg-fuchsia-600 text-white rounded-lg text-xs font-bold uppercase">OK</button>
             </div>
         </div>
     </div>
 
-    <!-- STORAGE LIBRARY MODAL -->
-    <div id="storage-modal" class="fixed inset-0 bg-black/90 z-[110] hidden flex items-center justify-center backdrop-blur-sm p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(168,85,247,0.3)] flex flex-col h-[500px]">
-            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/40 rounded-t-2xl">
-                <h3 class="text-white font-bold tracking-wide text-sm uppercase"><i class="fas fa-cloud mr-2"></i>Bibliothèque Storage</h3>
-                <button onclick="closeModal('storage-modal')" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-4 bg-fuchsia-900/10 text-[10px] text-fuchsia-300 border-b border-white/5 flex gap-2">
-                 <button onclick="listStorageFiles('mp3')" class="px-3 py-1 bg-black/40 hover:bg-black/60 rounded border border-white/10">Audio (MP3)</button>
-                 <button onclick="listStorageFiles('lyrics')" class="px-3 py-1 bg-black/40 hover:bg-black/60 rounded border border-white/10">Paroles (PDF)</button>
-                 <button onclick="listStorageFiles('sheet')" class="px-3 py-1 bg-black/40 hover:bg-black/60 rounded border border-white/10">Partitions (PDF)</button>
-            </div>
-            <div id="storage-file-list" class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-2">
-                <div class="text-center text-gray-500 text-xs py-10">Sélectionnez une catégorie ci-dessus.</div>
-            </div>
+    <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm">
+            <h3 class="text-white font-bold uppercase text-xs mb-4 text-center border-b border-white/10 pb-2" id="modal-slot-info">Date</h3>
+            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
+            <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg text-xs font-bold uppercase">Retirer l'artiste</button>
         </div>
     </div>
 
-    <div id="delete-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center backdrop-blur-md p-4">
-        <div class="bg-[#150a1f] border border-red-500/30 rounded-2xl p-8 w-full max-w-xs shadow-[0_0_40px_rgba(220,38,38,0.2)] text-center">
-            <div class="mb-4 w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto border border-red-500/20"><i class="fas fa-trash-alt text-2xl text-red-500"></i></div>
-            <h3 class="text-white font-bold text-lg mb-2">Confirmer suppression ?</h3>
-            <p class="text-gray-400 text-xs mb-6 leading-relaxed">Cette action est irréversible. L'élément sera retiré de la base de données.</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModal('delete-modal')" class="py-2 border border-gray-700 text-gray-400 rounded-lg hover:bg-white/5 text-xs font-bold uppercase">Annuler</button>
-                <button onclick="confirmDelete()" class="py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 text-xs font-bold uppercase shadow-lg">Supprimer</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="delete-audio-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center backdrop-blur-md p-4">
-        <div class="bg-[#150a1f] border border-red-500/30 rounded-2xl p-8 w-full max-w-xs shadow-[0_0_40px_rgba(220,38,38,0.2)] text-center">
-             <div class="mb-4 w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto border border-red-500/20"><i class="fas fa-music text-2xl text-red-500"></i></div>
-            <h3 class="text-white font-bold text-lg mb-2">Supprimer ce titre ?</h3>
-            <p class="text-gray-400 text-xs mb-6">Le fichier et les liens associés seront effacés.</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModal('delete-audio-modal')" class="py-2 border border-gray-700 text-gray-400 rounded-lg hover:bg-white/5 text-xs font-bold uppercase">Annuler</button>
-                <button onclick="confirmDeleteAudio()" class="py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 text-xs font-bold uppercase shadow-lg">Supprimer</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm shadow-[0_0_50px_rgba(168,85,247,0.3)] transform transition-all">
-            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                <h3 class="text-white font-bold tracking-wide text-sm uppercase">Assigner un artiste</h3>
-                <button onclick="closeModal('assign-modal')" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="mb-4 text-[10px] text-fuchsia-400 uppercase font-bold tracking-widest bg-fuchsia-900/10 p-2 rounded border border-fuchsia-500/10 text-center" id="modal-slot-info">Date - Slot</div>
-            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar"></div>
-            <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/10 text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center">
-                <i class="fas fa-user-slash mr-2"></i> Retirer l'assignation
-            </button>
-        </div>
-    </div>
-
+    <!-- SCRIPTS -->
     <script>
-        // --- VARIABLES GLOBALES ---
         let ARTISTS = [];
         let assignments = {};
-        let SETLISTS = {
-             wed: { date: "MER", content: "" },
-             thu: { date: "JEU", content: "" },
-             fri: { date: "VEN", content: "" },
-             sat: { date: "SAM", content: "" }
-        };
+        let SETLISTS = { wed: { date: "MER", content: "" }, thu: { date: "JEU", content: "" }, fri: { date: "VEN", content: "" }, sat: { date: "SAM", content: "" } };
         let AUDIO_LIBRARY = [];
-        let useLocalStorage = false;
-        let localDataLoaded = false;
         let currentDate = new Date(); 
         let selectedArtistId = null;
+        let highlightedRow = null;
         let currentEditSlot = null;
         let isAdminMode = false;
-        let audioToDeleteId = null;
-        let artistToDeleteId = null;
-        let currentTrack = null; 
-        let targetInputIdForStorage = null; // Pour savoir quel input remplir après sélection
-        let lastPlayStart = 0; // Mémorise le dernier point de départ de lecture
-        let highlightedRow = null; // Mémorise la date dont la ligne est surlignée
+        let currentTrack = null;
+        let lastPlayStart = 0;
 
-        // --- CONSTANTES ---
-        const DEFAULT_ARTISTS = [
-            { id: '1', name: 'EXEMPLE 1', color: 'bg-fuchsia-500 text-white', group: 'chant', role: 'chant' }, 
-            { id: '2', name: 'EXEMPLE 2', color: 'bg-orange-500 text-white', group: 'chant', role: 'chant' }
-        ];
-
-        const COLOR_PALETTES = { 
-            singers: [
-                'bg-pink-500 text-white', 'bg-fuchsia-500 text-white', 'bg-rose-500 text-white', 
-                'bg-purple-500 text-white', 'bg-indigo-500 text-white',
-                'bg-fuchsia-400 text-gray-800', 'bg-pink-400 text-gray-800', 'bg-rose-400 text-gray-800',
-                'bg-pink-300 text-gray-800', 'bg-fuchsia-300 text-gray-800', 'bg-sky-300 text-gray-800',
-                'bg-lime-300 text-gray-800', 'bg-yellow-300 text-gray-800', 'bg-orange-300 text-gray-800',
-                'bg-teal-300 text-gray-800', 'bg-cyan-300 text-gray-800', 'bg-violet-300 text-gray-800'
-            ], 
-            piano: [
-                'bg-green-600 text-white', 'bg-emerald-700 text-white', 'bg-lime-700 text-white',
-                'bg-yellow-800 text-white', 'bg-amber-900 text-white', 'bg-stone-700 text-white',
-                'bg-green-800 text-white', 'bg-olive-700 text-white'
-            ], 
-            basse: [
-                'bg-violet-600 text-white', 'bg-purple-800 text-white', 'bg-indigo-700 text-white', 
-                'bg-blue-600 text-white', 'bg-cyan-700 text-white', 'bg-sky-900 text-white',
-                'bg-slate-700 text-white', 'bg-blue-900 text-white'
-            ], 
-            drum: [
-                'bg-red-600 text-white', 'bg-orange-600 text-white', 'bg-amber-600 text-white',
-                'bg-yellow-500 text-black', 'bg-red-800 text-white', 'bg-yellow-800 text-white',
-                'bg-orange-800 text-white', 'bg-rose-700 text-white'
-            ] 
-        };
-
-        // --- FONCTIONS SYSTÈME (ADAPTÉES POUR NETLIFY) ---
-        // On vérifie directement l'existence des objets globaux
-        const PUBLIC_DATA = (col) => {
-            if(window.collection && window.db && window.appId && !useLocalStorage) {
-                return window.collection(window.db, 'artifacts', window.appId, 'public', 'data', col);
-            }
-            return null;
-        };
-        const PUBLIC_DOC = (col, id) => {
-            if(window.doc && window.db && window.appId && !useLocalStorage) {
-                return window.doc(window.db, 'artifacts', window.appId, 'public', 'data', col, id);
-            }
-            return null;
-        };
+        const PUBLIC_DOC = (col, id) => window.doc(window.db, 'artifacts', window.appId, 'public', 'data', col, id);
 
         function showToast(msg) {
             const t = document.getElementById('toast-notification');
             if(msg) document.getElementById('toast-msg').innerText = msg;
-            t.classList.remove('toast-visible');
-            void t.offsetWidth; // Force reflow
-            t.classList.add('toast-visible');
+            t.classList.add('toast-visible'); setTimeout(() => t.classList.remove('toast-visible'), 3000);
         }
-
         function showErrorToast(msg) {
             const t = document.getElementById('error-toast');
             document.getElementById('error-message').innerText = msg;
-            t.classList.remove('opacity-0');
-            setTimeout(() => t.classList.add('opacity-0'), 5000);
+            t.classList.add('opacity-100'); setTimeout(() => t.classList.remove('opacity-100'), 5000);
         }
 
-        // --- GESTION STORAGE FIREBASE ---
-
-        // Fonction pour uploader un fichier vers Storage (NOUVELLE VERSION AVEC BOUTON UNIQUE)
-        window.uploadSingleFile = function(input, type, btnId, targetInputId) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            // MODIFICATION : On commente ce bloc pour autoriser l'upload sur Netlify même si le mode local est détecté
-            /*
-            if (useLocalStorage) {
-                alert("L'upload Storage nécessite d'être connecté au serveur. Mode Local actif.");
-                input.value = "";
-                return;
-            }
-            */
-
-            // UI UPDATES: Loading State
+        window.uploadSingleFile = function(input, type, btnId, targetId) {
+            const file = input.files[0]; if (!file) return;
             const btn = document.getElementById(btnId);
-            const originalContent = btn.innerHTML;
-            const originalClass = btn.className;
-            
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><br>ENVOI...`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
             btn.classList.add('upload-loading');
 
-            const currentAppId = window.appId || 'default-app';
-            const trackTitle = document.getElementById('audio-title-input').value.trim().toUpperCase() || 'UNTITLED';
-            const slugTitle = trackTitle.replace(/[^A-Z0-9]/g, '-');
-            const timestamp = Date.now();
-            const ext = file.name.split('.').pop();
-            
-            const basePath = `artifacts/${currentAppId}/public`;
-            let folder = `${basePath}/audio/mp3`;
-            if (type === 'lyrics') folder = `${basePath}/audio/lyrics`;
-            if (type === 'sheet') folder = `${basePath}/audio/sheets`;
+            const path = `artifacts/${window.appId}/public/audio/${type}/${Date.now()}_${file.name}`;
+            const ref = window.storageRef(window.storage, path);
+            const task = window.uploadBytesResumable(ref, file);
 
-            const filePath = `${folder}/${slugTitle}_${timestamp}.${ext}`;
-            const storageRef = window.storageRef(window.storage, filePath);
-            const uploadTask = window.uploadBytesResumable(storageRef, file);
-
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    // Optional: Update text with %
-                    const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                    if(progress < 100) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><br>${progress}%`;
-                }, 
-                (error) => {
-                    console.error("Upload Error:", error);
-                    
-                    // MODIF : Détection du blocage sécurité (CORS) typique de l'éditeur
-                    if (error.code === 'storage/unauthorized' || error.message.includes('network') || error.code === 'storage/retry-limit-exceeded') {
-                        // On n'affiche plus l'alerte spécifique Canvas pour éviter la confusion sur Netlify, 
-                        // mais on loggue proprement l'erreur.
-                        console.warn("Storage Error - Possible CORS or Auth issue.");
-                        alert("Erreur Upload : Vérifiez votre connexion ou les permissions.\nSi vous êtes en prévisualisation, c'est normal.");
-                    } else {
-                        showErrorToast("Erreur Upload");
-                    }
-
-                    // Reset Button
-                    btn.innerHTML = originalContent;
-                    btn.className = originalClass;
-                }, 
-                () => {
-                    // Success
-                    window.getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        document.getElementById(targetInputId).value = downloadURL;
-                        showToast("Fichier Enregistré !");
-                        
-                        // UI Success State
-                        btn.classList.remove('upload-loading');
-                        btn.classList.add('upload-success');
-                        btn.innerHTML = `<i class="fas fa-check"></i><br>OK`;
-                    });
-                }
-            );
-        };
-
-        // Ouvrir la modale de sélection (Unused in new UI but kept for compatibility if needed)
-        window.openStoragePicker = function(type, targetId) {
-            if(useLocalStorage) return alert("Storage indisponible en local.");
-            targetInputIdForStorage = targetId;
-            document.getElementById('storage-modal').classList.remove('hidden');
-            let folderKey = 'mp3';
-            if(type === 'pdf' && targetId.includes('lyrics')) folderKey = 'lyrics';
-            if(type === 'pdf' && targetId.includes('sheet')) folderKey = 'sheet';
-            listStorageFiles(folderKey);
-        };
-
-        // Lister les fichiers d'un dossier Storage
-        window.listStorageFiles = function(folderKey) {
-            const listContainer = document.getElementById('storage-file-list');
-            listContainer.innerHTML = '<div class="text-center text-gray-500 text-xs animate-pulse">Chargement...</div>';
-
-            const currentAppId = window.appId || 'default-app';
-            const basePath = `artifacts/${currentAppId}/public`;
-            
-            let folderPath = `${basePath}/audio/mp3`;
-            if(folderKey === 'lyrics') folderPath = `${basePath}/audio/lyrics`;
-            if(folderKey === 'sheet') folderPath = `${basePath}/audio/sheets`;
-
-            const listRef = window.storageRef(window.storage, folderPath);
-
-            window.listAll(listRef).then((res) => {
-                if (res.items.length === 0) {
-                    listContainer.innerHTML = '<div class="text-center text-gray-500 text-xs">Aucun fichier trouvé.</div>';
-                    return;
-                }
-                
-                let html = '';
-                // Pour chaque fichier, on a besoin de l'URL pour le select
-                res.items.forEach((itemRef) => {
-                    html += `
-                    <div class="flex justify-between items-center bg-white/5 p-2 rounded hover:bg-white/10 cursor-pointer border border-white/5" onclick="selectStorageFile('${itemRef.fullPath}')">
-                        <span class="text-xs text-gray-300 truncate"><i class="fas fa-file mr-2 text-fuchsia-500"></i>${itemRef.name}</span>
-                        <i class="fas fa-plus-circle text-gray-500"></i>
-                    </div>`;
+            task.on('state_changed', null, (e) => { showErrorToast("Échec upload"); btn.innerHTML = "ERR"; }, () => {
+                window.getDownloadURL(task.snapshot.ref).then(url => {
+                    document.getElementById(targetId).value = url;
+                    btn.classList.replace('upload-loading', 'upload-success');
+                    btn.innerHTML = `<i class="fas fa-check"></i>`;
                 });
-                listContainer.innerHTML = html;
-            }).catch((error) => {
-                console.error(error);
-                listContainer.innerHTML = '<div class="text-center text-red-500 text-xs">Erreur accès/listing.</div>';
             });
         };
 
-        window.selectStorageFile = function(fullPath) {
-            const fileRef = window.storageRef(window.storage, fullPath);
-            window.getDownloadURL(fileRef).then((url) => {
-                if(targetInputIdForStorage) {
-                    document.getElementById(targetInputIdForStorage).value = url;
-                    closeModal('storage-modal');
-                    // Suppression de la preview ici car la modale est fermée
-                    showToast("Fichier sélectionné");
-                }
-            }).catch(e => showErrorToast("Erreur URL"));
-        };
-
-        function setupEventListeners() {
-            document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
-            document.getElementById('admin-pass-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAdminPassword(); });
+        function renderPlanning() {
+            const container = document.getElementById('planning-container');
+            const sidebar = document.getElementById('artist-sidebar-content');
+            const mobileContainer = document.getElementById('artist-mobile-content');
             
-            // AJOUT : Sécurité anti-fermeture accidentelle
-            // Le navigateur demandera confirmation avant de fermer l'onglet
-            window.addEventListener('beforeunload', (e) => {
-                e.preventDefault();
-                e.returnValue = ''; 
-            });
-        }
+            const monthName = currentDate.toLocaleDateString('fr-FR', {month: 'long'}).toUpperCase();
+            document.getElementById('current-month-display').textContent = `${monthName} ${currentDate.getFullYear()}`;
 
-        // --- UI & LOGIQUE ---
-        function updateColorPicker() {
-            const role = document.getElementById('new-artist-role').value;
-            const container = document.getElementById('new-artist-color-picker');
-            
-            let palette;
-            if (role === 'chant') palette = COLOR_PALETTES.singers;
-            else if (role === 'piano') palette = COLOR_PALETTES.piano;
-            else if (role === 'basse') palette = COLOR_PALETTES.basse;
-            else if (role === 'drum') palette = COLOR_PALETTES.drum;
-            else palette = COLOR_PALETTES.singers; 
-            
-            const groupType = (role === 'chant') ? 'chant' : 'musicien';
-            const usedColors = ARTISTS.filter(a => a.group === groupType && a.role === role).map(a => a.color);
+            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-10 pr-4">
+                <div class=""></div><div class="col-span-3 bg-purple-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest">Chants</div><div class=""></div><div class="col-span-3 bg-blue-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest">Musiciens</div>
+                <div class="sticky-col bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 border border-white/5">DATES</div>
+                <div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 1</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 2</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 3</div><div class=""></div>
+                <div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Piano</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Basse</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Drum</div>`;
 
-            let html = '';
-            let firstFreeColor = null;
-
-            palette.forEach(colorClass => {
-                const isUsed = usedColors.includes(colorClass);
-                const usedClass = isUsed ? 'used' : '';
-                if(!firstFreeColor && !isUsed) firstFreeColor = colorClass;
-                html += `<div class="color-swatch ${colorClass} ${usedClass}" onclick="selectColor(this, '${colorClass}')"></div>`;
-            });
-            container.innerHTML = html;
-            const defaultColor = firstFreeColor || palette[0];
-            selectColor(null, defaultColor);
-        }
-
-        function selectColor(element, colorValue) {
-            document.getElementById('selected-color-value').value = colorValue;
-            const container = document.getElementById('new-artist-color-picker');
-            container.querySelectorAll('.color-swatch').forEach(swatch => {
-                swatch.classList.remove('active');
-                if (element && swatch === element) swatch.classList.add('active');
-                else if (!element && swatch.className.includes(colorValue) && !swatch.classList.contains('used')) swatch.classList.add('active');
-            });
-        }
-        
-        function getArtistScheduleHTML(artistId) {
-            const artistAssignments = [];
-            for (const [key, assignedId] of Object.entries(assignments)) {
-                if (assignedId === artistId) {
-                    const [dateStr, slot] = key.split('_');
+            const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            while(d.getMonth() === currentDate.getMonth()) {
+                if([3,4,5,6].includes(d.getDay())) {
+                    const dateStr = [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+                    const isSat = d.getDay() === 6;
+                    const isRowActive = highlightedRow === dateStr;
+                    const dateCellBg = isRowActive ? 'bg-fuchsia-800' : (isSat ? 'bg-[#2a1b3d]' : 'bg-[#1a0b2e]');
                     
-                    // MODIF : Parsing manuel pour éviter le décalage UTC
-                    const [y, m, d] = dateStr.split('-').map(Number);
-                    const date = new Date(y, m - 1, d);
+                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="sticky-col h-16 flex flex-col justify-center items-center border border-white/5 rounded-lg ${dateCellBg} cursor-pointer group ${isRowActive?'row-active':''}">
+                        <span class="text-[8px] uppercase text-fuchsia-300">${d.toLocaleDateString('fr-FR', {weekday: 'short'})}</span>
+                        <span class="text-lg font-black text-white leading-none">${d.getDate()}</span>
+                    </div>`;
 
-                    if (date.getMonth() === currentDate.getMonth() && date.getFullYear() === currentDate.getFullYear()) {
-                        artistAssignments.push({ date, slot });
-                    }
+                    ['chant1', 'chant2', 'chant3', 'sep', 'piano', 'basse', 'drum'].forEach(slot => {
+                        if(slot === 'sep') gridHTML += `<div></div>`;
+                        else {
+                            const artistId = assignments[`${dateStr}_${slot}`];
+                            const artist = ARTISTS.find(a => a.id === artistId);
+                            let cellClass = `h-16 border border-white/5 flex items-center justify-center rounded transition-all ${isRowActive?'row-active':''} `;
+                            let content = '';
+                            if(artist) {
+                                cellClass += `${artist.color} `;
+                                if(selectedArtistId && artist.id !== selectedArtistId) cellClass += `cell-dimmed `;
+                                content = `<span class="font-bold text-[10px] px-1 truncate">${artist.name}</span>`;
+                            } else {
+                                cellClass += `bg-black/20 `;
+                                if(selectedArtistId) cellClass += `cell-dimmed `;
+                                if(isAdminMode) content = `<i class="fas fa-plus text-white/10"></i>`;
+                            }
+                            gridHTML += `<div class="${cellClass}" onclick="${isAdminMode?`handleCellClick('${dateStr}','${slot}')`:''}">${content}</div>`;
+                        }
+                    });
+                    if(isSat) gridHTML += `<div class="col-span-8 h-2"></div>`;
                 }
+                d.setDate(d.getDate() + 1);
             }
-            artistAssignments.sort((a, b) => a.date - b.date);
-            if (artistAssignments.length === 0) return '<div class="text-[9px] text-gray-500 text-center py-1 schedule-dropdown">Aucune date ce mois-ci</div>';
-            return `<div class="mt-1 bg-white/5 rounded-lg p-2 schedule-dropdown"><ul class="space-y-1">${artistAssignments.map(a => {
-                const dayName = a.date.toLocaleDateString('fr-FR', {weekday: 'short'});
-                const dayNum = a.date.getDate().toString().padStart(2, '0');
-                return `<li class="flex justify-between text-[10px] text-gray-300"><span class="font-bold text-fuchsia-400 capitalize">${dayName} ${dayNum}</span><span class="uppercase opacity-70 text-[9px]">${a.slot.replace(/(\d+)$/, ' $1')}</span></li>`;
-            }).join('')}</ul></div>`;
-        }
-        
-        function toggleArtistFilter(id) { selectedArtistId = (selectedArtistId === id) ? null : id; renderPlanning(); }
+            gridHTML += `</div></div>`;
+            container.innerHTML = gridHTML;
 
-        // AJOUT : Fonction pour surligner une ligne entière
-        window.toggleRowHighlight = function(dateStr) {
-            if (highlightedRow === dateStr) highlightedRow = null;
-            else highlightedRow = dateStr;
-            renderPlanning();
+            // Remplissage de la légende (Desktop et Mobile)
+            const artistItemsHTML = ARTISTS.map(a => `<button onclick="toggleArtistFilter('${a.id}')" class="w-full p-2 rounded text-[10px] font-bold uppercase transition-all shadow-md ${a.color} ${selectedArtistId===a.id?'ring-2 ring-white scale-105':'opacity-70 hover:opacity-100'}">${a.name}</button>`).join('');
+            
+            if(sidebar) sidebar.innerHTML = artistItemsHTML;
+            if(mobileContainer) mobileContainer.innerHTML = artistItemsHTML;
+        }
+
+        window.toggleRowHighlight = (d) => { highlightedRow = (highlightedRow===d)?null:d; renderPlanning(); };
+        window.toggleArtistFilter = (id) => { selectedArtistId = (selectedArtistId===id)?null:id; renderPlanning(); };
+
+        function renderAudioList(term='') {
+            const list = document.getElementById('audio-track-list');
+            const filtered = AUDIO_LIBRARY.filter(t => t.title.toLowerCase().includes(term.toLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
+            list.innerHTML = filtered.map(t => `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}">
+                <span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i>
+            </button>`).join('');
+        }
+
+        window.selectTrack = (id) => {
+            currentTrack = AUDIO_LIBRARY.find(t => t.id === id);
+            document.getElementById('player-empty-state').classList.add('hidden');
+            document.getElementById('player-content').classList.remove('hidden');
+            document.getElementById('player-title').innerText = currentTrack.title;
+            const a = document.getElementById('audio-element');
+            a.src = currentTrack.src || "";
+            a.currentTime = 0; lastPlayStart = 0;
+            updateBtn('btn-lyrics', currentTrack.lyrics);
+            updateBtn('btn-sheet', currentTrack.sheet);
+            renderAudioList(document.getElementById('audio-search').value);
         };
 
-        function renderArtistList(group, specificRole = null) {
-            return ARTISTS.filter(a => {
-                if (group === 'chant') return a.group === 'chant';
-                if (group === 'musicien') return (a.group === 'musicien' && (!specificRole || a.role === specificRole));
-                return false;
-            }).map(artist => {
-                const isSelected = selectedArtistId === artist.id;
-                let scheduleHTML = isSelected ? getArtistScheduleHTML(artist.id) : '';
-                return `<div class="mb-1"><button onclick="toggleArtistFilter('${artist.id}')" class="artist-pill w-full px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center justify-center relative ${artist.color} ${isSelected ? 'selected' : 'opacity-80 hover:opacity-100'}">${artist.name} ${isSelected ? '<span class="absolute right-3 w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_5px_white]"></span>' : ''}</button>${scheduleHTML}</div>`;
-            }).join('');
+        function updateBtn(id, link) {
+            const b = document.getElementById(id); 
+            if(!b) return;
+            b.href = link || "#";
+            if(link) {
+                b.classList.replace('opacity-50', 'opacity-100');
+                b.classList.replace('cursor-not-allowed', 'cursor-pointer');
+            } else {
+                b.classList.replace('opacity-100', 'opacity-50');
+                b.classList.add('cursor-not-allowed');
+            }
+        }
+
+        window.togglePlay = () => {
+            const a = document.getElementById('audio-element'); const i = document.getElementById('play-btn').querySelector('i');
+            if(a.paused) { a.play(); i.className = "fas fa-pause"; lastPlayStart = a.currentTime; }
+            else { a.pause(); i.className = "fas fa-play ml-1"; }
+        };
+        window.stopAudio = () => { const a = document.getElementById('audio-element'); a.pause(); a.currentTime = 0; resetPlayerUI(); };
+        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPlayStart; a.play(); };
+        window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play ml-1"; };
+        window.updateProgress = () => {
+            const a = document.getElementById('audio-element');
+            if(a.duration) {
+                document.getElementById('progress-bar').style.width = `${(a.currentTime/a.duration)*100}%`;
+                document.getElementById('time-current').innerText = formatTime(a.currentTime);
+                document.getElementById('time-total').innerText = formatTime(a.duration);
+            }
+        };
+        function formatTime(s) { const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc.toString().padStart(2,'0')}`; }
+        window.seekAudio = (e) => { const a = document.getElementById('audio-element'); a.currentTime = (e.offsetX / e.currentTarget.clientWidth) * a.duration; };
+        window.setSpeed = (s) => { document.getElementById('audio-element').playbackRate = s; document.querySelectorAll('.speed-btn').forEach(b => b.classList.toggle('active-speed', parseFloat(b.innerText)===s)); };
+        window.setVolume = (v) => { document.getElementById('audio-element').volume = v; };
+
+        window.initRealtimeData = () => {
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'artists'), s => { ARTISTS = s.docs.map(d=>d.data()); renderAdminTeamList(); renderPlanning(); });
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'planning'), s => { assignments = {}; s.forEach(d=>assignments[d.id]=d.data().artistId); renderPlanning(); });
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'audio'), s => { AUDIO_LIBRARY = s.docs.map(d=>d.data()); renderAudioList(); renderAdminAudioList(); renderHomeNews(); });
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'setlists'), s => { s.forEach(d=>{if(SETLISTS[d.id]) SETLISTS[d.id]=d.data();}); renderSetlistPublic(); });
+            document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+        };
+
+        window.addNewArtist = async () => {
+            const name = document.getElementById('new-artist-name').value.toUpperCase().trim();
+            const color = document.getElementById('selected-color-value').value;
+            if(!name || !color) return;
+            const id = Date.now().toString();
+            await setDoc(PUBLIC_DOC('artists', id), { id, name, color, role: document.getElementById('new-artist-role').value });
+            document.getElementById('new-artist-name').value = ''; showToast();
+        };
+
+        window.saveAudioTrack = async () => {
+            const title = document.getElementById('audio-title-input').value.toUpperCase().trim(); if(!title) return;
+            const id = document.getElementById('audio-id-input').value || Date.now().toString();
+            await setDoc(PUBLIC_DOC('audio', id), { id, title, isNew: document.getElementById('audio-is-new').checked, src: document.getElementById('audio-src-input').value, lyrics: document.getElementById('audio-lyrics-input').value, sheet: document.getElementById('audio-sheet-input').value, youtube: document.getElementById('audio-youtube-input').value });
+            clearAudioForm(); showToast();
+        };
+
+        window.renderHomeNews = () => {
+            const c = document.getElementById('home-news-container'); const nt = AUDIO_LIBRARY.filter(t => t.isNew);
+            if(!nt.length) { c.classList.add('hidden'); return; }
+            c.classList.remove('hidden');
+            c.innerHTML = `<div class="bg-red-900/80 p-4 rounded-xl border border-red-500/50 shadow-lg animate-pulse">
+                <h3 class="text-white font-black text-xs mb-3">🚨 NOUVEAUTÉ À TRAVAILLER</h3>
+                ${nt.map(t => `<div class="bg-black/40 p-3 rounded flex justify-between items-center mb-2">
+                    <span class="text-white font-bold text-xs">${t.title}</span>
+                    <button onclick="playNewsTrack('${t.id}')" class="bg-white text-red-900 px-4 py-1 rounded-full text-[10px] font-bold">ÉCOUTER</button>
+                </div>`).join('')}
+            </div>`;
+        };
+        window.playNewsTrack = (id) => { showPage('audio'); setTimeout(() => selectTrack(id), 100); };
+
+        function renderSetlistPublic() {
+            const c = document.getElementById('setlist-public-container');
+            const d = [{k:'wed',c:'blue'},{k:'thu',c:'purple'},{k:'fri',c:'pink'},{k:'sat',c:'indigo'}];
+            c.innerHTML = d.map(day => `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full">
+                <div class="bg-${day.c}-600 p-4 text-center text-white font-bold">${SETLISTS[day.k].date}</div>
+                <div class="p-6 text-xs text-gray-200 flex-1 whitespace-pre-wrap">${SETLISTS[day.k].content}</div>
+                <button onclick="copySet('${day.k}')" class="m-3 p-2 bg-white/5 rounded text-[10px] uppercase font-bold text-gray-400">Copier</button>
+            </div>`).join('');
+        }
+        window.copySet = (id) => { navigator.clipboard.writeText(SETLISTS[id].content); showToast("Copié !"); };
+
+        window.saveSetlistsOnly = async () => {
+            for(let k of ['wed','thu','fri','sat']) {
+                SETLISTS[k].date = document.getElementById('date-'+k).value;
+                SETLISTS[k].content = document.getElementById('setlist-'+k).value;
+                await setDoc(PUBLIC_DOC('setlists', k), SETLISTS[k]);
+            }
+            showToast();
+        };
+
+        window.showPage = (id) => {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.id==='nav-'+id));
+            if(id === 'admin-panel') loadAdminValues();
+        };
+
+        function loadAdminValues() {
+            for(let k of ['wed','thu','fri','sat']) {
+                if(document.getElementById('date-'+k)) document.getElementById('date-'+k).value = SETLISTS[k].date || '';
+                if(document.getElementById('setlist-'+k)) document.getElementById('setlist-'+k).value = SETLISTS[k].content || '';
+            }
+            renderAdminTeamList();
+            renderAdminAudioList();
+        }
+
+        window.toggleSidebar = () => { document.getElementById('main-sidebar').classList.toggle('sidebar-collapsed'); };
+        window.toggleAdminMode = () => { if(isAdminMode) { isAdminMode=false; updateAdminUI(); } else document.getElementById('password-modal').classList.remove('hidden'); };
+        window.checkAdminPassword = () => { if(document.getElementById('admin-pass-input').value==='mondaine') { isAdminMode=true; updateAdminUI(); closeModal('password-modal'); } };
+        window.updateAdminUI = () => { document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); renderPlanning(); };
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+        window.handleCellClick = (d, s) => { currentEditSlot = {dateStr:d, slot:s}; renderModalArtists(); document.getElementById('assign-modal').classList.remove('hidden'); };
+        
+        function renderModalArtists() {
+            document.getElementById('modal-artist-list').innerHTML = ARTISTS.map(a => `<button onclick="setAssign('${a.id}')" class="${a.color} p-3 rounded font-bold text-[10px] uppercase">${a.name}</button>`).join('');
+        }
+        window.setAssign = async (id) => { await setDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`), { artistId: id }); closeModal('assign-modal'); };
+        window.removeAssignment = async () => { await deleteDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`)); closeModal('assign-modal'); };
+
+        function clearAudioForm() {
+            document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type!=='hidden'&&i.type!=='checkbox') i.value=''; });
+            document.getElementById('audio-id-input').value=''; document.getElementById('audio-is-new').checked=false;
+            document.querySelectorAll('.upload-btn').forEach(b => { b.classList.remove('upload-success'); b.innerHTML = b.id.includes('audio') ? '<i class="fas fa-music"></i>' : (b.id.includes('lyrics') ? '<i class="fas fa-align-center"></i>' : '<i class="fas fa-scroll"></i>'); });
+        }
+        
+        function renderAdminAudioList() {
+            document.getElementById('admin-audio-list').innerHTML = AUDIO_LIBRARY.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1"><span class="text-[10px] text-white">${t.title}</span><div class="flex gap-1"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join('');
         }
 
         function renderAdminTeamList() {
              const container = document.getElementById('admin-team-list');
+             if(!container) return;
              const categories = [
                 { id: 'chant', label: 'CHANTS', icon: 'fa-microphone-alt', color: 'text-fuchsia-400' },
                 { id: 'piano', label: 'PIANO', icon: 'fa-keyboard', color: 'text-green-400' },
@@ -1000,717 +631,30 @@
             ];
             container.innerHTML = categories.map(cat => {
                 const catArtists = ARTISTS.filter(a => a.role === cat.id);
-                return `<div class="mb-4"><h4 class="text-xs font-bold uppercase mb-2 ${cat.color} border-b border-white/5 pb-1"><i class="fas ${cat.icon} mr-1"></i> ${cat.label}</h4><div class="grid grid-cols-2 gap-2">${catArtists.map(a => `<div class="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5 group"><span class="text-xs font-bold ${a.color} px-2 py-1 rounded">${a.name}</span><button onclick="askDeleteArtist('${a.id}')" class="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-2"><i class="fas fa-times"></i></button></div>`).join('')}</div></div>`;
-            }).join('');
-        }
-        
-        function renderPlanning() {
-            const container = document.getElementById('planning-container');
-            const sidebar = document.getElementById('artist-sidebar-content');
-            const options = { month: 'long'};
-            const monthName = currentDate.toLocaleDateString('fr-FR', options).toUpperCase();
-            const yearStr = currentDate.getFullYear();
-            document.getElementById('current-month-display').textContent = `${monthName} ${yearStr}`;
-
-            let verticalMonthHTML = `<div class="month-sidebar flex flex-col justify-center items-center w-20 md:w-28 shrink-0 mr-4 md:mr-8 rounded-r-3xl border-r border-fuchsia-400/30 hidden md:flex">`; // MODIF: Caché sur très petits écrans si besoin, ou on le garde
-            for(let char of monthName) { verticalMonthHTML += `<span class="month-char block text-5xl md:text-7xl font-black mb-0 md:mb-1 text-center w-full cursor-default select-none">${char}</span>`; }
-            verticalMonthHTML += `</div>`;
-
-            // MODIF : sticky-col ajouté à la case titre "DATES"
-            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-20 pr-4"><div class=""></div><div class="col-span-3 flex items-center justify-center gap-2 bg-purple-900/40 p-3 rounded-t-xl border border-purple-500/20 backdrop-blur-sm"><i class="fas fa-microphone-alt text-purple-400"></i><span class="font-bold text-purple-100 tracking-[0.2em] uppercase text-xs">Chants</span></div><div></div><div class="col-span-3 flex items-center justify-center gap-2 bg-blue-900/40 p-3 rounded-t-xl border border-blue-500/20 backdrop-blur-sm"><i class="fas fa-music text-blue-400"></i><span class="font-bold text-blue-100 tracking-[0.2em] uppercase text-xs">Musiciens</span></div>
-            <div class="bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 rounded-l-lg border border-white/5 flex items-center justify-center sticky-col">DATES</div>
-            <div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10">Chant 1</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10">Chant 2</div><div class="bg-purple-500/20 text-purple-200 font-bold text-[10px] uppercase py-3 border border-purple-500/10 rounded-r-lg">Chant 3</div><div class="flex justify-center"><div class="w-[1px] h-full bg-white/10"></div></div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10 rounded-l-lg">Piano</div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10">Basse</div><div class="bg-blue-500/20 text-blue-200 font-bold text-[10px] uppercase py-3 border border-blue-500/10 rounded-r-lg">Drum</div>`;
-
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            const d = new Date(year, month, 1);
-            while(d.getMonth() === month) {
-                if([3,4,5,6].includes(d.getDay())) {
-                    
-                    // MODIF : Génération de la date force en local (YYYY-MM-DD)
-                    const dateStr = [
-                        d.getFullYear(),
-                        String(d.getMonth() + 1).padStart(2, '0'),
-                        String(d.getDate()).padStart(2, '0')
-                    ].join('-');
-
-                    const dayName = d.toLocaleDateString('fr-FR', {weekday: 'long'});
-                    const dayNum = d.getDate().toString().padStart(2, '0');
-                    const isSat = d.getDay() === 6;
-                    const isToday = new Date().toDateString() === d.toDateString();
-                    
-                    // MODIF : Background opaque pour la colonne sticky
-                    const rowColor = isSat ? 'bg-fuchsia-900/40' : 'bg-fuchsia-900/20';
-                    // La couleur de la colonne date doit être unie pour cacher ce qui passe dessous
-                    const dateCellColor = isSat ? 'bg-[#2a1b3d]' : 'bg-[#1a0b2e]'; 
-                    
-                    // Gestion de la classe active pour la ligne
-                    const isRowActive = highlightedRow === dateStr;
-                    const activeClass = isRowActive ? 'row-active' : '';
-
-                    // MODIF : Ajout de la classe 'sticky-col' et ajustement du background
-                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="flex flex-col justify-center items-center h-16 border border-white/5 rounded-lg ${dateCellColor} ${isToday ? 'ring-2 ring-fuchsia-400' : ''} ${activeClass} sticky-col cursor-pointer hover:bg-white/10 transition-colors group relative"><span class="text-[9px] uppercase text-fuchsia-200 tracking-wider mb-0.5 group-hover:text-white transition-colors">${dayName}</span><span class="text-xl font-black text-white leading-none group-hover:scale-110 transition-transform">${dayNum}</span></div>`;
-
-                    ['chant1', 'chant2', 'chant3', 'sep', 'piano', 'basse', 'drum'].forEach(slot => {
-                        if(slot === 'sep') gridHTML += `<div class="flex justify-center h-full"><div class="w-[1px] h-full bg-white/10"></div></div>`;
-                        else {
-                            const assignKey = `${dateStr}_${slot}`;
-                            const artistId = assignments[assignKey];
-                            const artist = ARTISTS.find(a => a.id === artistId);
-                            const interactClass = isAdminMode ? 'interactive cursor-pointer' : 'cursor-default';
-                            
-                            // MODIF: On retire bg-black/30 de la base ici pour éviter le conflit
-                            let cellClass = `relative h-16 border border-white/5 flex items-center justify-center planning-cell rounded-md ${interactClass} ${activeClass} `;
-                            let cellContent = '';
-                            
-                            if(artist) {
-                                // Si artiste présent : on applique SA couleur
-                                cellClass += `${artist.color} shadow-lg `;
-                                cellContent = `<span class="font-bold text-xs truncate px-2 py-1 select-none">${artist.name}</span>`;
-                                if(selectedArtistId && artist.id === selectedArtistId) cellClass += `cell-highlight `;
-                                else if (selectedArtistId && artist.id !== selectedArtistId) cellClass += `cell-dimmed `;
-                            } else {
-                                // Si vide : on applique le fond sombre par défaut (bg-black/30) ici
-                                cellClass += `bg-black/30 `;
-                                
-                                // MODIF : On grise aussi les cases vides si un artiste est sélectionné
-                                if(selectedArtistId) cellClass += `cell-dimmed `;
-
-                                if (isAdminMode) cellContent = `<i class="fas fa-plus text-white/20 text-xs hover:text-white/80 transition-colors"></i>`;
-                            }
-
-                            const clickAction = isAdminMode ? `onclick="handleCellClick('${dateStr}', '${slot}')"` : '';
-                            gridHTML += `<div class="${cellClass}" ${clickAction}>${cellContent}</div>`;
-                        }
-                    });
-                    
-                    // AJOUT : Séparateur de semaine après chaque Samedi
-                    if (isSat) {
-                        gridHTML += `<div class="col-span-8 h-6 flex items-center justify-center mb-2 mt-2 opacity-50"><div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div></div>`;
-                    }
-                }
-                d.setDate(d.getDate() + 1);
-            }
-            gridHTML += `</div></div>`;
-            container.innerHTML = verticalMonthHTML + gridHTML;
-            
-            sidebar.innerHTML = `<div class="mb-8"><h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4 pl-1 tracking-[0.2em] flex items-center gap-2"><i class="fas fa-microphone-alt"></i> Chants</h3><div class="space-y-2">${renderArtistList('chant')}</div></div><div><h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4 pl-1 tracking-[0.2em] flex items-center gap-2"><i class="fas fa-music"></i> Musiciens</h3><div class="space-y-2"><div class="mb-2"><div class="text-[9px] text-green-500 font-bold uppercase mb-1 opacity-70">Piano</div>${renderArtistList('musicien', 'piano')}</div><div class="mb-2"><div class="text-[9px] text-blue-500 font-bold uppercase mb-1 opacity-70">Basse</div>${renderArtistList('musicien', 'basse')}</div><div class="mb-2"><div class="text-[9px] text-red-500 font-bold uppercase mb-1 opacity-70">Drum</div>${renderArtistList('musicien', 'drum')}</div></div></div>`;
-        }
-
-        function renderSetlistPublic() {
-            const container = document.getElementById('setlist-public-container');
-            const days = [{ id: 'wed', color: 'blue', data: SETLISTS.wed }, { id: 'thu', color: 'purple', data: SETLISTS.thu }, { id: 'fri', color: 'pink', data: SETLISTS.fri }, { id: 'sat', color: 'indigo', data: SETLISTS.sat }];
-            container.innerHTML = days.map(day => {
-                const listHTML = (day.data ? day.data.content : "").split('\n').filter(l => l.trim()).map(line => {
-                    if(line.toUpperCase().includes('SET ') || line === line.toUpperCase()) return `<p class="text-${day.color}-400 font-bold text-xs uppercase underline mt-4 mb-2 tracking-widest">${line}</p>`;
-                    return `<li class="ml-4">${line}</li>`;
-                }).join('') || '<li class="italic text-gray-500 list-none">Aucune chanson</li>';
-                
-                // AJOUT : Bouton Copier en bas de la carte
-                return `<div class="bg-${day.color}-900/10 border border-${day.color}-500/30 p-0 rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.2)] flex flex-col h-full">
-                    <div class="header-${day.color} text-white py-4 text-center font-bold uppercase text-sm md:text-base tracking-wider shadow-lg">${day.data ? day.data.date : ""}</div>
-                    <div class="p-6 text-sm text-gray-200 flex-1">
-                        <ul class="list-disc list-outside space-y-2 text-xs md:text-sm font-medium opacity-90">${listHTML}</ul>
-                    </div>
-                    <div class="p-3 bg-black/20 border-t border-white/5 flex justify-center">
-                        <button onclick="copySetlist('${day.id}')" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/10 px-4 py-2 rounded-full transition-colors border border-white/5 flex items-center gap-2 group">
-                            <i class="fas fa-copy group-hover:text-${day.color}-400 transition-colors"></i> Copier
-                        </button>
+                return `<div class="mb-4">
+                    <h4 class="text-[10px] font-bold uppercase mb-2 ${cat.color} border-b border-white/5 pb-1"><i class="fas ${cat.icon} mr-1"></i> ${cat.label}</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        ${catArtists.map(a => `<div class="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5 group">
+                            <span class="text-[10px] font-bold ${a.color} px-2 py-1 rounded">${a.name}</span>
+                            <button onclick="deleteArtist('${a.id}')" class="text-gray-600 hover:text-red-500 p-1"><i class="fas fa-times"></i></button>
+                        </div>`).join('')}
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // NOUVELLE FONCTION POUR COPIER LE TEXTE
-        window.copySetlist = function(dayId) {
-            const content = SETLISTS[dayId] ? SETLISTS[dayId].content : "";
-            if(!content) return;
-            
-            // Méthode compatible (textarea invisible) pour copier
-            const el = document.createElement('textarea');
-            el.value = content;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            
-            showToast("Setlist copiée !");
-        };
-        
-        function renderAdminAudioList() {
-            const container = document.getElementById('admin-audio-list');
-            const sorted = [...AUDIO_LIBRARY].sort((a, b) => a.title.localeCompare(b.title));
-            container.innerHTML = sorted.length ? sorted.map(t => `<div class="flex items-center justify-between bg-white/5 p-3 rounded mb-2 hover:bg-white/10 transition-colors"><div class="truncate flex-1 pr-4"><div class="text-xs font-bold text-white uppercase">${t.isNew ? '<i class="fas fa-star text-yellow-400 mr-1"></i>' : ''}${t.title}</div><div class="text-[9px] text-gray-500 font-mono truncate">${t.src ? 'Audio OK' : 'Pas d\'audio'}</div></div><div class="flex gap-2"><button onclick="editAudioTrack('${t.id}')" class="text-blue-400 hover:text-blue-300 p-2"><i class="fas fa-edit"></i></button><button onclick="askDeleteAudio('${t.id}')" class="text-red-400 hover:text-red-300 p-2"><i class="fas fa-trash"></i></button></div></div>`).join('') : `<p class="text-gray-500 text-center italic text-xs mt-4">Aucun titre.</p>`;
+        window.deleteArtist = async (id) => { if(confirm("Supprimer l'artiste ?")) await deleteDoc(PUBLIC_DOC('artists', id)); };
+        window.editAudio = (id) => { const t = AUDIO_LIBRARY.find(a=>a.id===id); document.getElementById('audio-id-input').value=t.id; document.getElementById('audio-title-input').value=t.title; document.getElementById('audio-is-new').checked=t.isNew; document.getElementById('audio-src-input').value=t.src; };
+        window.deleteAudio = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(PUBLIC_DOC('audio', id)); };
+
+        function updateColorPicker() {
+            const colors = ['bg-pink-500','bg-fuchsia-500','bg-purple-500','bg-indigo-500','bg-blue-500','bg-teal-500','bg-green-500','bg-yellow-500','bg-orange-500','bg-red-500'];
+            document.getElementById('new-artist-color-picker').innerHTML = colors.map(c => `<div class="w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all ${c}" onclick="selectColor(this,'${c} text-white')"></div>`).join('');
+            selectColor(null, colors[0]+' text-white');
         }
-        
-        function renderAudioList(term='') {
-            const list = document.getElementById('audio-track-list');
-            const filteredTracks = AUDIO_LIBRARY.filter(t => t.title.toLowerCase().includes(term.toLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
-            const groupedTracks = filteredTracks.reduce((acc, track) => {
-                const firstLetter = track.title.charAt(0).toUpperCase();
-                if (!acc[firstLetter]) acc[firstLetter] = [];
-                acc[firstLetter].push(track);
-                return acc;
-            }, {});
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-            let listHTML = '';
-            
-            if (filteredTracks.length === 0) listHTML = `<div class="text-gray-500 text-center italic mt-10">Aucun titre trouvé.</div>`;
-            else {
-                alphabet.forEach(letter => {
-                    const tracksForLetter = groupedTracks[letter];
-                    if (tracksForLetter && tracksForLetter.length > 0) {
-                        listHTML += `<div class="text-xs font-black text-fuchsia-500 pt-4 pb-1 border-b border-white/5 mb-1">${letter}</div>`;
-                        tracksForLetter.forEach(t => {
-                            // MODIF : Ajout de l'icône sirène si c'est une nouveauté
-                            const newBadge = t.isNew ? '<span class="mr-2 text-lg animate-pulse">🚨</span>' : '';
-                            listHTML += `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left py-3 px-4 border-b border-white/5 text-gray-300 font-bold uppercase hover:text-white flex items-center justify-between group ${currentTrack?.id===t.id?'active':''}"><span>${newBadge}${t.title}</span><i class="fas fa-play text-xs opacity-0 group-hover:opacity-50 text-fuchsia-500 transition-opacity"></i></button>`;
-                        });
-                    }
-                });
-            }
-            list.innerHTML = listHTML;
-        }
+        window.selectColor = (el, c) => { document.getElementById('selected-color-value').value=c; document.querySelectorAll('#new-artist-color-picker div').forEach(d=>d.style.transform=(el===d)?'scale(1.2)':'scale(1)'); };
 
-        // AJOUT : FONCTION POUR AFFICHER LES NOUVEAUTÉS SUR L'ACCUEIL
-        function renderHomeNews() {
-            const container = document.getElementById('home-news-container');
-            const newTracks = AUDIO_LIBRARY.filter(t => t.isNew);
-            
-            if (newTracks.length === 0) {
-                container.classList.add('hidden');
-                container.innerHTML = '';
-                return;
-            }
-
-            container.classList.remove('hidden');
-            container.innerHTML = `
-                <div class="bg-red-900/80 backdrop-blur-md border border-red-500/50 rounded-xl p-1 shadow-[0_0_30px_rgba(220,38,38,0.4)] animate-pulse">
-                    <div class="bg-black/40 rounded-lg p-4">
-                        <h3 class="text-red-400 font-black uppercase tracking-[0.2em] text-xs mb-4 flex items-center justify-center gap-2">
-                            <i class="fas fa-exclamation-triangle"></i> NOUVEAUTÉ À TRAVAILLER
-                        </h3>
-                        <div class="space-y-3">
-                            ${newTracks.map(t => `
-                                <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white/5 p-3 rounded-lg border border-white/10">
-                                    <div class="text-center md:text-left">
-                                        <div class="text-white font-bold uppercase text-sm md:text-base tracking-wider">🚨 ${t.title}</div>
-                                        <div class="text-[10px] text-gray-400">Nouveau titre ajouté</div>
-                                    </div>
-                                    <button onclick="playNewsTrack('${t.id}')" class="bg-white text-red-900 hover:bg-red-100 font-bold py-2 px-6 rounded-full text-xs uppercase tracking-widest shadow-lg transform hover:scale-105 transition-all flex items-center gap-2">
-                                        <i class="fas fa-play"></i> Écouter
-                                    </button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // AJOUT : FONCTION POUR JOUER DEPUIS L'ACCUEIL
-        window.playNewsTrack = function(id) {
-            showPage('audio');
-            setTimeout(() => {
-                selectTrack(id);
-                // On force la lecture
-                const audioEl = document.getElementById('audio-element');
-                if (audioEl && audioEl.src) {
-                    audioEl.play().catch(e => console.log("Autoplay bloqué par le navigateur"));
-                    document.getElementById('play-btn').querySelector('i').className='fas fa-pause text-xl ml-1';
-                }
-            }, 100);
-        };
-
-        function editAudioTrack(id) {
-            const t = AUDIO_LIBRARY.find(tr => tr.id === id); if(!t) return;
-            document.getElementById('audio-id-input').value = t.id; document.getElementById('audio-title-input').value = t.title;
-            document.getElementById('audio-src-input').value = t.src||''; document.getElementById('audio-lyrics-input').value = t.lyrics||'';
-            document.getElementById('audio-sheet-input').value = t.sheet||''; document.getElementById('audio-youtube-input').value = t.youtube||'';
-            // AJOUT : Charger l'état de la checkbox
-            document.getElementById('audio-is-new').checked = t.isNew || false;
-        }
-
-        function clearAudioForm() {
-             // MODIF : On vide tous les champs textes visibles
-             document.querySelectorAll('#admin-panel input').forEach(i => { 
-                 if(i.type !== 'hidden' && i.type !== 'checkbox') i.value = ''; 
-             });
-             
-             // MODIF CRUCIALE : On force le vidage de l'ID caché pour éviter d'écraser un ancien titre
-             document.getElementById('audio-id-input').value = '';
-             
-             // Reset checkbox Nouveauté
-             document.getElementById('audio-is-new').checked = false;
-             
-             // Reset file inputs (sécurité supplémentaire)
-             document.querySelectorAll('input[type="file"]').forEach(i => { i.value = ''; }); 
-             
-             // Reset du design des boutons d'upload
-             document.querySelectorAll('.upload-btn').forEach(btn => {
-                 btn.classList.remove('upload-success', 'upload-loading');
-                 
-                 // On remet les icônes d'origine
-                 if(btn.id === 'upload-btn-audio') btn.innerHTML = `<i class="fas fa-music text-fuchsia-500 group-hover:text-white transition-colors"></i><span class="text-fuchsia-200 group-hover:text-white transition-colors">Audio</span>`;
-                 if(btn.id === 'upload-btn-lyrics') btn.innerHTML = `<i class="fas fa-align-center text-blue-500 group-hover:text-white transition-colors"></i><span class="text-blue-200 group-hover:text-white transition-colors">Paroles</span>`;
-                 if(btn.id === 'upload-btn-sheet') btn.innerHTML = `<i class="fas fa-scroll text-orange-500 group-hover:text-white transition-colors"></i><span class="text-orange-200 group-hover:text-white transition-colors">Partit.</span>`;
-             });
-        }
-        
-        function updateBtn(id, link) {
-            const btn = document.getElementById(id);
-            if(!btn) return;
-
-            // Reset
-            btn.onclick = null;
-            btn.removeAttribute('href');
-
-            // Cas : Pas de lien
-            if (!link) {
-                btn.classList.replace('opacity-100', 'opacity-50');
-                btn.classList.replace('cursor-pointer', 'cursor-not-allowed');
-                btn.href = '#';
-                btn.onclick = (e) => e.preventDefault();
-                return;
-            }
-
-            // Cas : Lien valide
-            btn.classList.replace('opacity-50', 'opacity-100');
-            btn.classList.replace('cursor-not-allowed', 'cursor-pointer');
-            
-            // On force TOUJOURS l'ouverture dans un nouvel onglet pour éviter les blocages de sécurité
-            btn.href = link;
-            btn.target = "_blank";
-            btn.rel = "noopener noreferrer";
-        }
-
-        function openPdfViewer(url) {
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.inset = '0';
-            modal.style.background = 'rgba(0,0,0,0.9)';
-            modal.style.zIndex = '9999';
-
-            modal.innerHTML = `
-                <div style="position:absolute;top:20px;right:20px">
-                    <button onclick="this.closest('div').parentNode.remove()"
-                        style="background:#d946ef;color:white;border:none;padding:10px 14px;border-radius:50%">
-                        ✕
-                    </button>
-                </div>
-                <iframe src="${url}" style="width:100%;height:100%;border:0"></iframe>
-            `;
-
-            document.body.appendChild(modal);
-        }
-        
-        window.switchToLocalMode = function() {
-            if(useLocalStorage) return; 
-            console.warn("Passage en Mode Local");
-            useLocalStorage = true;
-            showErrorToast("Mode Local Activé");
-            loadLocalData();
-            document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
-        };
-
-        function loadLocalData() {
-            if(localDataLoaded) return;
-            try {
-                const sArtists = localStorage.getItem('mondaine_artists');
-                const sPlanning = localStorage.getItem('mondaine_planning');
-                const sSetlists = localStorage.getItem('mondaine_setlists');
-                const sAudio = localStorage.getItem('mondaine_audio_library');
-                
-                ARTISTS = sArtists ? JSON.parse(sArtists) : DEFAULT_ARTISTS;
-                assignments = sPlanning ? JSON.parse(sPlanning) : {};
-                if(sSetlists) SETLISTS = JSON.parse(sSetlists);
-                AUDIO_LIBRARY = sAudio ? JSON.parse(sAudio) : [];
-                
-                renderAdminTeamList();
-                renderPlanning();
-                renderSetlistPublic();
-                renderAdminAudioList();
-                renderAudioList();
-                renderHomeNews(); // AJOUT
-                updateColorPicker();
-                localDataLoaded = true;
-            } catch(e) { console.error("Local Load Error", e); }
-        }
-
-        window.initRealtimeData = function() {
-            if(!window.db) {
-                // window.switchToLocalMode(); // MODIF : On désactive le passage forcé
-                console.error("Pas de DB détectée");
-                return;
-            }
-            
-            const listeners = [];
-            const collections = ['artists', 'planning', 'setlists', 'audio'];
-            let initialLoadComplete = 0;
-            let connectionFailed = false;
-
-            const handleFirestoreError = (error, listenerName) => {
-                console.error(`Erreur Sync ${listenerName}:`, error);
-                
-                // MODIF : On n'active le mode local QUE si c'est vraiment bloqué
-                if (error.code === 'permission-denied') {
-                     showErrorToast("Droits refusés (Vérifier Règles)");
-                }
-            };
-            
-            try {
-                collections.forEach(colName => {
-                    const ref = PUBLIC_DATA(colName);
-                    if (ref) {
-                        const unsubscribe = window.onSnapshot(ref, (snapshot) => {
-                            if (connectionFailed) return;
-                            if (colName === 'artists') {
-                                ARTISTS = snapshot.docs.map(doc => doc.data());
-                                renderAdminTeamList();
-                                renderPlanning();
-                                updateColorPicker();
-                            } else if (colName === 'planning') {
-                                assignments = {}; snapshot.forEach(d => assignments[d.id] = d.data().artistId); renderPlanning();
-                            } else if (colName === 'setlists') {
-                                snapshot.forEach(d => { if(SETLISTS[d.id]) SETLISTS[d.id] = d.data(); });
-                                renderSetlistPublic();
-                                if(document.getElementById('setlist-wed')) loadAdminValues();
-                            } else if (colName === 'audio') {
-                                AUDIO_LIBRARY = snapshot.docs.map(doc => doc.data());
-                                renderAdminAudioList(); renderAdminAudioList(); renderAudioList(document.getElementById('audio-search').value);
-                                renderHomeNews(); // AJOUT : Mise à jour de l'accueil en temps réel
-                            }
-                            
-                            initialLoadComplete++;
-                            if (initialLoadComplete >= 4) document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
-                        }, (error) => handleFirestoreError(error, colName));
-                        listeners.push(unsubscribe);
-                    }
-                });
-            } catch(e) {
-                console.error("Erreur générale connexion DB", e);
-                window.switchToLocalMode();
-            }
-            
-            if (listeners.length === 0) window.switchToLocalMode();
-        };
-
-        // --- ACTIONS ---
-        window.addNewArtist = async function() {
-            const name = document.getElementById('new-artist-name').value.toUpperCase().trim();
-            const role = document.getElementById('new-artist-role').value;
-            const color = document.getElementById('selected-color-value').value;
-            if(!name || !color) return alert("Infos manquantes");
-
-            const id = Date.now().toString();
-            const newArtist = { id, name, color, group: role === 'chant' ? 'chant' : 'musicien', role: role };
-
-            if(useLocalStorage) {
-                ARTISTS.push(newArtist);
-                localStorage.setItem('mondaine_artists', JSON.stringify(ARTISTS));
-                renderAdminTeamList(); updateColorPicker();
-                document.getElementById('new-artist-name').value = '';
-                showToast("Sauvegardé (Local)");
-            } else {
-                try {
-                    await window.setDoc(PUBLIC_DOC('artists', id), newArtist);
-                    document.getElementById('new-artist-name').value = '';
-                    showToast();
-                } catch(e) { if(e.code === 'permission-denied') window.switchToLocalMode(); else showErrorToast("Erreur serveur"); }
-            }
-        };
-
-        window.confirmDelete = async function() {
-            if(!artistToDeleteId) return;
-            if(useLocalStorage) {
-                ARTISTS = ARTISTS.filter(a => a.id !== artistToDeleteId);
-                localStorage.setItem('mondaine_artists', JSON.stringify(ARTISTS));
-                renderAdminTeamList(); updateColorPicker();
-                closeModal('delete-modal');
-            } else {
-                try { await window.deleteDoc(PUBLIC_DOC('artists', artistToDeleteId)); closeModal('delete-modal'); } 
-                catch(e) { showErrorToast("Erreur suppression"); }
-            }
-            artistToDeleteId = null;
-        };
-
-        window.setAssignment = async function(artistId) {
-            if(!currentEditSlot) return;
-            const key = `${currentEditSlot.dateStr}_${currentEditSlot.slot}`;
-            if(useLocalStorage) {
-                assignments[key] = artistId;
-                localStorage.setItem('mondaine_planning', JSON.stringify(assignments));
-                renderPlanning();
-                closeModal('assign-modal');
-            } else {
-                try { await window.setDoc(PUBLIC_DOC('planning', key), { artistId }); closeModal('assign-modal'); } 
-                catch(e) { showErrorToast("Erreur assignation"); }
-            }
-        };
-
-        window.removeAssignment = async function() {
-            if(!currentEditSlot) return;
-            const key = `${currentEditSlot.dateStr}_${currentEditSlot.slot}`;
-            if(useLocalStorage) {
-                delete assignments[key];
-                localStorage.setItem('mondaine_planning', JSON.stringify(assignments));
-                renderPlanning();
-                closeModal('assign-modal');
-            } else {
-                try { await window.deleteDoc(PUBLIC_DOC('planning', key)); closeModal('assign-modal'); } 
-                catch(e) { showErrorToast("Erreur suppression"); }
-            }
-        };
-
-        window.saveSetlistsOnly = async function() {
-            SETLISTS.wed.date = document.getElementById('date-wed').value;
-            SETLISTS.wed.content = document.getElementById('setlist-wed').value;
-            SETLISTS.thu.date = document.getElementById('date-thu').value;
-            SETLISTS.thu.content = document.getElementById('setlist-thu').value;
-            SETLISTS.fri.date = document.getElementById('date-fri').value;
-            SETLISTS.fri.content = document.getElementById('setlist-fri').value;
-            SETLISTS.sat.date = document.getElementById('date-sat').value;
-            SETLISTS.sat.content = document.getElementById('setlist-sat').value;
-
-            if(useLocalStorage) {
-                localStorage.setItem('mondaine_setlists', JSON.stringify(SETLISTS));
-                renderSetlistPublic();
-                showToast("Sauvegardé (Local)");
-            } else {
-                try {
-                    await window.setDoc(PUBLIC_DOC('setlists', 'wed'), SETLISTS.wed);
-                    await window.setDoc(PUBLIC_DOC('setlists', 'thu'), SETLISTS.thu);
-                    await window.setDoc(PUBLIC_DOC('setlists', 'fri'), SETLISTS.fri);
-                    await window.setDoc(PUBLIC_DOC('setlists', 'sat'), SETLISTS.sat);
-                    showToast();
-                } catch(e) { showErrorToast("Erreur sauvegarde"); }
-            }
-        };
-
-        window.saveAudioTrack = async function() {
-            const idInput = document.getElementById('audio-id-input').value;
-            const title = document.getElementById('audio-title-input').value.trim().toUpperCase();
-            if(!title) return alert("Titre obligatoire");
-
-            const id = idInput || Date.now().toString();
-            const newTrack = {
-                id, title,
-                src: document.getElementById('audio-src-input').value.trim(),
-                lyrics: document.getElementById('audio-lyrics-input').value.trim(),
-                sheet: document.getElementById('audio-sheet-input').value.trim(),
-                youtube: document.getElementById('audio-youtube-input').value.trim(),
-                // AJOUT : Sauvegarde de l'état "Nouveauté"
-                isNew: document.getElementById('audio-is-new').checked
-            };
-
-            // MODIF: Suppression de la limite de taille pour Firestore, car on stocke maintenant des URL
-            
-            if(useLocalStorage) {
-                const idx = AUDIO_LIBRARY.findIndex(t => t.id === id);
-                if(idx !== -1) AUDIO_LIBRARY[idx] = newTrack; else AUDIO_LIBRARY.push(newTrack);
-                try { localStorage.setItem('mondaine_audio_library', JSON.stringify(AUDIO_LIBRARY)); renderAdminAudioList(); clearAudioForm(); showToast("Sauvegardé (Local)"); renderHomeNews(); } catch(e) { alert("Mémoire pleine !"); }
-            } else {
-                try { await window.setDoc(PUBLIC_DOC('audio', id), newTrack); clearAudioForm(); showToast(); } catch(e) { showErrorToast("Erreur sauvegarde"); }
-            }
-        };
-        
-        window.confirmDeleteAudio = async function() {
-             if(!audioToDeleteId) return;
-             if(useLocalStorage) {
-                 AUDIO_LIBRARY = AUDIO_LIBRARY.filter(t => t.id !== audioToDeleteId);
-                 localStorage.setItem('mondaine_audio_library', JSON.stringify(AUDIO_LIBRARY));
-                 renderAdminAudioList();
-                 closeModal('delete-audio-modal');
-             } else {
-                 try { await window.deleteDoc(PUBLIC_DOC('audio', audioToDeleteId)); closeModal('delete-audio-modal'); } 
-                 catch(e) { showErrorToast("Erreur suppression"); }
-             }
-             audioToDeleteId = null;
-        };
-
-        window.showPage = function(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'text-fuchsia-400'));
-            const activeLink = document.getElementById('nav-' + pageId);
-            if(activeLink) activeLink.classList.add('active');
-
-            if(pageId === 'planning') renderPlanning();
-            if(pageId === 'setlist') renderSetlistPublic();
-            if(pageId === 'audio') renderAudioList(document.getElementById('audio-search').value);
-            if(pageId === 'admin-panel') { loadAdminValues(); updateColorPicker(); }
-        };
-
-        window.toggleAdminMode = function() {
-            if(!isAdminMode) {
-                document.getElementById('password-modal').classList.remove('hidden');
-                document.getElementById('admin-pass-input').value = '';
-                document.getElementById('pass-error').classList.add('hidden');
-                document.getElementById('admin-pass-input').focus();
-            } else { isAdminMode = false; updateAdminUI(); }
-        };
-        window.checkAdminPassword = function() {
-            if(document.getElementById('admin-pass-input').value === "mondaine") {
-                isAdminMode = true; closeModal('password-modal'); updateAdminUI();
-            } else document.getElementById('pass-error').classList.remove('hidden');
-        };
-
-        window.updateAdminUI = function() {
-            const btn = document.getElementById('admin-toggle-btn');
-            const icon = btn.querySelector('i');
-            const navItem = document.getElementById('admin-nav-item');
-            if(isAdminMode) {
-                btn.classList.add('text-fuchsia-500'); icon.classList.replace('fa-lock', 'fa-unlock'); navItem.classList.remove('hidden'); 
-            } else {
-                btn.classList.remove('text-fuchsia-500'); icon.classList.replace('fa-unlock', 'fa-lock'); navItem.classList.add('hidden'); 
-                if(!document.getElementById('admin-panel').classList.contains('hidden')) showPage('home');
-            }
-            renderPlanning();
-        };
-
-        window.loadAdminValues = function() {
-            if(SETLISTS.wed) {
-                document.getElementById('date-wed').value = SETLISTS.wed.date || '';
-                document.getElementById('setlist-wed').value = SETLISTS.wed.content || '';
-                document.getElementById('date-thu').value = SETLISTS.thu.date || '';
-                document.getElementById('setlist-thu').value = SETLISTS.thu.content || '';
-                document.getElementById('date-fri').value = SETLISTS.fri.date || '';
-                document.getElementById('setlist-fri').value = SETLISTS.fri.content || '';
-                document.getElementById('date-sat').value = SETLISTS.sat.date || '';
-                document.getElementById('setlist-sat').value = SETLISTS.sat.content || '';
-            }
-            renderAdminTeamList(); 
-            renderAdminAudioList(); 
-        };
-
-        window.handleCellClick = function(dateStr, slot) {
-            if(!isAdminMode) return; 
-            currentEditSlot = { dateStr, slot };
-            let allowedGroup = slot.startsWith('chant') ? 'chant' : 'musicien';
-            let allowedRole = (allowedGroup === 'musicien') ? slot : 'chant';
-
-            const filteredArtists = ARTISTS.filter(a => {
-                const groupMatch = a.group === allowedGroup;
-                if (allowedGroup === 'chant') return groupMatch && a.role === 'chant';
-                return groupMatch && a.role === allowedRole;
-            });
-            
-            const modalList = document.getElementById('modal-artist-list');
-            modalList.innerHTML = filteredArtists.length ? 
-                filteredArtists.map(a => `<button onclick="setAssignment('${a.id}')" class="${a.color} px-2 py-3 rounded-lg text-xs font-bold hover:scale-105 transition-transform shadow-md">${a.name}</button>`).join('') : 
-                `<p class="col-span-2 text-center text-gray-500 text-xs italic py-4">Aucun artiste disponible.</p>`;
-            
-            document.getElementById('modal-slot-info').innerText = `${dateStr} • ${slot.toUpperCase()}`;
-            document.getElementById('assign-modal').classList.remove('hidden');
-        };
-
-        window.askDeleteArtist = function(id) { artistToDeleteId = id; document.getElementById('delete-modal').classList.remove('hidden'); };
-        window.askDeleteAudio = function(id) { audioToDeleteId = id; document.getElementById('delete-audio-modal').classList.remove('hidden'); };
-        window.changeMonth = function(delta) { currentDate.setMonth(currentDate.getMonth() + delta); renderPlanning(); };
-        window.toggleSidebar = function() {
-            const sidebar = document.getElementById('main-sidebar');
-            sidebar.classList.toggle('sidebar-collapsed');
-            document.getElementById('sidebar-icon').className = sidebar.classList.contains('sidebar-collapsed') ? 'fas fa-expand-alt text-lg' : 'fas fa-compress-alt text-lg';
-        };
-        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
-
-        window.selectTrack = function(id) {
-            currentTrack = AUDIO_LIBRARY.find(t => t.id === id); renderAudioList(document.getElementById('audio-search').value);
-            document.getElementById('player-empty-state').classList.add('hidden'); document.getElementById('player-content').classList.remove('hidden');
-            document.getElementById('player-title').innerText = currentTrack.title;
-            updateBtn('btn-lyrics', currentTrack.lyrics); updateBtn('btn-sheet', currentTrack.sheet); updateBtn('btn-youtube', currentTrack.youtube);
-            
-            const audioEl = document.getElementById('audio-element');
-            
-            // Reset UI forcé au changement de titre
-            resetPlayerUI(); 
-            lastPlayStart = 0; // Reset du point de repère
-            document.getElementById('time-current').innerText = "00:00";
-            document.getElementById('time-total').innerText = "00:00";
-
-            if(currentTrack.src) { 
-                audioEl.src = currentTrack.src; 
-                audioEl.currentTime = 0; // Remet le temps à 0
-                audioEl.volume = 1; 
-            } else { 
-                audioEl.src = ""; 
-            }
-        };
-
-        window.togglePlay = function() { 
-            const audioEl = document.getElementById('audio-element');
-            const i = document.getElementById('play-btn').querySelector('i'); 
-            
-            if (audioEl) {
-                // Si l'audio est en pause ou fini
-                if(audioEl.paused || audioEl.ended) { 
-                    // Si le morceau était fini, on le remet à 0 avant
-                    if(audioEl.ended) audioEl.currentTime = 0;
-                    
-                    // C'est ICI qu'on sauvegarde le point de repère (CUE)
-                    lastPlayStart = audioEl.currentTime; 
-                    
-                    audioEl.play(); 
-                    i.className='fas fa-pause text-xl ml-1'; 
-                } 
-                else { 
-                    audioEl.pause(); 
-                    i.className='fas fa-play text-xl ml-1'; 
-                }
-            }
-        };
-
-        window.stopAudio = function() { const a = document.getElementById('audio-element'); if(a) { a.pause(); a.currentTime=0; resetPlayerUI(); } };
-        
-        window.resetAudio = function() { 
-            const a = document.getElementById('audio-element'); 
-            if(a) { 
-                // On revient au dernier point de repère enregistré
-                a.currentTime = lastPlayStart || 0; 
-                
-                // Et on lance la lecture directement (comme demandé "le morceau repart")
-                a.play(); 
-                document.getElementById('play-btn').querySelector('i').className='fas fa-pause text-xl ml-1';
-            } 
-        };
-
-        window.resetPlayerUI = function() { document.getElementById('play-btn').querySelector('i').className='fas fa-play text-xl ml-1'; document.getElementById('progress-bar').style.width='0%'; };
-        window.updateProgress = function() { 
-             const a = document.getElementById('audio-element');
-             if(a && a.duration) {
-                document.getElementById('progress-bar').style.width = `${(a.currentTime/a.duration)*100}%`; 
-                document.getElementById('time-current').innerText = formatTime(a.currentTime);
-                document.getElementById('time-total').innerText = formatTime(a.duration);
-             }
-        };
-        function formatTime(s) { if (!s || isNaN(s)) return "00:00"; const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`; }
-        window.seekAudio = function(e) { const a = document.getElementById('audio-element'); if(a&&a.duration) a.currentTime = (e.offsetX / e.currentTarget.clientWidth) * a.duration; };
-        
-        // MODIF: Activation du volume et vitesse
-        window.setVolume = function(v) { 
-            const a = document.getElementById('audio-element'); 
-            if(a) a.volume = parseFloat(v); 
-        };
-        
-        window.setSpeed = function(v) { 
-            const a = document.getElementById('audio-element'); 
-            if(a) {
-                a.playbackRate = parseFloat(v);
-                showToast(`Vitesse : x${v}`);
-                
-                // Highlight logic
-                document.querySelectorAll('.speed-btn').forEach(btn => {
-                   if(btn.innerText === v.toString()) btn.classList.add('active-speed');
-                   else btn.classList.remove('active-speed');
-                });
-            }
-        };
-
-        // --- INIT ---
-        window.onload = () => {
-            showPage('home');
-            setupEventListeners();
-        };
+        window.onload = () => { showPage('home'); updateColorPicker(); window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); };
     </script>
 </body>
 </html>
