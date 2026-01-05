@@ -79,6 +79,7 @@
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
 
+    <!-- Écran de chargement -->
     <div id="loading-overlay">
         <div class="flex flex-col items-center">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500 mb-4 shadow-[0_0_15px_#d946ef]"></div>
@@ -86,6 +87,7 @@
         </div>
     </div>
 
+    <!-- Initialisation Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -117,6 +119,7 @@
         });
     </script>
 
+    <!-- Sidebar -->
     <aside id="main-sidebar" class="w-20 md:w-64 bg-black/80 backdrop-blur-xl border-r border-white/5 flex flex-col z-50 shrink-0 transition-all duration-300">
         <div class="p-4 md:p-8 text-center">
             <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30">
@@ -143,6 +146,7 @@
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="flex-1 relative overflow-hidden bg-[#050505]">
         <!-- ACCUEIL -->
         <section id="home" class="page-section h-full w-full absolute inset-0 z-10 overflow-y-auto">
@@ -338,7 +342,7 @@
 
                         <div class="flex items-center gap-3 mb-6 bg-fuchsia-900/20 p-3 rounded-lg border border-fuchsia-500/20">
                             <input type="checkbox" id="audio-is-new" class="w-4 h-4 accent-fuchsia-500">
-                            <label for="audio-is-new" class="text-xs font-bold uppercase text-white cursive cursor-pointer">Nouveauté / À travailler</label>
+                            <label for="audio-is-new" class="text-xs font-bold uppercase text-white cursor-pointer italic">Nouveauté / À travailler</label>
                         </div>
 
                         <div class="flex gap-2">
@@ -354,7 +358,7 @@
         </section>
     </main>
 
-    <!-- UI COMPONENTS -->
+    <!-- Modals & Notifications -->
     <div id="toast-notification" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-green-600/90 backdrop-blur-md text-white px-8 py-3 rounded-full shadow-lg z-[100] opacity-0 font-bold text-xs uppercase transition-all pointer-events-none flex items-center gap-3">
         <i class="fas fa-check-circle text-lg"></i> <span id="toast-msg">Enregistré</span>
     </div>
@@ -383,7 +387,7 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- Script Logique -->
     <script>
         let ARTISTS = [];
         let assignments = {};
@@ -544,6 +548,11 @@
             if(sidebar) sidebar.innerHTML = sidebarHTML;
             if(mobileContainer) mobileContainer.innerHTML = sidebarHTML;
         }
+
+        window.changeMonth = (delta) => {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderPlanning();
+        };
 
         window.toggleRowHighlight = (d) => { highlightedRow = (highlightedRow===d)?null:d; renderPlanning(); };
         window.toggleArtistFilter = (id) => { selectedArtistId = (selectedArtistId===id)?null:id; renderPlanning(); };
