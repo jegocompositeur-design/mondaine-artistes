@@ -65,7 +65,9 @@
         .track-item { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .track-item.active { background: linear-gradient(90deg, rgba(217, 70, 239, 0.15) 0%, transparent 100%); border-left: 3px solid #d946ef; color: #f0abfc; }
         
-        /* STYLE DU SLIDER AVEC PROGRESSION COLOREE */
+        /* Alphabetic Divider */
+        .alpha-divider { background: rgba(255,255,255,0.02); border-left: 2px solid rgba(255,255,255,0.1); padding: 4px 16px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.3); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 8px; }
+
         input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); width: 100%; border-radius: 10px; height: 6px; outline: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; box-shadow: 0 0 10px rgba(217,70,239,0.8); border: 2px solid #d946ef; }
         input[type=range]::-moz-range-thumb { height: 18px; width: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; border: 2px solid #d946ef; }
@@ -213,20 +215,20 @@
                     <div class="flex-1 overflow-y-auto pr-2 pb-20 md:pb-0" id="audio-track-list"></div>
                 </div>
 
-                <!-- LECTEUR FIXE (Haut sur mobile, Droite sur desktop) -->
-                <div class="h-[45vh] md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl shrink-0">
+                <!-- LECTEUR FIXE -->
+                <div class="h-[50vh] md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl shrink-0">
                     <div id="player-empty-state" class="flex flex-col items-center justify-center h-full text-center opacity-40">
                         <i class="fas fa-headphones text-4xl md:text-5xl text-fuchsia-500 mb-2"></i>
                         <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Sélectionnez un titre</p>
                     </div>
                     <div id="player-content" class="hidden flex flex-col h-full overflow-y-auto">
-                        <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight break-words text-center md:text-left">TITRE</h3>
-                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-4 md:p-8 mb-4 md:mb-6 border border-white/5 shadow-inner">
-                            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                                <div class="flex gap-2" id="speed-controls">
-                                    <button onclick="setSpeed(0.5)" class="speed-btn px-2.5 py-1">0.5</button>
-                                    <button onclick="setSpeed(1.0)" class="speed-btn px-2.5 py-1 active-speed">1.0</button>
-                                    <button onclick="setSpeed(1.5)" class="speed-btn px-2.5 py-1">1.5</button>
+                        <h3 id="player-title" class="text-lg md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight break-words text-center md:text-left">TITRE</h3>
+                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-4 md:p-8 mb-4 border border-white/5 shadow-inner">
+                            <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
+                                <div class="flex gap-1.5 md:gap-2" id="speed-controls">
+                                    <button onclick="setSpeed(0.5)" class="speed-btn px-2 py-1">0.5</button>
+                                    <button onclick="setSpeed(1.0)" class="speed-btn px-2 py-1 active-speed">1.0</button>
+                                    <button onclick="setSpeed(1.5)" class="speed-btn px-2 py-1">1.5</button>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-volume-up text-[10px] text-gray-500"></i>
@@ -234,9 +236,9 @@
                                 </div>
                             </div>
                             
-                            <div class="flex justify-center items-center gap-6 md:gap-8 mb-6">
+                            <div class="flex justify-center items-center gap-6 md:gap-8 mb-5">
                                 <button onclick="stopAudio()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-stop text-sm md:text-lg"></i></button>
-                                <button onclick="togglePlay()" id="play-btn" class="w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white flex items-center justify-center shadow-[0_0_25px_rgba(217,70,239,0.4)] hover:scale-105 transition-transform"><i class="fas fa-play ml-1 text-xl md:text-3xl"></i></button>
+                                <button onclick="togglePlay()" id="play-btn" class="w-12 h-12 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white flex items-center justify-center shadow-[0_0_25px_rgba(217,70,239,0.4)] hover:scale-105 transition-transform"><i class="fas fa-play ml-1 text-xl md:text-3xl"></i></button>
                                 <button onclick="resetAudio()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-redo-alt text-sm md:text-lg"></i></button>
                             </div>
                             
@@ -252,16 +254,17 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <a id="btn-lyrics" href="#" target="_blank" class="flex items-center justify-center gap-2 p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
+                        <!-- BOUTONS RESSOURCES -->
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <a id="btn-lyrics" href="#" target="_blank" class="flex items-center justify-center gap-2 p-2 bg-blue-900/20 border border-blue-500/20 rounded-lg opacity-50 text-[9px] md:text-[10px] font-bold uppercase transition-all">
                                 <i class="fas fa-align-center text-blue-400"></i><span>Paroles</span>
                             </a>
-                            <a id="btn-sheet" href="#" target="_blank" class="flex items-center justify-center gap-2 p-3 bg-orange-900/20 border border-orange-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
+                            <a id="btn-sheet" href="#" target="_blank" class="flex items-center justify-center gap-2 p-2 bg-orange-900/20 border border-orange-500/20 rounded-lg opacity-50 text-[9px] md:text-[10px] font-bold uppercase transition-all">
                                 <i class="fas fa-music text-orange-400"></i><span>Partition</span>
                             </a>
                         </div>
-                        <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 p-3 bg-red-900/20 border border-red-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
-                            <i class="fab fa-youtube text-red-500 text-lg"></i><span>Vidéo / Choré</span>
+                        <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 p-2 bg-red-900/20 border border-red-500/20 rounded-lg opacity-50 text-[9px] md:text-[10px] font-bold uppercase transition-all">
+                            <i class="fab fa-youtube text-red-500 text-sm md:text-lg"></i><span>Vidéo / Choré</span>
                         </a>
                     </div>
                 </div>
@@ -364,7 +367,7 @@
     </div>
 
     <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-sm">
             <h3 class="text-white font-bold uppercase text-xs mb-4 text-center border-b border-white/10 pb-2" id="modal-slot-info">Date</h3>
             <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
             <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg text-xs font-bold uppercase">Retirer l'artiste</button>
@@ -453,10 +456,13 @@
             const mobileContainer = document.getElementById('artist-mobile-content');
             const monthName = currentDate.toLocaleDateString('fr-FR', {month: 'long'}).toUpperCase();
             document.getElementById('current-month-display').textContent = `${monthName} ${currentDate.getFullYear()}`;
+            
             let verticalMonthHTML = `<div class="month-sidebar flex flex-col justify-center items-center w-20 md:w-28 shrink-0 mr-4 md:mr-8 rounded-r-3xl border-r border-fuchsia-400/30 hidden md:flex">`;
             for(let char of monthName) { verticalMonthHTML += `<span class="month-char block text-5xl md:text-7xl font-black mb-1 text-center w-full">${char}</span>`; }
             verticalMonthHTML += `</div>`;
-            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-10 pr-4"><div class=""></div><div class="col-span-3 bg-purple-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest text-purple-200">Chants</div><div class=""></div><div class="col-span-3 bg-blue-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest text-blue-200">Musiciens</div><div class="sticky-col bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 border border-white/5">DATES</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 1</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 2</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 3</div><div class="flex justify-center h-full"><div class="w-px h-full bg-white/10"></div></div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Piano</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Basse</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Drum</div>`;
+            
+            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[60px_1fr_1fr_1fr_20px_1fr_1fr_1fr] md:grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1 text-center pb-10 pr-4"><div class=""></div><div class="col-span-3 bg-purple-900/40 p-1 md:p-2 rounded-t text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-purple-200">Chants</div><div class=""></div><div class="col-span-3 bg-blue-900/40 p-1 md:p-2 rounded-t text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-blue-200">Musiciens</div><div class="sticky-col bg-white/5 text-gray-400 font-bold text-[9px] md:text-[10px] uppercase py-2 md:py-3 border border-white/5">DATES</div><div class="bg-purple-500/10 text-purple-200 text-[8px] md:text-[9px] uppercase py-2 md:py-3 border border-white/5">Chant 1</div><div class="bg-purple-500/10 text-purple-200 text-[8px] md:text-[9px] uppercase py-2 md:py-3 border border-white/5">Chant 2</div><div class="bg-purple-500/10 text-purple-200 text-[8px] md:text-[9px] uppercase py-2 md:py-3 border border-white/5">Chant 3</div><div class="flex justify-center h-full"><div class="w-px h-full bg-white/10"></div></div><div class="bg-blue-500/10 text-blue-200 text-[8px] md:text-[9px] uppercase py-2 md:py-3 border border-white/5">Piano</div><div class="bg-blue-500/10 text-blue-200 text-[8px] md:text-[9px] uppercase py-2 md:py-3 border border-white/5">Basse</div><div class="bg-blue-500/10 text-blue-200 text-[8px] md:text-[9px] uppercase py-2 md:py-3 border border-white/5">Drum</div>`;
+            
             const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             while(d.getMonth() === currentDate.getMonth()) {
                 if([3,4,5,6].includes(d.getDay())) {
@@ -464,33 +470,36 @@
                     const isSat = d.getDay() === 6;
                     const isRowActive = highlightedRow === dateStr;
                     const dateCellBg = isRowActive ? 'bg-fuchsia-700 shadow-[0_0_20px_rgba(255,255,255,0.3)]' : (isSat ? 'bg-[#2a1b3d]' : 'bg-[#1a0b2e]');
-                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="sticky-col h-16 flex flex-col justify-center items-center border border-white/5 rounded-lg ${dateCellBg} cursor-pointer group ${isRowActive?'row-active':''}"><span class="text-[8px] uppercase text-fuchsia-300 font-bold tracking-wider">${d.toLocaleDateString('fr-FR', {weekday: 'short'})}</span><span class="text-lg font-black text-white leading-none">${d.getDate()}</span></div>`;
+                    
+                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="sticky-col h-10 md:h-16 flex flex-col justify-center items-center border border-white/5 rounded-lg ${dateCellBg} cursor-pointer group ${isRowActive?'row-active':''}"><span class="text-[7px] md:text-[8px] uppercase text-fuchsia-300 font-bold tracking-wider">${d.toLocaleDateString('fr-FR', {weekday: 'short'})}</span><span class="text-base md:text-lg font-black text-white leading-none">${d.getDate()}</span></div>`;
+                    
                     ['chant1', 'chant2', 'chant3', 'sep', 'piano', 'basse', 'drum'].forEach(slot => {
                         if(slot === 'sep') gridHTML += `<div class="flex justify-center h-full"><div class="w-px h-full bg-white/10"></div></div>`;
                         else {
                             const artistId = assignments[`${dateStr}_${slot}`];
                             const artist = ARTISTS.find(a => a.id === artistId);
-                            let cellClass = `h-16 border border-white/5 flex items-center justify-center rounded transition-all planning-cell ${isRowActive?'row-active':''} `;
+                            let cellClass = `h-10 md:h-16 border border-white/5 flex items-center justify-center rounded transition-all planning-cell ${isRowActive?'row-active':''} `;
                             let content = '';
                             if(artist) {
                                 cellClass += `${artist.color} shadow-lg `;
                                 if(selectedArtistId && artist.id === selectedArtistId) cellClass += `cell-highlight `;
                                 else if (selectedArtistId && artist.id !== selectedArtistId) cellClass += `cell-dimmed `;
-                                content = `<span class="font-bold text-[10px] px-1 truncate pointer-events-none">${artist.name}</span>`;
+                                content = `<span class="font-bold text-[8px] md:text-[10px] px-1 truncate pointer-events-none">${artist.name}</span>`;
                             } else {
                                 cellClass += `bg-black/20 `;
                                 if(selectedArtistId) cellClass += `cell-dimmed `;
-                                if(isAdminMode) content = `<i class="fas fa-plus text-white/10"></i>`;
+                                if(isAdminMode) content = `<i class="fas fa-plus text-white/10 text-[10px]"></i>`;
                             }
                             gridHTML += `<div class="${cellClass}" onclick="${isAdminMode?`handleCellClick('${dateStr}','${slot}')`:''}">${content}</div>`;
                         }
                     });
-                    if(isSat) gridHTML += `<div class="col-span-8 h-2"></div>`;
+                    if(isSat) gridHTML += `<div class="col-span-8 h-1 md:h-2"></div>`;
                 }
                 d.setDate(d.getDate() + 1);
             }
             gridHTML += `</div></div>`;
             container.innerHTML = verticalMonthHTML + gridHTML;
+            
             const roles = [{ id: 'chant', label: 'Chants', icon: 'fa-microphone-alt', color: 'text-fuchsia-400' }, { id: 'piano', label: 'Piano', icon: 'fa-keyboard', color: 'text-green-400' }, { id: 'basse', label: 'Basse', icon: 'fa-guitar', color: 'text-blue-400' }, { id: 'drum', label: 'Batterie', icon: 'fa-drum', color: 'text-red-400' }];
             const sidebarHTML = roles.map(role => `<div class="mb-6"><h4 class="text-[9px] font-bold uppercase mb-3 ${role.color} tracking-widest flex items-center gap-2"><i class="fas ${role.icon} text-xs"></i> ${role.label}</h4><div class="space-y-1">${renderArtistList(role.id)}</div></div>`).join('');
             if(sidebar) sidebar.innerHTML = sidebarHTML;
@@ -503,7 +512,20 @@
         function renderAudioList(term='') {
             const list = document.getElementById('audio-track-list');
             const filtered = AUDIO_LIBRARY.filter(t => t.title.toLowerCase().includes(term.toLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
-            list.innerHTML = filtered.map(t => `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}"><span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i></button>`).join('');
+            
+            let html = '';
+            let currentAlpha = '';
+            
+            filtered.forEach(t => {
+                const firstChar = t.title.charAt(0).toUpperCase();
+                if (firstChar !== currentAlpha && isNaN(firstChar)) {
+                    currentAlpha = firstChar;
+                    html += `<div class="alpha-divider">${currentAlpha}</div>`;
+                }
+                html += `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}"><span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i></button>`;
+            });
+            
+            list.innerHTML = html;
         }
 
         window.selectTrack = (id) => {
@@ -524,9 +546,17 @@
 
         function updateBtn(id, link) {
             const b = document.getElementById(id); if(!b) return;
-            b.href = link || "#";
-            if(link) { b.classList.remove('opacity-50'); b.classList.add('opacity-100'); }
-            else { b.classList.remove('opacity-100'); b.classList.add('opacity-50'); }
+            if(link && link.trim() !== "" && link !== "#") {
+                b.href = link;
+                b.classList.remove('opacity-50', 'pointer-events-none');
+                b.classList.add('opacity-100');
+                b.onclick = null;
+            } else {
+                b.href = "javascript:void(0)";
+                b.classList.remove('opacity-100');
+                b.classList.add('opacity-50', 'pointer-events-none');
+                b.onclick = (e) => { e.preventDefault(); return false; };
+            }
         }
 
         window.togglePlay = () => {
@@ -545,10 +575,7 @@
             if(a.duration) {
                 const percent = (a.currentTime / a.duration) * 100;
                 slider.value = percent;
-                
-                // Coloration de la barre (gradient dynamique)
                 slider.style.background = `linear-gradient(to right, #d946ef 0%, #d946ef ${percent}%, rgba(255,255,255,0.1) ${percent}%, rgba(255,255,255,0.1) 100%)`;
-
                 document.getElementById('time-current').innerText = formatTime(a.currentTime);
                 document.getElementById('time-total').innerText = formatTime(a.duration);
             }
@@ -686,9 +713,7 @@
         window.editAudio = (id) => {
             const t = AUDIO_LIBRARY.find(a=>a.id===id);
             if(!t) return;
-            
-            clearAudioForm(); // On vide tout avant pour réinitialiser les styles
-            
+            clearAudioForm();
             document.getElementById('audio-id-input').value = t.id;
             document.getElementById('audio-title-input').value = t.title;
             document.getElementById('audio-is-new').checked = t.isNew;
@@ -696,15 +721,11 @@
             document.getElementById('audio-lyrics-input').value = t.lyrics || '';
             document.getElementById('audio-sheet-input').value = t.sheet || '';
             document.getElementById('audio-youtube-input').value = t.youtube || '';
-            
             document.getElementById('audio-form-status').innerText = "Modification : " + t.title;
-
-            // On vérifie quels fichiers existent pour mettre les coches vertes
             if(t.src) setUploadSuccessUI('upload-btn-audio');
             if(t.lyrics) setUploadSuccessUI('upload-btn-lyrics');
             if(t.sheet) setUploadSuccessUI('upload-btn-sheet');
-            
-            showPage('admin-panel'); // On s'assure d'être sur la page
+            showPage('admin-panel');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
