@@ -25,9 +25,6 @@
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); max-height: 0; } to { opacity: 1; transform: translateY(0); max-height: 500px; } }
-        .schedule-dropdown { animation: slideDown 0.3s ease-out forwards; overflow: hidden; }
-
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f0f13; }
         ::-webkit-scrollbar-thumb { background: #4a1d96; border-radius: 10px; }
@@ -60,7 +57,6 @@
         .month-sidebar { background: linear-gradient(180deg, #d946ef 0%, #7e22ce 100%); box-shadow: 5px 0 30px rgba(0,0,0,0.6); }
 
         .glass-panel { background: rgba(10, 5, 20, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.05); }
-        .admin-textarea { background-color: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #ddd; font-family: 'Courier New', monospace; transition: all 0.3s; }
 
         .track-item { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .track-item.active { background: linear-gradient(90deg, rgba(217, 70, 239, 0.15) 0%, transparent 100%); border-left: 3px solid #d946ef; color: #f0abfc; }
@@ -75,11 +71,20 @@
         #loading-overlay { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
         .upload-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; color: #9ca3af; }
         .upload-success { background: rgba(22, 163, 74, 0.8) !important; color: white !important; }
+        
+        .color-bubble { width: 1.25rem; height: 1.25rem; border-radius: 9999px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+        .color-bubble:hover { transform: scale(1.3); border-color: white; }
+        .color-bubble.selected { transform: scale(1.3); border-color: white; box-shadow: 0 0 10px white; }
+        .color-bubble.disabled { opacity: 0.1; pointer-events: none; cursor: not-allowed; filter: grayscale(1); }
+
+        .setlist-editor { background: rgba(0,0,0,0.5); border: 1px solid rgba(217, 70, 239, 0.3); color: white; width: 100%; border-radius: 1rem; padding: 1rem; font-family: inherit; font-size: 0.75rem; line-height: 1.5; resize: none; overflow: hidden; outline: none; transition: border-color 0.3s; }
+        .setlist-editor:focus { border-color: #d946ef; box-shadow: 0 0 15px rgba(217, 70, 239, 0.2); }
+
+        .date-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: 700; color: #eee; white-space: nowrap; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base selection:bg-fuchsia-500 selection:text-white">
 
-    <!-- Écran de chargement -->
     <div id="loading-overlay">
         <div class="flex flex-col items-center">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500 mb-4 shadow-[0_0_15px_#d946ef]"></div>
@@ -87,7 +92,6 @@
         </div>
     </div>
 
-    <!-- Initialisation Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -119,7 +123,6 @@
         });
     </script>
 
-    <!-- Sidebar -->
     <aside id="main-sidebar" class="w-20 md:w-64 bg-black/80 backdrop-blur-xl border-r border-white/5 flex flex-col z-50 shrink-0 transition-all duration-300">
         <div class="p-4 md:p-8 text-center">
             <div class="w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-gray-900 to-black rounded-full mx-auto flex items-center justify-center mb-3 border border-purple-500/30">
@@ -146,7 +149,6 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 relative overflow-hidden bg-[#050505]">
         <!-- ACCUEIL -->
         <section id="home" class="page-section h-full w-full absolute inset-0 z-10 overflow-y-auto">
@@ -183,8 +185,11 @@
 
         <!-- SETLISTE -->
         <section id="setlist" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-4 md:p-10 bg-[#0b0b10]">
-            <div class="flex items-center mb-8 pt-2 border-b border-white/5 pb-4">
+            <div class="flex items-center justify-between mb-8 pt-2 border-b border-white/5 pb-4">
                 <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Set <span class="text-fuchsia-600">Liste</span></h2>
+                <div id="admin-setlist-controls" class="hidden">
+                    <span class="text-[10px] font-bold text-fuchsia-400 animate-pulse">MODE ÉDITION ACTIF</span>
+                </div>
             </div>
             <div id="setlist-public-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
         </section>
@@ -254,9 +259,6 @@
         <section id="admin-panel" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-6 md:p-10 bg-[#0f0a18]">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-white/10 pb-6 gap-4">
                 <h2 class="text-3xl font-black text-white uppercase tracking-tighter"><i class="fas fa-cogs text-fuchsia-600 mr-3"></i>Administration</h2>
-                <button onclick="saveSetlistsOnly()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-8 rounded-full uppercase text-xs tracking-wider transition-all">
-                    Enregistrer Setlists
-                </button>
             </header>
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
@@ -274,7 +276,8 @@
                                 <option value="drum">DRUM</option>
                             </select>
                         </div>
-                        <div id="new-artist-color-picker" class="flex flex-wrap gap-2 mb-4"></div>
+                        <div class="mb-2 text-[9px] uppercase font-bold text-gray-500">Choisissez une couleur disponible :</div>
+                        <div id="new-artist-color-picker" class="flex flex-wrap gap-2 mb-4 p-1 bg-black/20 rounded-lg max-h-40 overflow-y-auto"></div>
                         <input type="hidden" id="selected-color-value">
                         <button onclick="addNewArtist()" class="w-full bg-gradient-to-r from-fuchsia-700 to-purple-700 py-3 rounded text-white font-bold uppercase text-xs transition-all">Ajouter l'artiste</button>
                     </div>
@@ -282,36 +285,10 @@
                 </div>
 
                 <div class="lg:col-span-7 bg-white/5 p-6 rounded-2xl border border-white/5">
-                    <h3 class="text-blue-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
-                        <i class="fas fa-list-ol"></i> Édition Hebdomadaire
+                    <h3 class="text-fuchsia-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
+                        <i class="fas fa-headphones"></i> Bibliothèque Audio & Fichiers
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <input type="text" id="date-wed" class="w-full bg-transparent border-b border-white/10 text-xs mb-2 text-blue-300 font-bold" placeholder="MERCREDI">
-                            <textarea id="setlist-wed" class="admin-textarea w-full h-48 rounded-lg p-3 resize-none outline-none text-xs" placeholder="Liste..."></textarea>
-                        </div>
-                        <div>
-                            <input type="text" id="date-thu" class="w-full bg-transparent border-b border-white/10 text-xs mb-2 text-purple-300 font-bold" placeholder="JEUDI">
-                            <textarea id="setlist-thu" class="admin-textarea w-full h-48 rounded-lg p-3 resize-none outline-none text-xs" placeholder="Liste..."></textarea>
-                        </div>
-                        <div>
-                            <input type="text" id="date-fri" class="w-full bg-transparent border-b border-white/10 text-xs mb-2 text-pink-300 font-bold" placeholder="VENDREDI">
-                            <textarea id="setlist-fri" class="admin-textarea w-full h-48 rounded-lg p-3 resize-none outline-none text-xs" placeholder="Liste..."></textarea>
-                        </div>
-                        <div>
-                            <input type="text" id="date-sat" class="w-full bg-transparent border-b border-white/10 text-xs mb-2 text-indigo-300 font-bold" placeholder="SAMEDI">
-                            <textarea id="setlist-sat" class="admin-textarea w-full h-48 rounded-lg p-3 resize-none outline-none text-xs" placeholder="Liste..."></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white/5 p-6 rounded-2xl border border-white/5">
-                <h3 class="text-fuchsia-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
-                    <i class="fas fa-headphones"></i> Bibliothèque Audio & Fichiers
-                </h3>
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div class="lg:col-span-5 bg-black/40 p-6 rounded-xl border border-white/5">
+                    <div class="bg-black/40 p-6 rounded-xl border border-white/5">
                         <input type="hidden" id="audio-id-input">
                         <input type="text" id="audio-title-input" placeholder="TITRE DU MORCEAU" class="w-full bg-white/5 p-3 rounded mb-4 text-white font-bold uppercase text-sm border border-white/10 outline-none focus:border-fuchsia-500">
                         
@@ -342,7 +319,7 @@
 
                         <div class="flex items-center gap-3 mb-6 bg-fuchsia-900/20 p-3 rounded-lg border border-fuchsia-500/20">
                             <input type="checkbox" id="audio-is-new" class="w-4 h-4 accent-fuchsia-500">
-                            <label for="audio-is-new" class="text-xs font-bold uppercase text-white cursor-pointer italic">Nouveauté / À travailler</label>
+                            <label for="audio-is-new" class="text-xs font-bold uppercase text-white cursor-pointer">Nouveauté / À travailler</label>
                         </div>
 
                         <div class="flex gap-2">
@@ -350,7 +327,7 @@
                             <button onclick="clearAudioForm()" class="px-4 bg-gray-800 rounded text-white font-bold uppercase text-xs">Reset</button>
                         </div>
                     </div>
-                    <div class="lg:col-span-7 bg-black/30 rounded-xl border border-white/5 p-4 overflow-hidden flex flex-col h-[450px]">
+                    <div class="mt-4 bg-black/30 rounded-xl border border-white/5 p-4 overflow-hidden flex flex-col h-[400px]">
                         <div id="admin-audio-list" class="space-y-1 overflow-y-auto pr-2"></div>
                     </div>
                 </div>
@@ -358,36 +335,29 @@
         </section>
     </main>
 
-    <!-- Modals & Notifications -->
     <div id="toast-notification" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-green-600/90 backdrop-blur-md text-white px-8 py-3 rounded-full shadow-lg z-[100] opacity-0 font-bold text-xs uppercase transition-all pointer-events-none flex items-center gap-3">
         <i class="fas fa-check-circle text-lg"></i> <span id="toast-msg">Enregistré</span>
     </div>
 
-    <!-- MODAL MOT DE PASSE ADMIN -->
     <div id="password-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center shadow-[0_0_50px_rgba(217,70,239,0.3)]">
-            <h3 class="text-white font-black text-xl mb-6 uppercase tracking-tighter">Admin Mondaine</h3>
-            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-center text-white mb-6 focus:border-fuchsia-500 outline-none text-2xl tracking-[0.5em]" placeholder="••••">
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="closeModal('password-modal')" class="py-4 border border-white/10 text-gray-400 rounded-xl text-xs font-bold uppercase hover:bg-white/5 transition-all">Annuler</button>
-                <button onclick="checkAdminPassword()" class="py-4 bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white rounded-xl text-xs font-bold uppercase shadow-lg shadow-fuchsia-500/20">OK</button>
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center">
+            <h3 class="text-white font-black text-xl mb-6 uppercase">Admin Mondaine</h3>
+            <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded p-3 text-center text-white mb-4 focus:border-fuchsia-500 outline-none" placeholder="••••">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModal('password-modal')" class="py-3 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold uppercase">Annuler</button>
+                <button onclick="checkAdminPassword()" class="py-3 bg-fuchsia-600 text-white rounded-lg text-xs font-bold uppercase">OK</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL ASSIGNATION PLANNING -->
     <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <h3 class="text-white font-bold uppercase text-[10px] tracking-widest mb-6 text-center border-b border-white/5 pb-4" id="modal-slot-info">Assigner Artiste</h3>
-            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1"></div>
-            <div class="mt-6 pt-4 border-t border-white/5 space-y-3">
-                <button onclick="removeAssignment()" class="w-full py-4 border border-red-500/30 text-red-400 rounded-xl text-[10px] font-bold uppercase hover:bg-red-500/5 transition-all">Retirer l'artiste</button>
-                <button onclick="closeModal('assign-modal')" class="w-full py-2 text-gray-500 text-[9px] uppercase font-bold hover:text-white transition-colors">Fermer</button>
-            </div>
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm">
+            <h3 class="text-white font-bold uppercase text-xs mb-4 text-center border-b border-white/10 pb-2" id="modal-slot-info">Date</h3>
+            <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
+            <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg text-xs font-bold uppercase">Retirer l'artiste</button>
         </div>
     </div>
 
-    <!-- Script Logique -->
     <script>
         let ARTISTS = [];
         let assignments = {};
@@ -402,6 +372,41 @@
         let lastPlayStart = 0;
 
         const PUBLIC_DOC = (col, id) => window.doc(window.db, 'artifacts', window.appId, 'public', 'data', col, id);
+
+        const PALETTES = {
+            chant: [
+                // Fluo / Très Flash (12)
+                'bg-yellow-400', 'bg-lime-400', 'bg-cyan-400', 'bg-fuchsia-500', 'bg-rose-500', 'bg-green-400', 
+                'bg-orange-500', 'bg-blue-400', 'bg-pink-500', 'bg-indigo-400', 'bg-emerald-400', 'bg-violet-500',
+                // Pastels (12)
+                'bg-fuchsia-200', 'bg-pink-200', 'bg-rose-200', 'bg-purple-200', 'bg-violet-200', 'bg-indigo-200',
+                'bg-fuchsia-300', 'bg-pink-300', 'bg-rose-300', 'bg-purple-300', 'bg-violet-300', 'bg-indigo-300'
+            ],
+            piano: [
+                // Verts (7)
+                'bg-green-500', 'bg-emerald-500', 'bg-teal-500', 'bg-lime-500', 'bg-green-300', 'bg-emerald-300', 'bg-teal-300',
+                // Marrons / Terres (7)
+                'bg-stone-500', 'bg-stone-700', 'bg-stone-400', 'bg-stone-300', 'bg-stone-600', 'bg-orange-950', 'bg-yellow-950',
+                // Gris (6)
+                'bg-gray-500', 'bg-gray-400', 'bg-slate-400', 'bg-slate-600', 'bg-zinc-500', 'bg-neutral-600'
+            ],
+            basse: [
+                // Bleus (7)
+                'bg-blue-500', 'bg-blue-400', 'bg-sky-500', 'bg-sky-400', 'bg-cyan-500', 'bg-blue-700', 'bg-cyan-700',
+                // Violets (7)
+                'bg-purple-600', 'bg-purple-500', 'bg-purple-400', 'bg-violet-500', 'bg-violet-400', 'bg-indigo-700', 'bg-indigo-400',
+                // Roses (6)
+                'bg-pink-500', 'bg-pink-400', 'bg-fuchsia-500', 'bg-rose-500', 'bg-rose-400', 'bg-pink-600'
+            ],
+            drum: [
+                // Jaunes / Ambres (7)
+                'bg-yellow-500', 'bg-yellow-400', 'bg-amber-500', 'bg-amber-400', 'bg-yellow-600', 'bg-amber-600', 'bg-yellow-300',
+                // Rouges (7)
+                'bg-red-500', 'bg-red-600', 'bg-red-400', 'bg-rose-600', 'bg-rose-700', 'bg-red-700', 'bg-red-300',
+                // Oranges (6)
+                'bg-orange-500', 'bg-orange-400', 'bg-orange-600', 'bg-orange-300', 'bg-orange-700', 'bg-amber-700'
+            ]
+        };
 
         function showToast(msg) {
             const t = document.getElementById('toast-notification');
@@ -434,38 +439,37 @@
             });
         };
 
-        function getArtistScheduleHTML(artistId) {
-            const artistAssignments = [];
-            for (const [key, assignedId] of Object.entries(assignments)) {
-                if (assignedId === artistId) {
-                    const [dateStr, slot] = key.split('_');
-                    const [y, m, d] = dateStr.split('-').map(Number);
-                    const date = new Date(y, m - 1, d);
-                    if (date.getMonth() === currentDate.getMonth()) {
-                        artistAssignments.push({ date, slot });
-                    }
-                }
-            }
-            artistAssignments.sort((a, b) => a.date - b.date);
-            if (artistAssignments.length === 0) return '<div class="text-[9px] text-gray-500 text-center py-1">Aucune date ce mois-ci</div>';
-            return `<div class="mt-1 bg-white/5 rounded-lg p-2"><ul class="space-y-1">${artistAssignments.map(a => {
-                const dayName = a.date.toLocaleDateString('fr-FR', {weekday: 'short'});
-                const dayNum = a.date.getDate().toString().padStart(2, '0');
-                return `<li class="flex justify-between text-[10px] text-gray-300"><span class="font-bold text-fuchsia-400 capitalize">${dayName} ${dayNum}</span><span class="uppercase opacity-70 text-[9px]">${a.slot.replace(/(\d+)$/, ' $1')}</span></li>`;
-            }).join('')}</ul></div>`;
-        }
-
         function renderArtistList(roleId) {
             const artists = ARTISTS.filter(a => a.role === roleId);
             return artists.map(a => {
                 const isSelected = selectedArtistId === a.id;
-                const scheduleHTML = isSelected ? getArtistScheduleHTML(a.id) : '';
+                
+                // On récupère les dates où l'artiste est présent
+                let datesHTML = '';
+                if(isSelected) {
+                    const artistDates = [...new Set(Object.entries(assignments)
+                        .filter(([key, val]) => val === a.id)
+                        .map(([key]) => key.split('_')[0]))].sort();
+                    
+                    if(artistDates.length > 0) {
+                        datesHTML = `<div class="flex flex-wrap gap-1 mt-2 px-1 pb-2">
+                            ${artistDates.map(dStr => {
+                                const dObj = new Date(dStr);
+                                const fmt = dObj.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'});
+                                return `<span class="date-badge">${fmt}</span>`;
+                            }).join('')}
+                        </div>`;
+                    } else {
+                        datesHTML = `<div class="text-[8px] text-gray-500 italic mt-1 text-center">Aucune date prévue</div>`;
+                    }
+                }
+
                 return `<div class="mb-1">
                     <button onclick="toggleArtistFilter('${a.id}')" class="artist-pill w-full px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center justify-center relative ${a.color} ${isSelected ? 'selected' : 'opacity-80 hover:opacity-100'}">
                         ${a.name}
                         ${isSelected ? '<span class="absolute right-3 w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>' : ''}
                     </button>
-                    ${scheduleHTML}
+                    ${datesHTML}
                 </div>`;
             }).join('');
         }
@@ -474,7 +478,6 @@
             const container = document.getElementById('planning-container');
             const sidebar = document.getElementById('artist-sidebar-content');
             const mobileContainer = document.getElementById('artist-mobile-content');
-            if(!container) return;
             
             const monthName = currentDate.toLocaleDateString('fr-FR', {month: 'long'}).toUpperCase();
             document.getElementById('current-month-display').textContent = `${monthName} ${currentDate.getFullYear()}`;
@@ -549,17 +552,11 @@
             if(mobileContainer) mobileContainer.innerHTML = sidebarHTML;
         }
 
-        window.changeMonth = (delta) => {
-            currentDate.setMonth(currentDate.getMonth() + delta);
-            renderPlanning();
-        };
-
         window.toggleRowHighlight = (d) => { highlightedRow = (highlightedRow===d)?null:d; renderPlanning(); };
         window.toggleArtistFilter = (id) => { selectedArtistId = (selectedArtistId===id)?null:id; renderPlanning(); };
 
         function renderAudioList(term='') {
             const list = document.getElementById('audio-track-list');
-            if(!list) return;
             const filtered = AUDIO_LIBRARY.filter(t => t.title.toLowerCase().includes(term.toLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
             list.innerHTML = filtered.map(t => `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}">
                 <span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i>
@@ -574,10 +571,8 @@
             const a = document.getElementById('audio-element');
             a.src = currentTrack.src || "";
             a.currentTime = 0; lastPlayStart = 0;
-            
-            a.play().catch(e => console.log("Auto-play bloqué par le navigateur"));
+            a.play().catch(e => console.log("Auto-play bloqué"));
             document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl";
-            
             updateBtn('btn-lyrics', currentTrack.lyrics);
             updateBtn('btn-sheet', currentTrack.sheet);
             updateBtn('btn-youtube', currentTrack.youtube);
@@ -585,25 +580,19 @@
         };
 
         function updateBtn(id, link) {
-            const b = document.getElementById(id); 
-            if(!b) return;
+            const b = document.getElementById(id); if(!b) return;
             b.href = link || "#";
-            if(link) {
-                b.classList.remove('opacity-50', 'cursor-not-allowed');
-                b.classList.add('opacity-100', 'cursor-pointer');
-            } else {
-                b.classList.remove('opacity-100', 'cursor-pointer');
-                b.classList.add('opacity-50', 'cursor-not-allowed');
-            }
+            if(link) { b.classList.remove('opacity-50'); b.classList.add('opacity-100'); }
+            else { b.classList.remove('opacity-100'); b.classList.add('opacity-50'); }
         }
 
         window.togglePlay = () => {
             const a = document.getElementById('audio-element'); const i = document.getElementById('play-btn').querySelector('i');
-            if(a.paused) { a.play(); i.className = "fas fa-pause text-2xl md:text-3xl"; lastPlayStart = a.currentTime; }
+            if(a.paused) { a.play(); i.className = "fas fa-pause text-2xl md:text-3xl"; }
             else { a.pause(); i.className = "fas fa-play text-2xl md:text-3xl ml-1"; }
         };
         window.stopAudio = () => { const a = document.getElementById('audio-element'); a.pause(); a.currentTime = 0; resetPlayerUI(); };
-        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPlayStart; a.play(); document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl"; };
+        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = 0; a.play(); };
         window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play text-2xl md:text-3xl ml-1"; };
         window.updateProgress = () => {
             const a = document.getElementById('audio-element');
@@ -619,7 +608,7 @@
         window.setVolume = (v) => { document.getElementById('audio-element').volume = v; };
 
         window.initRealtimeData = () => {
-            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'artists'), s => { ARTISTS = s.docs.map(d=>d.data()); renderPlanning(); renderAdminTeamList(); });
+            onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'artists'), s => { ARTISTS = s.docs.map(d=>d.data()); renderPlanning(); renderAdminTeamList(); if(isAdminMode) updateColorPicker(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'planning'), s => { assignments = {}; s.forEach(d=>assignments[d.id]=d.data().artistId); renderPlanning(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'audio'), s => { AUDIO_LIBRARY = s.docs.map(d=>d.data()); renderAudioList(); renderAdminAudioList(); renderHomeNews(); });
             onSnapshot(collection(window.db, 'artifacts', window.appId, 'public', 'data', 'setlists'), s => { s.forEach(d=>{if(SETLISTS[d.id]) SETLISTS[d.id]=d.data();}); renderSetlistPublic(); });
@@ -652,7 +641,7 @@
 
         window.renderHomeNews = () => {
             const c = document.getElementById('home-news-container'); const nt = AUDIO_LIBRARY.filter(t => t.isNew);
-            if(!nt.length || !c) { if(c) c.classList.add('hidden'); return; }
+            if(!nt.length) { c.classList.add('hidden'); return; }
             c.classList.remove('hidden');
             c.innerHTML = `<div class="bg-red-900/80 p-4 rounded-xl border border-red-500/50 shadow-lg animate-pulse">
                 <h3 class="text-white font-black text-xs mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> NOUVEAUTÉ À TRAVAILLER</h3>
@@ -666,55 +655,86 @@
 
         function renderSetlistPublic() {
             const c = document.getElementById('setlist-public-container');
-            if(!c) return;
             const d = [{k:'wed',c:'blue'},{k:'thu',c:'purple'},{k:'fri',c:'pink'},{k:'sat',c:'indigo'}];
-            c.innerHTML = d.map(day => `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl">
-                <div class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm">${SETLISTS[day.k].date}</div>
-                <div class="p-6 text-xs text-gray-200 flex-1 whitespace-pre-wrap font-medium">${SETLISTS[day.k].content || "Aucune liste..."}</div>
-                <button onclick="copySet('${day.k}')" class="m-3 p-3 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] uppercase font-bold text-gray-400 transition-all flex items-center justify-center gap-2"><i class="fas fa-copy"></i> Copier</button>
-            </div>`).join('');
-        }
-        window.copySet = (id) => { navigator.clipboard.writeText(SETLISTS[id].content); showToast("Setlist copiée !"); };
+            
+            c.innerHTML = d.map(day => {
+                const dayData = SETLISTS[day.k];
+                if (isAdminMode) {
+                    return `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl">
+                        <input type="text" id="edit-date-${day.k}" value="${dayData.date}" class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm outline-none border-none">
+                        <div class="p-6 flex-1">
+                            <textarea id="edit-content-${day.k}" 
+                                class="setlist-editor" 
+                                placeholder="Entrez la liste ici..." 
+                                oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'">${dayData.content || ""}</textarea>
+                        </div>
+                        <button onclick="saveSetlistInline('${day.k}')" class="m-3 p-3 bg-green-600 hover:bg-green-500 rounded-xl text-[10px] uppercase font-bold text-white transition-all flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-save"></i> Enregistrer</button>
+                    </div>`;
+                } else {
+                    return `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl">
+                        <div class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm">${dayData.date}</div>
+                        <div class="p-6 text-xs text-gray-200 flex-1 whitespace-pre-wrap font-medium">${dayData.content || "Aucune liste..."}</div>
+                        <button onclick="copySet('${day.k}')" class="m-3 p-3 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] uppercase font-bold text-gray-400 transition-all flex items-center justify-center gap-2"><i class="fas fa-copy"></i> Copier</button>
+                    </div>`;
+                }
+            }).join('');
 
-        window.saveSetlistsOnly = async () => {
-            for(let k of ['wed','thu','fri','sat']) {
-                SETLISTS[k].date = document.getElementById('date-'+k).value;
-                SETLISTS[k].content = document.getElementById('setlist-'+k).value;
-                await setDoc(PUBLIC_DOC('setlists', k), SETLISTS[k]);
+            // Auto-adjust heights on load
+            if(isAdminMode) {
+                setTimeout(() => {
+                    d.forEach(day => {
+                        const el = document.getElementById(`edit-content-${day.k}`);
+                        if(el) el.style.height = el.scrollHeight + 'px';
+                    });
+                }, 100);
             }
-            showToast();
+        }
+
+        window.saveSetlistInline = async (k) => {
+            const dateVal = document.getElementById('edit-date-'+k).value;
+            const contentVal = document.getElementById('edit-content-'+k).value;
+            SETLISTS[k] = { date: dateVal, content: contentVal };
+            await setDoc(PUBLIC_DOC('setlists', k), SETLISTS[k]);
+            showToast("Setlist " + dateVal + " enregistrée");
         };
+
+        window.copySet = (id) => { navigator.clipboard.writeText(SETLISTS[id].content); showToast("Setlist copiée !"); };
 
         window.showPage = (id) => {
             document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.id==='nav-'+id));
             if(id === 'admin-panel') loadAdminValues();
+            if(id === 'setlist') renderSetlistPublic();
         };
 
         function loadAdminValues() {
-            for(let k of ['wed','thu','fri','sat']) {
-                if(document.getElementById('date-'+k)) document.getElementById('date-'+k).value = SETLISTS[k].date || '';
-                if(document.getElementById('setlist-'+k)) document.getElementById('setlist-'+k).value = SETLISTS[k].content || '';
-            }
             renderAdminTeamList();
             renderAdminAudioList();
+            updateColorPicker();
         }
 
         window.toggleSidebar = () => { document.getElementById('main-sidebar').classList.toggle('sidebar-collapsed'); };
         window.toggleAdminMode = () => { 
-            if(isAdminMode) { isAdminMode=false; updateAdminUI(); } 
-            else { document.getElementById('password-modal').classList.remove('hidden'); } 
+            if(isAdminMode) { 
+                isAdminMode=false; 
+                document.getElementById('admin-setlist-controls').classList.add('hidden');
+                updateAdminUI(); 
+            } else document.getElementById('password-modal').classList.remove('hidden'); 
         };
         window.checkAdminPassword = () => { 
             if(document.getElementById('admin-pass-input').value==='mondaine') { 
-                isAdminMode=true; updateAdminUI(); closeModal('password-modal'); 
-                document.getElementById('admin-pass-input').value = '';
-            } else {
-                showToast("Mot de passe incorrect");
-            }
+                isAdminMode=true; 
+                document.getElementById('admin-setlist-controls').classList.remove('hidden');
+                updateAdminUI(); 
+                closeModal('password-modal'); 
+            } 
         };
-        window.updateAdminUI = () => { document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); renderPlanning(); };
+        window.updateAdminUI = () => { 
+            document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); 
+            renderPlanning(); 
+            renderSetlistPublic();
+        };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
         window.handleCellClick = (d, s) => { currentEditSlot = {dateStr:d, slot:s}; renderModalArtists(); document.getElementById('assign-modal').classList.remove('hidden'); };
         
@@ -726,30 +746,28 @@
 
         function clearAudioForm() {
             document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type!=='hidden'&&i.type!=='checkbox') i.value=''; });
-            document.getElementById('audio-id-input').value=''; document.getElementById('audio-is-new').checked=false;
-            document.querySelectorAll('.upload-btn').forEach(b => { b.classList.remove('upload-success'); b.innerHTML = b.id.includes('audio') ? '<i class="fas fa-music"></i>' : (b.id.includes('lyrics') ? '<i class="fas fa-align-center"></i>' : '<i class="fas fa-scroll"></i>'); });
+            document.getElementById('audio-id-input').value=''; 
+            document.getElementById('audio-is-new').checked=false;
         }
         
         function renderAdminAudioList() {
             const sorted = [...AUDIO_LIBRARY].sort((a,b) => a.title.localeCompare(b.title));
-            const container = document.getElementById('admin-audio-list');
-            if(!container) return;
-            container.innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join('');
+            document.getElementById('admin-audio-list').innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join('');
         }
 
         function renderAdminTeamList() {
              const container = document.getElementById('admin-team-list');
              if(!container) return;
              const categories = [
-                { id: 'chant', label: 'CHANTS', icon: 'fa-microphone-alt', color: 'text-fuchsia-400' },
-                { id: 'piano', label: 'PIANO', icon: 'fa-keyboard', color: 'text-green-400' },
-                { id: 'basse', label: 'BASSE', icon: 'fa-guitar', color: 'text-blue-400' },
-                { id: 'drum', label: 'BATTERIE', icon: 'fa-drum', color: 'text-red-400' }
+                { id: 'chant', label: 'CHANTS' },
+                { id: 'piano', label: 'PIANO' },
+                { id: 'basse', label: 'BASSE' },
+                { id: 'drum', label: 'DRUM' }
             ];
             container.innerHTML = categories.map(cat => {
                 const catArtists = ARTISTS.filter(a => a.role === cat.id);
                 return `<div class="mb-4">
-                    <h4 class="text-[10px] font-black uppercase mb-2 ${cat.color} border-b border-white/5 pb-1"><i class="fas ${cat.icon} mr-1"></i> ${cat.label}</h4>
+                    <h4 class="text-[10px] font-black uppercase mb-2 text-white/50 border-b border-white/5 pb-1">${cat.label}</h4>
                     <div class="grid grid-cols-2 gap-2">
                         ${catArtists.map(a => `<div class="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5 group">
                             <span class="text-[10px] font-bold ${a.color} px-2 py-1 rounded">${a.name}</span>
@@ -761,17 +779,41 @@
         }
 
         window.deleteArtist = async (id) => { if(confirm("Supprimer l'artiste ?")) await deleteDoc(PUBLIC_DOC('artists', id)); };
-        window.editAudio = (id) => { const t = AUDIO_LIBRARY.find(a=>a.id===id); document.getElementById('audio-id-input').value=t.id; document.getElementById('audio-title-input').value=t.title; document.getElementById('audio-is-new').checked=t.isNew; document.getElementById('audio-src-input').value=t.src; document.getElementById('audio-youtube-input').value=t.youtube||''; };
+        window.editAudio = (id) => { const t = AUDIO_LIBRARY.find(a=>a.id===id); document.getElementById('audio-id-input').value=t.id; document.getElementById('audio-title-input').value=t.title; document.getElementById('audio-is-new').checked=t.isNew; document.getElementById('audio-src-input').value=t.src; };
         window.deleteAudio = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(PUBLIC_DOC('audio', id)); };
 
-        function updateColorPicker() {
-            const colors = ['bg-pink-500','bg-fuchsia-500','bg-purple-500','bg-indigo-500','bg-blue-500','bg-teal-500','bg-green-500','bg-yellow-500','bg-orange-500','bg-red-500'];
+        window.updateColorPicker = () => {
+            const role = document.getElementById('new-artist-role').value;
+            const palette = PALETTES[role];
+            const usedColors = ARTISTS.filter(a => a.role === role).map(a => a.color.split(' ')[0]);
+            
             const container = document.getElementById('new-artist-color-picker');
-            if(!container) return;
-            container.innerHTML = colors.map(c => `<div class="w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all ${c}" onclick="selectColor(this,'${c} text-white')"></div>`).join('');
-            selectColor(null, colors[0]+' text-white');
+            container.innerHTML = palette.map(c => {
+                const isUsed = usedColors.includes(c);
+                return `<div class="color-bubble ${c} ${isUsed ? 'disabled' : ''}" onclick="selectColor(this,'${c}')"></div>`;
+            }).join('');
+            
+            // Auto-select first available
+            const firstAvailable = palette.find(c => !usedColors.includes(c));
+            if(firstAvailable) {
+                const firstEl = Array.from(container.children).find(el => el.classList.contains(firstAvailable));
+                selectColor(firstEl, firstAvailable);
+            }
         }
-        window.selectColor = (el, c) => { document.getElementById('selected-color-value').value=c; document.querySelectorAll('#new-artist-color-picker div').forEach(d=>d.style.transform=(el===d)?'scale(1.2)':'scale(1)'); };
+        
+        window.selectColor = (el, c) => { 
+            if(!el || el.classList.contains('disabled')) return;
+            
+            // Détection de luminosité pour le texte
+            let textColor = 'text-white';
+            if(c.includes('100') || c.includes('200') || c.includes('300') || c.includes('yellow') || c.includes('lime') || c.includes('amber')) {
+                textColor = 'text-black';
+            }
+            
+            document.getElementById('selected-color-value').value = `${c} ${textColor}`; 
+            document.querySelectorAll('.color-bubble').forEach(d=>d.classList.remove('selected'));
+            el.classList.add('selected');
+        };
 
         window.onload = () => { 
             showPage('home'); 
