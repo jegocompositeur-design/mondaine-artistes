@@ -198,7 +198,6 @@
                     <span class="text-[10px] font-bold text-fuchsia-400 animate-pulse">MODE ÉDITION ACTIF</span>
                 </div>
             </div>
-            <!-- LE BOUTON GLOBAL SERA INJECTÉ ICI PAR JS DANS LE CONTENEUR grid -->
             <div id="setlist-public-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
         </section>
 
@@ -265,7 +264,7 @@
             </div>
         </section>
 
-        <!-- ADMIN -->
+        <!-- ADMINISTRATION PANEL -->
         <section id="admin-panel" class="page-section h-full w-full absolute inset-0 hidden overflow-y-auto p-6 md:p-10 bg-[#0f0a18]">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-white/10 pb-6 gap-4">
                 <h2 class="text-3xl font-black text-white uppercase tracking-tighter"><i class="fas fa-cogs text-fuchsia-600 mr-3"></i>Administration</h2>
@@ -286,7 +285,6 @@
                                 <option value="drum">DRUM</option>
                             </select>
                         </div>
-                        <div class="mb-2 text-[9px] uppercase font-bold text-gray-500">Choisissez une couleur disponible :</div>
                         <div id="new-artist-color-picker" class="flex flex-wrap gap-2 mb-4 p-1 bg-black/20 rounded-lg max-h-40 overflow-y-auto"></div>
                         <input type="hidden" id="selected-color-value">
                         <button onclick="addNewArtist()" class="w-full bg-gradient-to-r from-fuchsia-700 to-purple-700 py-3 rounded text-white font-bold uppercase text-xs transition-all">Ajouter l'artiste</button>
@@ -310,7 +308,7 @@
                                 <i class="fas fa-align-center mb-2 text-blue-500 group-hover:text-white"></i><span>Paroles</span>
                             </button>
                             <button onclick="document.getElementById('upload-input-sheet').click()" id="upload-btn-sheet" class="upload-btn group">
-                                <i class="fas fa-scroll mb-2 text-orange-500 group-hover:text-white"></i><span>Partit.</span>
+                                <i class="fas fa-music mb-2 text-orange-400 group-hover:text-white"></i><span>Partit.</span>
                             </button>
                         </div>
 
@@ -384,27 +382,10 @@
         const PUBLIC_DOC = (col, id) => window.doc(window.db, 'artifacts', window.appId, 'public', 'data', col, id);
 
         const PALETTES = {
-            chant: [
-                'bg-yellow-300', 'bg-lime-400', 'bg-cyan-300', 'bg-fuchsia-400', 'bg-rose-400', 'bg-green-400', 
-                'bg-orange-400', 'bg-blue-300', 'bg-pink-400', 'bg-indigo-300', 'bg-emerald-300', 'bg-violet-400',
-                'bg-fuchsia-100', 'bg-pink-100', 'bg-rose-100', 'bg-purple-100', 'bg-violet-100', 'bg-indigo-100',
-                'bg-fuchsia-200', 'bg-pink-200', 'bg-rose-200', 'bg-purple-200', 'bg-violet-200', 'bg-indigo-200'
-            ],
-            piano: [
-                'bg-green-500', 'bg-emerald-500', 'bg-teal-500', 'bg-lime-500', 'bg-green-300', 'bg-emerald-300', 'bg-teal-300',
-                'bg-stone-500', 'bg-stone-700', 'bg-stone-400', 'bg-stone-300', 'bg-stone-600', 'bg-orange-950', 'bg-yellow-950',
-                'bg-gray-500', 'bg-gray-400', 'bg-slate-400', 'bg-slate-600', 'bg-zinc-500', 'bg-neutral-600'
-            ],
-            basse: [
-                'bg-blue-500', 'bg-blue-400', 'bg-sky-500', 'bg-sky-400', 'bg-cyan-500', 'bg-blue-700', 'bg-cyan-700',
-                'bg-purple-600', 'bg-purple-500', 'bg-purple-400', 'bg-violet-500', 'bg-violet-400', 'bg-indigo-700', 'bg-indigo-400',
-                'bg-pink-500', 'bg-pink-400', 'bg-fuchsia-500', 'bg-rose-500', 'bg-rose-400', 'bg-pink-600'
-            ],
-            drum: [
-                'bg-yellow-500', 'bg-yellow-400', 'bg-amber-500', 'bg-amber-400', 'bg-yellow-600', 'bg-amber-600', 'bg-yellow-300',
-                'bg-red-500', 'bg-red-600', 'bg-red-400', 'bg-rose-600', 'bg-rose-700', 'bg-red-700', 'bg-red-300',
-                'bg-orange-500', 'bg-orange-400', 'bg-orange-600', 'bg-orange-300', 'bg-orange-700', 'bg-amber-700'
-            ]
+            chant: ['bg-yellow-300', 'bg-lime-400', 'bg-cyan-300', 'bg-fuchsia-400', 'bg-rose-400', 'bg-green-400', 'bg-orange-400', 'bg-blue-300', 'bg-pink-400', 'bg-indigo-300', 'bg-emerald-300', 'bg-violet-400', 'bg-fuchsia-100', 'bg-pink-100', 'bg-rose-100', 'bg-purple-100', 'bg-violet-100', 'bg-indigo-100', 'bg-fuchsia-200', 'bg-pink-200', 'bg-rose-200', 'bg-purple-200', 'bg-violet-200', 'bg-indigo-200'],
+            piano: ['bg-green-500', 'bg-emerald-500', 'bg-teal-500', 'bg-lime-500', 'bg-green-300', 'bg-emerald-300', 'bg-teal-300', 'bg-stone-500', 'bg-stone-700', 'bg-stone-400', 'bg-stone-300', 'bg-stone-600', 'bg-orange-950', 'bg-yellow-950', 'bg-gray-500', 'bg-gray-400', 'bg-slate-400', 'bg-slate-600', 'bg-zinc-500', 'bg-neutral-600'],
+            basse: ['bg-blue-500', 'bg-blue-400', 'bg-sky-500', 'bg-sky-400', 'bg-cyan-500', 'bg-blue-700', 'bg-cyan-700', 'bg-purple-600', 'bg-purple-500', 'bg-purple-400', 'bg-violet-500', 'bg-violet-400', 'bg-indigo-700', 'bg-indigo-400', 'bg-pink-500', 'bg-pink-400', 'bg-fuchsia-500', 'bg-rose-500', 'bg-rose-400', 'bg-pink-600'],
+            drum: ['bg-yellow-500', 'bg-yellow-400', 'bg-amber-500', 'bg-amber-400', 'bg-yellow-600', 'bg-amber-600', 'bg-yellow-300', 'bg-red-500', 'bg-red-600', 'bg-red-400', 'bg-rose-600', 'bg-rose-700', 'bg-red-700', 'bg-red-300', 'bg-orange-500', 'bg-orange-400', 'bg-orange-600', 'bg-orange-300', 'bg-orange-700', 'bg-amber-700']
         };
 
         function showToast(msg) {
@@ -419,29 +400,19 @@
             const btn = document.getElementById(btnId);
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
             btn.classList.add('opacity-50');
-
             const path = `artifacts/${window.appId}/public/audio/${type}/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
             const ref = window.storageRef(window.storage, path);
             const task = window.uploadBytesResumable(ref, file);
-
-            task.on('state_changed', null, (e) => { 
-                console.error(e);
-                btn.innerHTML = "ERR"; 
-                btn.classList.remove('opacity-50');
-            }, () => {
+            task.on('state_changed', null, (e) => { console.error(e); btn.innerHTML = "ERR"; btn.classList.remove('opacity-50'); }, () => {
                 window.getDownloadURL(task.snapshot.ref).then(url => {
                     document.getElementById(targetId).value = url;
-                    btn.classList.remove('opacity-50');
-                    btn.classList.add('upload-success');
+                    btn.classList.remove('opacity-50'); btn.classList.add('upload-success');
                     btn.innerHTML = `<i class="fas fa-check"></i>`;
                 });
             });
         };
 
-        window.changeMonth = (offset) => {
-            currentDate.setMonth(currentDate.getMonth() + offset);
-            renderPlanning();
-        };
+        window.changeMonth = (offset) => { currentDate.setMonth(currentDate.getMonth() + offset); renderPlanning(); };
 
         function renderArtistList(roleId) {
             const artists = ARTISTS.filter(a => a.role === roleId);
@@ -450,30 +421,12 @@
                 let datesHTML = '';
                 if(isSelected) {
                     const curMonthStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-                    const artistDates = [...new Set(Object.entries(assignments)
-                        .filter(([key, val]) => val === a.id && key.startsWith(curMonthStr))
-                        .map(([key]) => key.split('_')[0]))].sort();
-                    
+                    const artistDates = [...new Set(Object.entries(assignments).filter(([key, val]) => val === a.id && key.startsWith(curMonthStr)).map(([key]) => key.split('_')[0]))].sort();
                     if(artistDates.length > 0) {
-                        datesHTML = `<div class="flex flex-wrap gap-1 mt-2 px-1 pb-2">
-                            ${artistDates.map(dStr => {
-                                const dObj = new Date(dStr);
-                                const fmt = dObj.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'});
-                                return `<span class="date-badge">${fmt}</span>`;
-                            }).join('')}
-                        </div>`;
-                    } else {
-                        datesHTML = `<div class="text-[8px] text-gray-500 italic mt-1 text-center">Aucune date ce mois-ci</div>`;
-                    }
+                        datesHTML = `<div class="flex flex-wrap gap-1 mt-2 px-1 pb-2">${artistDates.map(dStr => {const dObj = new Date(dStr); const fmt = dObj.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'}); return `<span class="date-badge">${fmt}</span>`;}).join('')}</div>`;
+                    } else { datesHTML = `<div class="text-[8px] text-gray-500 italic mt-1 text-center">Aucune date ce mois-ci</div>`; }
                 }
-
-                return `<div class="mb-1">
-                    <button onclick="toggleArtistFilter('${a.id}')" class="artist-pill w-full px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center justify-center relative ${a.color} ${isSelected ? 'selected' : 'opacity-80 hover:opacity-100'}">
-                        ${a.name}
-                        ${isSelected ? '<span class="absolute right-3 w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>' : ''}
-                    </button>
-                    ${datesHTML}
-                </div>`;
+                return `<div class="mb-1"><button onclick="toggleArtistFilter('${a.id}')" class="artist-pill w-full px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center justify-center relative ${a.color} ${isSelected ? 'selected' : 'opacity-80 hover:opacity-100'}">${a.name}${isSelected ? '<span class="absolute right-3 w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>' : ''}</button>${datesHTML}</div>`;
             }).join('');
         }
 
@@ -481,20 +434,12 @@
             const container = document.getElementById('planning-container');
             const sidebar = document.getElementById('artist-sidebar-content');
             const mobileContainer = document.getElementById('artist-mobile-content');
-            
             const monthName = currentDate.toLocaleDateString('fr-FR', {month: 'long'}).toUpperCase();
             document.getElementById('current-month-display').textContent = `${monthName} ${currentDate.getFullYear()}`;
-
             let verticalMonthHTML = `<div class="month-sidebar flex flex-col justify-center items-center w-20 md:w-28 shrink-0 mr-4 md:mr-8 rounded-r-3xl border-r border-fuchsia-400/30 hidden md:flex">`;
             for(let char of monthName) { verticalMonthHTML += `<span class="month-char block text-5xl md:text-7xl font-black mb-1 text-center w-full">${char}</span>`; }
             verticalMonthHTML += `</div>`;
-
-            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-10 pr-4">
-                <div class=""></div><div class="col-span-3 bg-purple-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest text-purple-200">Chants</div><div class=""></div><div class="col-span-3 bg-blue-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest text-blue-200">Musiciens</div>
-                <div class="sticky-col bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 border border-white/5">DATES</div>
-                <div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 1</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 2</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 3</div><div class="flex justify-center h-full"><div class="w-px h-full bg-white/10"></div></div>
-                <div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Piano</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Basse</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Drum</div>`;
-
+            let gridHTML = `<div class="flex-1 overflow-x-auto pb-4"><div class="min-w-[900px] grid grid-cols-[80px_1fr_1fr_1fr_20px_1fr_1fr_1fr] gap-1.5 text-center pb-10 pr-4"><div class=""></div><div class="col-span-3 bg-purple-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest text-purple-200">Chants</div><div class=""></div><div class="col-span-3 bg-blue-900/40 p-2 rounded-t text-[10px] font-bold uppercase tracking-widest text-blue-200">Musiciens</div><div class="sticky-col bg-white/5 text-gray-400 font-bold text-[10px] uppercase py-3 border border-white/5">DATES</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 1</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 2</div><div class="bg-purple-500/10 text-purple-200 text-[9px] uppercase py-3 border border-white/5">Chant 3</div><div class="flex justify-center h-full"><div class="w-px h-full bg-white/10"></div></div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Piano</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Basse</div><div class="bg-blue-500/10 text-blue-200 text-[9px] uppercase py-3 border border-white/5">Drum</div>`;
             const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             while(d.getMonth() === currentDate.getMonth()) {
                 if([3,4,5,6].includes(d.getDay())) {
@@ -502,12 +447,7 @@
                     const isSat = d.getDay() === 6;
                     const isRowActive = highlightedRow === dateStr;
                     const dateCellBg = isRowActive ? 'bg-fuchsia-700 shadow-[0_0_20px_rgba(255,255,255,0.3)]' : (isSat ? 'bg-[#2a1b3d]' : 'bg-[#1a0b2e]');
-                    
-                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="sticky-col h-16 flex flex-col justify-center items-center border border-white/5 rounded-lg ${dateCellBg} cursor-pointer group ${isRowActive?'row-active':''}">
-                        <span class="text-[8px] uppercase text-fuchsia-300 font-bold tracking-wider">${d.toLocaleDateString('fr-FR', {weekday: 'short'})}</span>
-                        <span class="text-lg font-black text-white leading-none">${d.getDate()}</span>
-                    </div>`;
-
+                    gridHTML += `<div onclick="toggleRowHighlight('${dateStr}')" class="sticky-col h-16 flex flex-col justify-center items-center border border-white/5 rounded-lg ${dateCellBg} cursor-pointer group ${isRowActive?'row-active':''}"><span class="text-[8px] uppercase text-fuchsia-300 font-bold tracking-wider">${d.toLocaleDateString('fr-FR', {weekday: 'short'})}</span><span class="text-lg font-black text-white leading-none">${d.getDate()}</span></div>`;
                     ['chant1', 'chant2', 'chant3', 'sep', 'piano', 'basse', 'drum'].forEach(slot => {
                         if(slot === 'sep') gridHTML += `<div class="flex justify-center h-full"><div class="w-px h-full bg-white/10"></div></div>`;
                         else {
@@ -534,22 +474,8 @@
             }
             gridHTML += `</div></div>`;
             container.innerHTML = verticalMonthHTML + gridHTML;
-
-            const roles = [
-                { id: 'chant', label: 'Chants', icon: 'fa-microphone-alt', color: 'text-fuchsia-400' },
-                { id: 'piano', label: 'Piano', icon: 'fa-keyboard', color: 'text-green-400' },
-                { id: 'basse', label: 'Basse', icon: 'fa-guitar', color: 'text-blue-400' },
-                { id: 'drum', label: 'Batterie', icon: 'fa-drum', color: 'text-red-400' }
-            ];
-
-            const sidebarHTML = roles.map(role => `
-                <div class="mb-6">
-                    <h4 class="text-[9px] font-bold uppercase mb-3 ${role.color} tracking-widest flex items-center gap-2">
-                        <i class="fas ${role.icon} text-xs"></i> ${role.label}
-                    </h4>
-                    <div class="space-y-1">${renderArtistList(role.id)}</div>
-                </div>
-            `).join('');
+            const roles = [{ id: 'chant', label: 'Chants', icon: 'fa-microphone-alt', color: 'text-fuchsia-400' }, { id: 'piano', label: 'Piano', icon: 'fa-keyboard', color: 'text-green-400' }, { id: 'basse', label: 'Basse', icon: 'fa-guitar', color: 'text-blue-400' }, { id: 'drum', label: 'Batterie', icon: 'fa-drum', color: 'text-red-400' }];
+            const sidebarHTML = roles.map(role => `<div class="mb-6"><h4 class="text-[9px] font-bold uppercase mb-3 ${role.color} tracking-widest flex items-center gap-2"><i class="fas ${role.icon} text-xs"></i> ${role.label}</h4><div class="space-y-1">${renderArtistList(role.id)}</div></div>`).join('');
             if(sidebar) sidebar.innerHTML = sidebarHTML;
             if(mobileContainer) mobileContainer.innerHTML = sidebarHTML;
         }
@@ -560,9 +486,7 @@
         function renderAudioList(term='') {
             const list = document.getElementById('audio-track-list');
             const filtered = AUDIO_LIBRARY.filter(t => t.title.toLowerCase().includes(term.toLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
-            list.innerHTML = filtered.map(t => `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}">
-                <span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i>
-            </button>`).join('');
+            list.innerHTML = filtered.map(t => `<button onclick="selectTrack('${t.id}')" class="track-item w-full text-left p-4 text-gray-400 font-bold uppercase flex justify-between items-center ${currentTrack?.id===t.id?'active':''}"><span class="truncate pr-4">${t.isNew?'🚨 ':''}${t.title}</span><i class="fas fa-play text-[10px] shrink-0"></i></button>`).join('');
         }
 
         window.selectTrack = (id) => {
@@ -590,26 +514,12 @@
 
         window.togglePlay = () => {
             const a = document.getElementById('audio-element'); const i = document.getElementById('play-btn').querySelector('i');
-            if(a.paused) { 
-                a.play(); 
-                i.className = "fas fa-pause text-2xl md:text-3xl"; 
-            }
-            else { 
-                lastPauseTime = a.currentTime; 
-                a.pause(); 
-                i.className = "fas fa-play text-2xl md:text-3xl ml-1"; 
-            }
+            if(a.paused) { a.play(); i.className = "fas fa-pause text-2xl md:text-3xl"; }
+            else { lastPauseTime = a.currentTime; a.pause(); i.className = "fas fa-play text-2xl md:text-3xl ml-1"; }
         };
 
         window.stopAudio = () => { const a = document.getElementById('audio-element'); a.pause(); a.currentTime = 0; lastPauseTime = 0; resetPlayerUI(); };
-        
-        window.resetAudio = () => { 
-            const a = document.getElementById('audio-element'); 
-            a.currentTime = lastPauseTime; 
-            a.play(); 
-            document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl";
-        };
-
+        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPauseTime; a.play(); document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl"; };
         window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play text-2xl md:text-3xl ml-1"; };
         
         window.updateProgress = () => {
@@ -625,9 +535,7 @@
 
         window.seekAudioSlider = (val) => {
             const a = document.getElementById('audio-element');
-            if(a.duration) {
-                a.currentTime = (val / 100) * a.duration;
-            }
+            if(a.duration) { a.currentTime = (val / 100) * a.duration; }
         };
 
         function formatTime(s) { const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc.toString().padStart(2,'0')}`; }
@@ -655,14 +563,7 @@
         window.saveAudioTrack = async () => {
             const title = document.getElementById('audio-title-input').value.toUpperCase().trim(); if(!title) return;
             const id = document.getElementById('audio-id-input').value || Date.now().toString();
-            await setDoc(PUBLIC_DOC('audio', id), { 
-                id, title, 
-                isNew: document.getElementById('audio-is-new').checked, 
-                src: document.getElementById('audio-src-input').value, 
-                lyrics: document.getElementById('audio-lyrics-input').value, 
-                sheet: document.getElementById('audio-sheet-input').value, 
-                youtube: document.getElementById('audio-youtube-input').value 
-            });
+            await setDoc(PUBLIC_DOC('audio', id), { id, title, isNew: document.getElementById('audio-is-new').checked, src: document.getElementById('audio-src-input').value, lyrics: document.getElementById('audio-lyrics-input').value, sheet: document.getElementById('audio-sheet-input').value, youtube: document.getElementById('audio-youtube-input').value });
             clearAudioForm(); showToast();
         };
 
@@ -670,65 +571,29 @@
             const c = document.getElementById('home-news-container'); const nt = AUDIO_LIBRARY.filter(t => t.isNew);
             if(!nt.length) { c.classList.add('hidden'); return; }
             c.classList.remove('hidden');
-            c.innerHTML = `<div class="bg-red-900/80 p-4 rounded-xl border border-red-500/50 shadow-lg animate-pulse">
-                <h3 class="text-white font-black text-xs mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> NOUVEAUTÉ À TRAVAILLER</h3>
-                ${nt.map(t => `<div class="bg-black/40 p-3 rounded-lg flex justify-between items-center mb-2 border border-white/5">
-                    <span class="text-white font-bold text-xs">🚨 ${t.title}</span>
-                    <button onclick="playNewsTrack('${t.id}')" class="bg-white text-red-900 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md">ÉCOUTER</button>
-                </div>`).join('')}
-            </div>`;
+            c.innerHTML = `<div class="bg-red-900/80 p-4 rounded-xl border border-red-500/50 shadow-lg animate-pulse"><h3 class="text-white font-black text-xs mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> NOUVEAUTÉ À TRAVAILLER</h3>${nt.map(t => `<div class="bg-black/40 p-3 rounded-lg flex justify-between items-center mb-2 border border-white/5"><span class="text-white font-bold text-xs">🚨 ${t.title}</span><button onclick="playNewsTrack('${t.id}')" class="bg-white text-red-900 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md">ÉCOUTER</button></div>`).join('')}</div>`;
         };
         window.playNewsTrack = (id) => { showPage('audio'); setTimeout(() => selectTrack(id), 100); };
 
         function renderSetlistPublic() {
             const c = document.getElementById('setlist-public-container');
             const d = [{k:'wed',c:'blue'},{k:'thu',c:'purple'},{k:'fri',c:'pink'},{k:'sat',c:'indigo'}];
-            
             let html = '';
-            
-            // AJOUT DU BOUTON GLOBAL SI ADMIN
             if (isAdminMode) {
-                html += `<div class="col-span-full mb-4 flex justify-center md:justify-end">
-                    <button onclick="saveAllSetlists()" class="w-full md:w-auto bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 px-8 py-4 rounded-2xl text-white font-black uppercase tracking-widest text-xs shadow-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 active:scale-95">
-                        <i class="fas fa-save text-lg"></i> ENREGISTRER TOUTES LES MODIFICATIONS
-                    </button>
-                </div>`;
+                html += `<div class="col-span-full mb-4 flex justify-center md:justify-end"><button onclick="saveAllSetlists()" class="w-full md:w-auto bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 px-8 py-4 rounded-2xl text-white font-black uppercase tracking-widest text-xs shadow-xl flex items-center justify-center gap-3 transition-all transform hover:scale-105 active:scale-95"><i class="fas fa-save text-lg"></i> ENREGISTRER TOUTES LES MODIFICATIONS</button></div>`;
             }
-
             html += d.map(day => {
                 const dayData = SETLISTS[day.k];
                 if (isAdminMode) {
-                    return `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl transition-all">
-                        <input type="text" id="edit-date-${day.k}" value="${dayData.date}" class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm outline-none border-none">
-                        <div class="p-6 flex-1">
-                            <textarea id="edit-content-${day.k}" 
-                                class="setlist-editor h-auto" 
-                                placeholder="Entrez la liste ici..." 
-                                oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'">${dayData.content || ""}</textarea>
-                        </div>
-                    </div>`;
+                    return `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl transition-all"><input type="text" id="edit-date-${day.k}" value="${dayData.date}" class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm outline-none border-none"><div class="p-6 flex-1"><textarea id="edit-content-${day.k}" class="setlist-editor h-auto" placeholder="Entrez la liste ici..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'">${dayData.content || ""}</textarea></div></div>`;
                 } else {
-                    return `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl">
-                        <div class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm">${dayData.date}</div>
-                        <div class="p-6 text-xs text-gray-200 flex-1 whitespace-pre-wrap font-medium">${dayData.content || "Aucune liste..."}</div>
-                        <button onclick="copySet('${day.k}')" class="m-3 p-3 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] uppercase font-bold text-gray-400 transition-all flex items-center justify-center gap-2"><i class="fas fa-copy"></i> Copier</button>
-                    </div>`;
+                    return `<div class="bg-${day.c}-900/10 border border-${day.c}-500/30 rounded-3xl overflow-hidden flex flex-col h-full shadow-2xl"><div class="bg-${day.c}-600 p-4 text-center text-white font-black uppercase tracking-widest text-sm">${dayData.date}</div><div class="p-6 text-xs text-gray-200 flex-1 whitespace-pre-wrap font-medium">${dayData.content || "Aucune liste..."}</div><button onclick="copySet('${day.k}')" class="m-3 p-3 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] uppercase font-bold text-gray-400 transition-all flex items-center justify-center gap-2"><i class="fas fa-copy"></i> Copier</button></div>`;
                 }
             }).join('');
-
             c.innerHTML = html;
-
-            if(isAdminMode) {
-                setTimeout(() => {
-                    d.forEach(day => {
-                        const el = document.getElementById(`edit-content-${day.k}`);
-                        if(el) el.style.height = el.scrollHeight + 'px';
-                    });
-                }, 100);
-            }
+            if(isAdminMode) { setTimeout(() => { d.forEach(day => { const el = document.getElementById(`edit-content-${day.k}`); if(el) el.style.height = el.scrollHeight + 'px'; }); }, 100); }
         }
 
-        // FONCTION DE SAUVEGARDE GLOBALE
         window.saveAllSetlists = async () => {
             const keys = ['wed', 'thu', 'fri', 'sat'];
             for (let k of keys) {
@@ -741,20 +606,11 @@
         };
 
         window.copySet = (id) => {
-            const text = SETLISTS[id].content;
-            if (!text) return;
-            const el = document.createElement('textarea');
-            el.value = text;
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';
-            document.body.appendChild(el);
-            el.select();
-            try {
-                document.execCommand('copy');
-                showToast("Setlist copiée !");
-            } catch (err) {
-                console.error("Erreur de copie");
-            }
+            const text = SETLISTS[id].content; if (!text) return;
+            const el = document.createElement('textarea'); el.value = text;
+            el.style.position = 'absolute'; el.style.left = '-9999px';
+            document.body.appendChild(el); el.select();
+            try { document.execCommand('copy'); showToast("Setlist copiée !"); } catch (err) { console.error("Erreur de copie"); }
             document.body.removeChild(el);
         };
 
@@ -766,113 +622,68 @@
             if(id === 'setlist') renderSetlistPublic();
         };
 
-        function loadAdminValues() {
-            renderAdminTeamList();
-            renderAdminAudioList();
-            updateColorPicker();
-        }
-
+        function loadAdminValues() { renderAdminTeamList(); renderAdminAudioList(); updateColorPicker(); }
         window.toggleSidebar = () => { document.getElementById('main-sidebar').classList.toggle('sidebar-collapsed'); };
-        window.toggleAdminMode = () => { 
-            if(isAdminMode) { 
-                isAdminMode=false; 
-                document.getElementById('admin-setlist-controls').classList.add('hidden');
-                updateAdminUI(); 
-            } else document.getElementById('password-modal').classList.remove('hidden'); 
-        };
-        window.checkAdminPassword = () => { 
-            if(document.getElementById('admin-pass-input').value==='mondaine') { 
-                isAdminMode=true; 
-                document.getElementById('admin-setlist-controls').classList.remove('hidden');
-                updateAdminUI(); 
-                closeModal('password-modal'); 
-            } 
-        };
-        window.updateAdminUI = () => { 
-            document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); 
-            renderPlanning(); 
-            renderSetlistPublic();
-        };
+        window.toggleAdminMode = () => { if(isAdminMode) { isAdminMode=false; document.getElementById('admin-setlist-controls').classList.add('hidden'); updateAdminUI(); } else document.getElementById('password-modal').classList.remove('hidden'); };
+        window.checkAdminPassword = () => { if(document.getElementById('admin-pass-input').value==='mondaine') { isAdminMode=true; document.getElementById('admin-setlist-controls').classList.remove('hidden'); updateAdminUI(); closeModal('password-modal'); } };
+        window.updateAdminUI = () => { document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); renderPlanning(); renderSetlistPublic(); };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
         window.handleCellClick = (d, s) => { currentEditSlot = {dateStr:d, slot:s}; renderModalArtists(); document.getElementById('assign-modal').classList.remove('hidden'); };
-        
-        function renderModalArtists() {
-            document.getElementById('modal-artist-list').innerHTML = ARTISTS.map(a => `<button onclick="setAssign('${a.id}')" class="${a.color} p-3 rounded font-bold text-[10px] uppercase shadow-md">${a.name}</button>`).join('');
-        }
+        function renderModalArtists() { document.getElementById('modal-artist-list').innerHTML = ARTISTS.map(a => `<button onclick="setAssign('${a.id}')" class="${a.color} p-3 rounded font-bold text-[10px] uppercase shadow-md">${a.name}</button>`).join(''); }
         window.setAssign = async (id) => { await setDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`), { artistId: id }); closeModal('assign-modal'); };
         window.removeAssignment = async () => { await deleteDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`)); closeModal('assign-modal'); };
 
         function clearAudioForm() {
-            document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type!=='hidden'&&i.type!=='checkbox') i.value=''; });
-            document.getElementById('audio-id-input').value=''; 
-            document.getElementById('audio-is-new').checked=false;
-        }
-        
-        function renderAdminAudioList() {
-            const sorted = [...AUDIO_LIBRARY].sort((a,b) => a.title.localeCompare(b.title));
-            document.getElementById('admin-audio-list').innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join('');
+            // 1. Vider les champs texte visibles
+            document.querySelectorAll('#admin-panel input').forEach(i => { 
+                if(i.type!=='hidden' && i.type!=='checkbox') i.value=''; 
+            });
+
+            // 2. Vider les IDs et URLs cachés
+            document.getElementById('audio-id-input').value = '';
+            document.getElementById('audio-src-input').value = '';
+            document.getElementById('audio-lyrics-input').value = '';
+            document.getElementById('audio-sheet-input').value = '';
+            document.getElementById('audio-is-new').checked = false;
+            document.getElementById('audio-youtube-input').value = '';
+
+            // 3. Réinitialiser visuellement les boutons d'upload
+            const resetBtn = (id, iconClass, label) => {
+                const btn = document.getElementById(id);
+                if(btn) {
+                    btn.classList.remove('upload-success', 'opacity-50');
+                    btn.innerHTML = `<i class="${iconClass} mb-2"></i><span>${label}</span>`;
+                }
+            };
+
+            resetBtn('upload-btn-audio', 'fas fa-music text-fuchsia-500', 'Audio');
+            resetBtn('upload-btn-lyrics', 'fas fa-align-center text-blue-500', 'Paroles');
+            resetBtn('upload-btn-sheet', 'fas fa-music text-orange-400', 'Partit.');
         }
 
-        function renderAdminTeamList() {
-             const container = document.getElementById('admin-team-list');
-             if(!container) return;
-             const categories = [
-                { id: 'chant', label: 'CHANT' },
-                { id: 'piano', label: 'PIANO' },
-                { id: 'basse', label: 'BASSE' },
-                { id: 'drum', label: 'DRUM' }
-            ];
-            container.innerHTML = categories.map(cat => {
-                const catArtists = ARTISTS.filter(a => a.role === cat.id);
-                return `<div class="mb-4">
-                    <h4 class="text-[10px] font-black uppercase mb-2 text-white/50 border-b border-white/5 pb-1">${cat.label}</h4>
-                    <div class="grid grid-cols-2 gap-2">
-                        ${catArtists.map(a => `<div class="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5 group">
-                            <span class="text-[10px] font-bold ${a.color} px-2 py-1 rounded">${a.name}</span>
-                            <button onclick="deleteArtist('${a.id}')" class="text-gray-600 hover:text-red-500 p-1"><i class="fas fa-times"></i></button>
-                        </div>`).join('')}
-                    </div>
-                </div>`;
-            }).join('');
-        }
+        function renderAdminAudioList() { const sorted = [...AUDIO_LIBRARY].sort((a,b) => a.title.localeCompare(b.title)); document.getElementById('admin-audio-list').innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join(''); }
+        function renderAdminTeamList() { const container = document.getElementById('admin-team-list'); if(!container) return; const categories = [{ id: 'chant', label: 'CHANT' }, { id: 'piano', label: 'PIANO' }, { id: 'basse', label: 'BASSE' }, { id: 'drum', label: 'DRUM' }]; container.innerHTML = categories.map(cat => { const catArtists = ARTISTS.filter(a => a.role === cat.id); return `<div class="mb-4"><h4 class="text-[10px] font-black uppercase mb-2 text-white/50 border-b border-white/5 pb-1">${cat.label}</h4><div class="grid grid-cols-2 gap-2">${catArtists.map(a => `<div class="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5 group"><span class="text-[10px] font-bold ${a.color} px-2 py-1 rounded">${a.name}</span><button onclick="deleteArtist('${a.id}')" class="text-gray-600 hover:text-red-500 p-1"><i class="fas fa-times"></i></button></div>`).join('')}</div></div>`; }).join(''); }
 
         window.deleteArtist = async (id) => { if(confirm("Supprimer l'artiste ?")) await deleteDoc(PUBLIC_DOC('artists', id)); };
         window.editAudio = (id) => { const t = AUDIO_LIBRARY.find(a=>a.id===id); document.getElementById('audio-id-input').value=t.id; document.getElementById('audio-title-input').value=t.title; document.getElementById('audio-is-new').checked=t.isNew; document.getElementById('audio-src-input').value=t.src; };
         window.deleteAudio = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(PUBLIC_DOC('audio', id)); };
 
         window.updateColorPicker = () => {
-            const role = document.getElementById('new-artist-role').value;
-            const palette = PALETTES[role];
-            const usedColors = ARTISTS.filter(a => a.role === role).map(a => a.color.split(' ')[0]);
+            const role = document.getElementById('new-artist-role').value; const palette = PALETTES[role]; const usedColors = ARTISTS.filter(a => a.role === role).map(a => a.color.split(' ')[0]);
             const container = document.getElementById('new-artist-color-picker');
-            container.innerHTML = palette.map(c => {
-                const isUsed = usedColors.includes(c);
-                return `<div class="color-bubble ${c} ${isUsed ? 'disabled' : ''}" onclick="selectColor(this,'${c}')"></div>`;
-            }).join('');
+            container.innerHTML = palette.map(c => { const isUsed = usedColors.includes(c); return `<div class="color-bubble ${c} ${isUsed ? 'disabled' : ''}" onclick="selectColor(this,'${c}')"></div>`; }).join('');
             const firstAvailable = palette.find(c => !usedColors.includes(c));
-            if(firstAvailable) {
-                const firstEl = Array.from(container.children).find(el => el.classList.contains(firstAvailable));
-                selectColor(firstEl, firstAvailable);
-            }
+            if(firstAvailable) { const firstEl = Array.from(container.children).find(el => el.classList.contains(firstAvailable)); selectColor(firstEl, firstAvailable); }
         }
         
         window.selectColor = (el, c) => { 
             if(!el || el.classList.contains('disabled')) return;
-            let textColor = 'text-white';
-            if(c.includes('100') || c.includes('200') || c.includes('300') || c.includes('yellow') || c.includes('lime') || c.includes('cyan')) {
-                textColor = 'text-black';
-            }
+            let textColor = (c.includes('100') || c.includes('200') || c.includes('300') || c.includes('yellow') || c.includes('lime') || c.includes('cyan')) ? 'text-black' : 'text-white';
             document.getElementById('selected-color-value').value = `${c} ${textColor}`; 
-            document.querySelectorAll('.color-bubble').forEach(d=>d.classList.remove('selected'));
-            el.classList.add('selected');
+            document.querySelectorAll('.color-bubble').forEach(d=>d.classList.remove('selected')); el.classList.add('selected');
         };
 
-        window.onload = () => { 
-            showPage('home'); 
-            updateColorPicker(); 
-            document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value));
-            window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); 
-        };
+        window.onload = () => { showPage('home'); updateColorPicker(); document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value)); window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); };
     </script>
 </body>
 </html>
