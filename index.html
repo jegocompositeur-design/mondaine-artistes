@@ -65,19 +65,17 @@
         .track-item { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .track-item.active { background: linear-gradient(90deg, rgba(217, 70, 239, 0.15) 0%, transparent 100%); border-left: 3px solid #d946ef; color: #f0abfc; }
         
-        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
-        input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: pointer; margin-top: -7px; box-shadow: 0 0 10px rgba(217,70,239,0.8); border: 2px solid #d946ef; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px; }
-        input[type=range]::-moz-range-thumb { height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: pointer; border: 2px solid #d946ef; box-shadow: 0 0 10px rgba(217,70,239,0.8); }
-        input[type=range]::-moz-range-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 2px; }
+        /* STYLE DU SLIDER AVEC PROGRESSION COLOREE */
+        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); width: 100%; border-radius: 10px; height: 6px; outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; box-shadow: 0 0 10px rgba(217,70,239,0.8); border: 2px solid #d946ef; }
+        input[type=range]::-moz-range-thumb { height: 18px; width: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; border: 2px solid #d946ef; }
 
         .speed-btn { font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); color: #9ca3af; }
         .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; }
 
         #loading-overlay { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .upload-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; color: #9ca3af; }
-        .upload-success { background: rgba(22, 163, 74, 0.8) !important; color: white !important; }
+        .upload-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; color: #9ca3af; transition: all 0.3s; }
+        .upload-success { background: rgba(22, 163, 74, 0.2) !important; border-color: rgba(34, 197, 94, 0.5) !important; color: #4ade80 !important; }
         
         .color-bubble { width: 1.25rem; height: 1.25rem; border-radius: 9999px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
         .color-bubble:hover { transform: scale(1.3); border-color: white; }
@@ -99,6 +97,7 @@
         </div>
     </div>
 
+    <!-- CONFIGURATION FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -195,69 +194,74 @@
             <div class="flex items-center justify-between mb-8 pt-2 border-b border-white/5 pb-4">
                 <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Set <span class="text-fuchsia-600">Liste</span></h2>
                 <div id="admin-setlist-controls" class="hidden">
-                    <span class="text-[10px] font-bold text-fuchsia-400 animate-pulse">MODE ÉDITION ACTIF</span>
+                    <span class="text-[10px] font-bold text-fuchsia-400 animate-pulse">ÉDITION ACTIF</span>
                 </div>
             </div>
             <div id="setlist-public-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20"></div>
         </section>
 
-        <!-- AUDIO -->
+        <!-- AUDIO PLAYER OPTIMISÉ -->
         <section id="audio" class="page-section h-full w-full absolute inset-0 hidden overflow-hidden bg-[#080510]">
             <div class="flex h-full flex-col md:flex-row">
-                <div class="flex-1 flex flex-col p-4 md:p-8 overflow-hidden order-2 md:order-1">
+                <!-- LISTE ET RECHERCHE -->
+                <div class="flex-1 flex flex-col p-4 md:p-8 overflow-hidden order-2 md:order-1 bg-black/20">
                     <h2 class="hidden md:block text-3xl font-black text-white mb-6 uppercase tracking-tighter">AUDIO <span class="text-fuchsia-600">PLAYER</span></h2>
-                    <div class="mb-4 md:mb-6 relative">
-                        <input type="text" id="audio-search" placeholder="RECHERCHER..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 md:py-4 pl-12 pr-6 text-white text-sm font-bold focus:border-fuchsia-500 outline-none uppercase tracking-wider">
+                    <div class="mb-4 relative">
+                        <input type="text" id="audio-search" placeholder="RECHERCHER..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 md:py-4 pl-12 pr-6 text-white text-sm font-bold focus:border-fuchsia-500 outline-none uppercase tracking-wider transition-all">
                         <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
                     </div>
-                    <div class="flex-1 overflow-y-auto pr-2 pb-24 md:pb-0" id="audio-track-list"></div>
+                    <div class="flex-1 overflow-y-auto pr-2 pb-20 md:pb-0" id="audio-track-list"></div>
                 </div>
 
-                <div class="h-auto md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl transition-all duration-300">
-                    <div id="player-empty-state" class="flex flex-col items-center justify-center h-32 md:h-full text-center opacity-40">
-                        <i class="fas fa-headphones text-3xl md:text-5xl text-fuchsia-500 mb-2"></i>
+                <!-- LECTEUR FIXE (Haut sur mobile, Droite sur desktop) -->
+                <div class="h-[45vh] md:h-full w-full md:w-[480px] glass-panel flex flex-col p-4 md:p-8 border-b md:border-b-0 md:border-l border-white/10 z-20 order-1 md:order-2 shadow-2xl shrink-0">
+                    <div id="player-empty-state" class="flex flex-col items-center justify-center h-full text-center opacity-40">
+                        <i class="fas fa-headphones text-4xl md:text-5xl text-fuchsia-500 mb-2"></i>
                         <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Sélectionnez un titre</p>
                     </div>
-                    <div id="player-content" class="hidden flex flex-col h-full">
-                        <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight break-words">TITRE</h3>
-                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-5 md:p-8 mb-6 border border-white/5 shadow-inner">
-                            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                    <div id="player-content" class="hidden flex flex-col h-full overflow-y-auto">
+                        <h3 id="player-title" class="text-xl md:text-3xl font-black text-white uppercase mb-4 md:mb-8 leading-tight break-words text-center md:text-left">TITRE</h3>
+                        <div class="bg-black/40 rounded-2xl md:rounded-3xl p-4 md:p-8 mb-4 md:mb-6 border border-white/5 shadow-inner">
+                            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
                                 <div class="flex gap-2" id="speed-controls">
-                                    <button onclick="setSpeed(0.5)" class="speed-btn px-3 py-1.5">0.5</button>
-                                    <button onclick="setSpeed(1.0)" class="speed-btn px-3 py-1.5 active-speed">1.0</button>
-                                    <button onclick="setSpeed(1.5)" class="speed-btn px-3 py-1.5">1.5</button>
+                                    <button onclick="setSpeed(0.5)" class="speed-btn px-2.5 py-1">0.5</button>
+                                    <button onclick="setSpeed(1.0)" class="speed-btn px-2.5 py-1 active-speed">1.0</button>
+                                    <button onclick="setSpeed(1.5)" class="speed-btn px-2.5 py-1">1.5</button>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-volume-up text-xs text-gray-500"></i>
-                                    <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-24">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-volume-up text-[10px] text-gray-500"></i>
+                                    <input type="range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)" class="w-16 md:w-24">
                                 </div>
                             </div>
-                            <div class="flex justify-center items-center gap-8 mb-8">
-                                <button onclick="stopAudio()" class="text-gray-500 hover:text-white transition-colors text-lg"><i class="fas fa-stop"></i></button>
-                                <button onclick="togglePlay()" id="play-btn" class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white flex items-center justify-center shadow-[0_0_30px_rgba(217,70,239,0.4)] hover:scale-105 transition-transform"><i class="fas fa-play ml-1 text-2xl md:text-3xl"></i></button>
-                                <button onclick="resetAudio()" class="text-gray-500 hover:text-white transition-colors text-lg"><i class="fas fa-redo-alt"></i></button>
+                            
+                            <div class="flex justify-center items-center gap-6 md:gap-8 mb-6">
+                                <button onclick="stopAudio()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-stop text-sm md:text-lg"></i></button>
+                                <button onclick="togglePlay()" id="play-btn" class="w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white flex items-center justify-center shadow-[0_0_25px_rgba(217,70,239,0.4)] hover:scale-105 transition-transform"><i class="fas fa-play ml-1 text-xl md:text-3xl"></i></button>
+                                <button onclick="resetAudio()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-redo-alt text-sm md:text-lg"></i></button>
                             </div>
+                            
                             <audio id="audio-element" ontimeupdate="updateProgress()" onended="resetPlayerUI()"></audio>
                             
-                            <div class="w-full mb-3 px-1">
-                                <input type="range" id="progress-slider" min="0" max="100" value="0" step="0.1" class="w-full h-4 cursor-pointer" oninput="seekAudioSlider(this.value)">
+                            <div class="w-full mb-3">
+                                <input type="range" id="progress-slider" min="0" max="100" value="0" step="0.1" class="w-full h-2 cursor-pointer" oninput="seekAudioSlider(this.value)">
                             </div>
                             
-                            <div class="flex justify-between text-xs text-gray-400 font-mono">
+                            <div class="flex justify-between text-[10px] text-gray-400 font-mono tracking-tighter">
                                 <span id="time-current">00:00</span>
                                 <span id="time-total">00:00</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <a id="btn-lyrics" href="#" target="_blank" class="flex flex-col items-center justify-center p-4 bg-blue-900/20 border border-blue-500/20 rounded-2xl opacity-50 text-[10px] md:text-xs font-bold uppercase transition-all hover:bg-blue-900/30">
-                                <i class="fas fa-align-center mb-2 text-blue-400 text-lg"></i><span>Paroles</span>
+
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <a id="btn-lyrics" href="#" target="_blank" class="flex items-center justify-center gap-2 p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
+                                <i class="fas fa-align-center text-blue-400"></i><span>Paroles</span>
                             </a>
-                            <a id="btn-sheet" href="#" target="_blank" class="flex flex-col items-center justify-center p-4 bg-orange-900/20 border border-orange-500/20 rounded-2xl opacity-50 text-[10px] md:text-xs font-bold uppercase transition-all hover:bg-orange-900/30">
-                                <i class="fas fa-music mb-2 text-orange-400 text-lg"></i><span>Partition</span>
+                            <a id="btn-sheet" href="#" target="_blank" class="flex items-center justify-center gap-2 p-3 bg-orange-900/20 border border-orange-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
+                                <i class="fas fa-music text-orange-400"></i><span>Partition</span>
                             </a>
                         </div>
-                        <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-3 p-4 bg-red-900/20 border border-red-500/20 rounded-2xl opacity-50 text-[10px] md:text-xs font-bold uppercase transition-all hover:bg-red-900/30">
-                            <i class="fab fa-youtube text-red-500 text-2xl"></i><span>Vidéo / Choré</span>
+                        <a id="btn-youtube" href="#" target="_blank" class="w-full flex items-center justify-center gap-2 p-3 bg-red-900/20 border border-red-500/20 rounded-xl opacity-50 text-[10px] font-bold uppercase transition-all">
+                            <i class="fab fa-youtube text-red-500 text-lg"></i><span>Vidéo / Choré</span>
                         </a>
                     </div>
                 </div>
@@ -271,7 +275,7 @@
             </header>
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-                <div class="lg:col-span-5 bg-white/5 p-6 rounded-2xl border border-white/5">
+                <div class="lg:col-span-5 bg-white/5 p-6 rounded-2xl border border-white/5 h-fit">
                     <h3 class="text-fuchsia-400 font-bold uppercase mb-6 text-sm flex items-center gap-2">
                         <i class="fas fa-users"></i> Gestion de l'équipe
                     </h3>
@@ -287,7 +291,7 @@
                         </div>
                         <div id="new-artist-color-picker" class="flex flex-wrap gap-2 mb-4 p-1 bg-black/20 rounded-lg max-h-40 overflow-y-auto"></div>
                         <input type="hidden" id="selected-color-value">
-                        <button onclick="addNewArtist()" class="w-full bg-gradient-to-r from-fuchsia-700 to-purple-700 py-3 rounded text-white font-bold uppercase text-xs transition-all">Ajouter l'artiste</button>
+                        <button onclick="addNewArtist()" class="w-full bg-gradient-to-r from-fuchsia-700 to-purple-700 py-3 rounded text-white font-bold uppercase text-xs transition-all shadow-lg hover:brightness-110">Ajouter l'artiste</button>
                     </div>
                     <div id="admin-team-list" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
                 </div>
@@ -298,6 +302,7 @@
                     </h3>
                     <div class="bg-black/40 p-6 rounded-xl border border-white/5">
                         <input type="hidden" id="audio-id-input">
+                        <div class="mb-1 text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1" id="audio-form-status">Nouveau Morceau</div>
                         <input type="text" id="audio-title-input" placeholder="TITRE DU MORCEAU" class="w-full bg-white/5 p-3 rounded mb-4 text-white font-bold uppercase text-sm border border-white/10 outline-none focus:border-fuchsia-500">
                         
                         <div class="grid grid-cols-3 gap-3 mb-4">
@@ -308,7 +313,7 @@
                                 <i class="fas fa-align-center mb-2 text-blue-500 group-hover:text-white"></i><span>Paroles</span>
                             </button>
                             <button onclick="document.getElementById('upload-input-sheet').click()" id="upload-btn-sheet" class="upload-btn group">
-                                <i class="fas fa-music mb-2 text-orange-400 group-hover:text-white"></i><span>Partit.</span>
+                                <i class="fas fa-scroll mb-2 text-orange-500 group-hover:text-white"></i><span>Partit.</span>
                             </button>
                         </div>
 
@@ -331,7 +336,7 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button onclick="saveAudioTrack()" class="flex-1 bg-gradient-to-r from-fuchsia-700 to-purple-700 py-3 rounded text-white font-bold uppercase text-xs shadow-lg">Sauvegarder</button>
+                            <button onclick="saveAudioTrack()" class="flex-1 bg-gradient-to-r from-fuchsia-700 to-purple-700 py-3 rounded text-white font-bold uppercase text-xs shadow-lg hover:brightness-110">Sauvegarder</button>
                             <button onclick="clearAudioForm()" class="px-4 bg-gray-800 rounded text-white font-bold uppercase text-xs">Reset</button>
                         </div>
                     </div>
@@ -348,7 +353,7 @@
     </div>
 
     <div id="password-modal" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-8 w-full max-w-sm text-center shadow-[0_0_50px_rgba(217,70,239,0.3)]">
             <h3 class="text-white font-black text-xl mb-6 uppercase">Admin Mondaine</h3>
             <input type="password" id="admin-pass-input" class="w-full bg-black/50 border border-white/10 rounded p-3 text-center text-white mb-4 focus:border-fuchsia-500 outline-none" placeholder="••••">
             <div class="grid grid-cols-2 gap-3">
@@ -400,17 +405,29 @@
             const btn = document.getElementById(btnId);
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
             btn.classList.add('opacity-50');
+
             const path = `artifacts/${window.appId}/public/audio/${type}/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
             const ref = window.storageRef(window.storage, path);
             const task = window.uploadBytesResumable(ref, file);
-            task.on('state_changed', null, (e) => { console.error(e); btn.innerHTML = "ERR"; btn.classList.remove('opacity-50'); }, () => {
+
+            task.on('state_changed', null, (e) => { 
+                console.error(e);
+                btn.innerHTML = "ERR"; 
+                btn.classList.remove('opacity-50');
+            }, () => {
                 window.getDownloadURL(task.snapshot.ref).then(url => {
                     document.getElementById(targetId).value = url;
-                    btn.classList.remove('opacity-50'); btn.classList.add('upload-success');
-                    btn.innerHTML = `<i class="fas fa-check"></i>`;
+                    setUploadSuccessUI(btnId);
                 });
             });
         };
+
+        function setUploadSuccessUI(btnId) {
+            const btn = document.getElementById(btnId);
+            btn.classList.remove('opacity-50');
+            btn.classList.add('upload-success');
+            btn.innerHTML = `<i class="fas fa-check-circle text-lg"></i>`;
+        }
 
         window.changeMonth = (offset) => { currentDate.setMonth(currentDate.getMonth() + offset); renderPlanning(); };
 
@@ -498,7 +515,7 @@
             a.src = currentTrack.src || "";
             a.currentTime = 0; lastPauseTime = 0; 
             a.play().catch(e => console.log("Auto-play bloqué"));
-            document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl";
+            document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-xl md:text-3xl";
             updateBtn('btn-lyrics', currentTrack.lyrics);
             updateBtn('btn-sheet', currentTrack.sheet);
             updateBtn('btn-youtube', currentTrack.youtube);
@@ -514,13 +531,13 @@
 
         window.togglePlay = () => {
             const a = document.getElementById('audio-element'); const i = document.getElementById('play-btn').querySelector('i');
-            if(a.paused) { a.play(); i.className = "fas fa-pause text-2xl md:text-3xl"; }
-            else { lastPauseTime = a.currentTime; a.pause(); i.className = "fas fa-play text-2xl md:text-3xl ml-1"; }
+            if(a.paused) { a.play(); i.className = "fas fa-pause text-xl md:text-3xl"; }
+            else { lastPauseTime = a.currentTime; a.pause(); i.className = "fas fa-play text-xl md:text-3xl ml-1"; }
         };
 
         window.stopAudio = () => { const a = document.getElementById('audio-element'); a.pause(); a.currentTime = 0; lastPauseTime = 0; resetPlayerUI(); };
-        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPauseTime; a.play(); document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-2xl md:text-3xl"; };
-        window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play text-2xl md:text-3xl ml-1"; };
+        window.resetAudio = () => { const a = document.getElementById('audio-element'); a.currentTime = lastPauseTime; a.play(); document.getElementById('play-btn').querySelector('i').className = "fas fa-pause text-xl md:text-3xl"; };
+        window.resetPlayerUI = () => { document.getElementById('play-btn').querySelector('i').className = "fas fa-play text-xl md:text-3xl ml-1"; };
         
         window.updateProgress = () => {
             const a = document.getElementById('audio-element');
@@ -528,6 +545,10 @@
             if(a.duration) {
                 const percent = (a.currentTime / a.duration) * 100;
                 slider.value = percent;
+                
+                // Coloration de la barre (gradient dynamique)
+                slider.style.background = `linear-gradient(to right, #d946ef 0%, #d946ef ${percent}%, rgba(255,255,255,0.1) ${percent}%, rgba(255,255,255,0.1) 100%)`;
+
                 document.getElementById('time-current').innerText = formatTime(a.currentTime);
                 document.getElementById('time-total').innerText = formatTime(a.duration);
             }
@@ -563,7 +584,14 @@
         window.saveAudioTrack = async () => {
             const title = document.getElementById('audio-title-input').value.toUpperCase().trim(); if(!title) return;
             const id = document.getElementById('audio-id-input').value || Date.now().toString();
-            await setDoc(PUBLIC_DOC('audio', id), { id, title, isNew: document.getElementById('audio-is-new').checked, src: document.getElementById('audio-src-input').value, lyrics: document.getElementById('audio-lyrics-input').value, sheet: document.getElementById('audio-sheet-input').value, youtube: document.getElementById('audio-youtube-input').value });
+            await setDoc(PUBLIC_DOC('audio', id), { 
+                id, title, 
+                isNew: document.getElementById('audio-is-new').checked, 
+                src: document.getElementById('audio-src-input').value, 
+                lyrics: document.getElementById('audio-lyrics-input').value, 
+                sheet: document.getElementById('audio-sheet-input').value, 
+                youtube: document.getElementById('audio-youtube-input').value 
+            });
             clearAudioForm(); showToast();
         };
 
@@ -634,20 +662,15 @@
         window.removeAssignment = async () => { await deleteDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`)); closeModal('assign-modal'); };
 
         function clearAudioForm() {
-            // 1. Vider les champs texte visibles
-            document.querySelectorAll('#admin-panel input').forEach(i => { 
-                if(i.type!=='hidden' && i.type!=='checkbox') i.value=''; 
-            });
-
-            // 2. Vider les IDs et URLs cachés
+            document.querySelectorAll('#admin-panel input').forEach(i => { if(i.type!=='hidden' && i.type!=='checkbox') i.value=''; });
             document.getElementById('audio-id-input').value = '';
             document.getElementById('audio-src-input').value = '';
             document.getElementById('audio-lyrics-input').value = '';
             document.getElementById('audio-sheet-input').value = '';
             document.getElementById('audio-is-new').checked = false;
             document.getElementById('audio-youtube-input').value = '';
+            document.getElementById('audio-form-status').innerText = "Nouveau Morceau";
 
-            // 3. Réinitialiser visuellement les boutons d'upload
             const resetBtn = (id, iconClass, label) => {
                 const btn = document.getElementById(id);
                 if(btn) {
@@ -655,18 +678,52 @@
                     btn.innerHTML = `<i class="${iconClass} mb-2"></i><span>${label}</span>`;
                 }
             };
-
             resetBtn('upload-btn-audio', 'fas fa-music text-fuchsia-500', 'Audio');
             resetBtn('upload-btn-lyrics', 'fas fa-align-center text-blue-500', 'Paroles');
-            resetBtn('upload-btn-sheet', 'fas fa-music text-orange-400', 'Partit.');
+            resetBtn('upload-btn-sheet', 'fas fa-scroll text-orange-500', 'Partit.');
         }
 
-        function renderAdminAudioList() { const sorted = [...AUDIO_LIBRARY].sort((a,b) => a.title.localeCompare(b.title)); document.getElementById('admin-audio-list').innerHTML = sorted.map(t => `<div class="bg-white/5 p-2 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5"><span class="text-[10px] font-bold text-white uppercase">${t.title}</span><div class="flex gap-1 opacity-50 group-hover:opacity-100"><button onclick="editAudio('${t.id}')" class="text-blue-400 p-1"><i class="fas fa-edit"></i></button><button onclick="deleteAudio('${t.id}')" class="text-red-400 p-1"><i class="fas fa-trash"></i></button></div></div>`).join(''); }
+        window.editAudio = (id) => {
+            const t = AUDIO_LIBRARY.find(a=>a.id===id);
+            if(!t) return;
+            
+            clearAudioForm(); // On vide tout avant pour réinitialiser les styles
+            
+            document.getElementById('audio-id-input').value = t.id;
+            document.getElementById('audio-title-input').value = t.title;
+            document.getElementById('audio-is-new').checked = t.isNew;
+            document.getElementById('audio-src-input').value = t.src || '';
+            document.getElementById('audio-lyrics-input').value = t.lyrics || '';
+            document.getElementById('audio-sheet-input').value = t.sheet || '';
+            document.getElementById('audio-youtube-input').value = t.youtube || '';
+            
+            document.getElementById('audio-form-status').innerText = "Modification : " + t.title;
+
+            // On vérifie quels fichiers existent pour mettre les coches vertes
+            if(t.src) setUploadSuccessUI('upload-btn-audio');
+            if(t.lyrics) setUploadSuccessUI('upload-btn-lyrics');
+            if(t.sheet) setUploadSuccessUI('upload-btn-sheet');
+            
+            showPage('admin-panel'); // On s'assure d'être sur la page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        function renderAdminAudioList() { 
+            const sorted = [...AUDIO_LIBRARY].sort((a,b) => a.title.localeCompare(b.title)); 
+            document.getElementById('admin-audio-list').innerHTML = sorted.map(t => `
+                <div class="bg-white/5 p-3 rounded flex justify-between items-center mb-1 group hover:bg-white/10 transition-all border border-white/5">
+                    <span class="text-[10px] font-bold text-white uppercase truncate pr-4">${t.title}</span>
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="editAudio('${t.id}')" class="text-blue-400 p-2 bg-blue-400/10 rounded-lg hover:bg-blue-400/20 transition-colors"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteAudio('${t.id}')" class="text-red-400 p-2 bg-red-400/10 rounded-lg hover:bg-red-400/20 transition-colors"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`).join(''); 
+        }
+
         function renderAdminTeamList() { const container = document.getElementById('admin-team-list'); if(!container) return; const categories = [{ id: 'chant', label: 'CHANT' }, { id: 'piano', label: 'PIANO' }, { id: 'basse', label: 'BASSE' }, { id: 'drum', label: 'DRUM' }]; container.innerHTML = categories.map(cat => { const catArtists = ARTISTS.filter(a => a.role === cat.id); return `<div class="mb-4"><h4 class="text-[10px] font-black uppercase mb-2 text-white/50 border-b border-white/5 pb-1">${cat.label}</h4><div class="grid grid-cols-2 gap-2">${catArtists.map(a => `<div class="flex justify-between items-center bg-black/30 p-2 rounded border border-white/5 group"><span class="text-[10px] font-bold ${a.color} px-2 py-1 rounded">${a.name}</span><button onclick="deleteArtist('${a.id}')" class="text-gray-600 hover:text-red-500 p-1"><i class="fas fa-times"></i></button></div>`).join('')}</div></div>`; }).join(''); }
 
         window.deleteArtist = async (id) => { if(confirm("Supprimer l'artiste ?")) await deleteDoc(PUBLIC_DOC('artists', id)); };
-        window.editAudio = (id) => { const t = AUDIO_LIBRARY.find(a=>a.id===id); document.getElementById('audio-id-input').value=t.id; document.getElementById('audio-title-input').value=t.title; document.getElementById('audio-is-new').checked=t.isNew; document.getElementById('audio-src-input').value=t.src; };
-        window.deleteAudio = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(PUBLIC_DOC('audio', id)); };
+        window.deleteAudio = async (id) => { if(confirm("Supprimer ce morceau définitivement ?")) await deleteDoc(PUBLIC_DOC('audio', id)); };
 
         window.updateColorPicker = () => {
             const role = document.getElementById('new-artist-role').value; const palette = PALETTES[role]; const usedColors = ARTISTS.filter(a => a.role === role).map(a => a.color.split(' ')[0]);
@@ -683,7 +740,12 @@
             document.querySelectorAll('.color-bubble').forEach(d=>d.classList.remove('selected')); el.classList.add('selected');
         };
 
-        window.onload = () => { showPage('home'); updateColorPicker(); document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value)); window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); };
+        window.onload = () => { 
+            showPage('home'); 
+            updateColorPicker(); 
+            document.getElementById('audio-search').addEventListener('input', (e) => renderAudioList(e.target.value)); 
+            window.addEventListener('beforeunload', (e)=>{e.preventDefault(); e.returnValue='';}); 
+        };
     </script>
 </body>
 </html>
