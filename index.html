@@ -76,8 +76,15 @@
         .speed-btn.active-speed { background: rgba(217, 70, 239, 0.3); color: #f0abfc; border-color: #d946ef; }
 
         #loading-overlay { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .upload-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; color: #9ca3af; transition: all 0.3s; }
-        .upload-success { background: rgba(22, 163, 74, 0.2) !important; border-color: rgba(34, 197, 94, 0.5) !important; color: #4ade80 !important; }
+        
+        /* Upload Buttons Logic */
+        .upload-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; color: #9ca3af; transition: all 0.3s; position: relative; }
+        .upload-success { 
+            background: rgba(34, 197, 94, 0.15) !important; 
+            border: 2px solid rgba(34, 197, 94, 0.6) !important; 
+            color: #4ade80 !important; 
+            box-shadow: inset 0 0 15px rgba(34, 197, 94, 0.1);
+        }
         
         .color-bubble { width: 1.25rem; height: 1.25rem; border-radius: 9999px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
         .color-bubble:hover { transform: scale(1.3); border-color: white; }
@@ -310,13 +317,13 @@
                         
                         <div class="grid grid-cols-3 gap-3 mb-4">
                             <button onclick="document.getElementById('upload-input-audio').click()" id="upload-btn-audio" class="upload-btn group">
-                                <i class="fas fa-music mb-2 text-fuchsia-500 group-hover:text-white"></i><span>Audio</span>
+                                <i class="fas fa-music mb-2 text-fuchsia-500"></i><span>Audio</span>
                             </button>
                             <button onclick="document.getElementById('upload-input-lyrics').click()" id="upload-btn-lyrics" class="upload-btn group">
-                                <i class="fas fa-align-center mb-2 text-blue-500 group-hover:text-white"></i><span>Paroles</span>
+                                <i class="fas fa-align-center mb-2 text-blue-500"></i><span>Paroles</span>
                             </button>
                             <button onclick="document.getElementById('upload-input-sheet').click()" id="upload-btn-sheet" class="upload-btn group">
-                                <i class="fas fa-scroll mb-2 text-orange-500 group-hover:text-white"></i><span>Partit.</span>
+                                <i class="fas fa-scroll mb-2 text-orange-500"></i><span>Partit.</span>
                             </button>
                         </div>
 
@@ -367,7 +374,7 @@
     </div>
 
     <div id="assign-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-sm">
+        <div class="bg-[#1a0b2e] border border-fuchsia-500/30 rounded-2xl p-6 w-full max-w-sm">
             <h3 class="text-white font-bold uppercase text-xs mb-4 text-center border-b border-white/10 pb-2" id="modal-slot-info">Date</h3>
             <div id="modal-artist-list" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
             <button onclick="removeAssignment()" class="w-full mt-4 py-3 border border-red-500/30 text-red-400 rounded-lg text-xs font-bold uppercase">Retirer l'artiste</button>
@@ -406,6 +413,7 @@
         window.uploadSingleFile = function(input, type, btnId, targetId) {
             const file = input.files[0]; if (!file) return;
             const btn = document.getElementById(btnId);
+            const originalHTML = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
             btn.classList.add('opacity-50');
 
@@ -429,7 +437,15 @@
             const btn = document.getElementById(btnId);
             btn.classList.remove('opacity-50');
             btn.classList.add('upload-success');
-            btn.innerHTML = `<i class="fas fa-check-circle text-lg"></i>`;
+            
+            // On s'assure que le label reste mais on ajoute une petite coche discrète
+            const labels = {
+                'upload-btn-audio': { icon: 'fas fa-music', text: 'Audio' },
+                'upload-btn-lyrics': { icon: 'fas fa-align-center', text: 'Paroles' },
+                'upload-btn-sheet': { icon: 'fas fa-scroll', text: 'Partit.' }
+            };
+            const info = labels[btnId];
+            btn.innerHTML = `<i class="${info.icon} mb-2"></i><span>${info.text} <i class="fas fa-check-circle text-[8px] ml-1"></i></span>`;
         }
 
         window.changeMonth = (offset) => { currentDate.setMonth(currentDate.getMonth() + offset); renderPlanning(); };
@@ -683,8 +699,35 @@
         window.checkAdminPassword = () => { if(document.getElementById('admin-pass-input').value==='mondaine') { isAdminMode=true; document.getElementById('admin-setlist-controls').classList.remove('hidden'); updateAdminUI(); closeModal('password-modal'); } };
         window.updateAdminUI = () => { document.getElementById('admin-nav-item').classList.toggle('hidden', !isAdminMode); renderPlanning(); renderSetlistPublic(); };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-        window.handleCellClick = (d, s) => { currentEditSlot = {dateStr:d, slot:s}; renderModalArtists(); document.getElementById('assign-modal').classList.remove('hidden'); };
-        function renderModalArtists() { document.getElementById('modal-artist-list').innerHTML = ARTISTS.map(a => `<button onclick="setAssign('${a.id}')" class="${a.color} p-3 rounded font-bold text-[10px] uppercase shadow-md">${a.name}</button>`).join(''); }
+        
+        window.handleCellClick = (d, s) => { 
+            currentEditSlot = {dateStr:d, slot:s}; 
+            renderModalArtists(s); 
+            document.getElementById('assign-modal').classList.remove('hidden'); 
+        };
+
+        function renderModalArtists(slotName) { 
+            const listContainer = document.getElementById('modal-artist-list');
+            const slotInfo = document.getElementById('modal-slot-info');
+            
+            // Déduction du rôle requis selon le slot cliqué
+            let roleRequired = '';
+            let label = '';
+            if(slotName.startsWith('chant')) { roleRequired = 'chant'; label = 'CHANT'; }
+            else if(slotName === 'piano') { roleRequired = 'piano'; label = 'PIANO'; }
+            else if(slotName === 'basse') { roleRequired = 'basse'; label = 'BASSE'; }
+            else if(slotName === 'drum') { roleRequired = 'drum'; label = 'DRUM'; }
+            
+            slotInfo.innerText = `Assigner un artiste (${label})`;
+            
+            const filtered = ARTISTS.filter(a => a.role === roleRequired);
+            if(filtered.length === 0) {
+                listContainer.innerHTML = `<div class="col-span-2 py-4 text-center text-[10px] text-gray-500 uppercase font-bold italic">Aucun artiste créé pour ce poste</div>`;
+            } else {
+                listContainer.innerHTML = filtered.map(a => `<button onclick="setAssign('${a.id}')" class="${a.color} p-3 rounded font-bold text-[10px] uppercase shadow-md active:scale-95 transition-transform">${a.name}</button>`).join(''); 
+            }
+        }
+
         window.setAssign = async (id) => { await setDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`), { artistId: id }); closeModal('assign-modal'); };
         window.removeAssignment = async () => { await deleteDoc(PUBLIC_DOC('planning', `${currentEditSlot.dateStr}_${currentEditSlot.slot}`)); closeModal('assign-modal'); };
 
@@ -722,9 +765,12 @@
             document.getElementById('audio-sheet-input').value = t.sheet || '';
             document.getElementById('audio-youtube-input').value = t.youtube || '';
             document.getElementById('audio-form-status').innerText = "Modification : " + t.title;
+            
+            // Mise à jour visuelle des boutons sans masquer les labels
             if(t.src) setUploadSuccessUI('upload-btn-audio');
             if(t.lyrics) setUploadSuccessUI('upload-btn-lyrics');
             if(t.sheet) setUploadSuccessUI('upload-btn-sheet');
+            
             showPage('admin-panel');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
